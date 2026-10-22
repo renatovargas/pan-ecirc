@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Renato Vargas">
+<meta name="description" content="Procesamiento de la base EDGAR para Panamá, 1970 a 2025, y asignación de las categorías del IPCC a los sectores de la Hoja de Ruta de Economía Circular">
+
+<title>Memoria de cálculo 5: emisiones de gases de efecto invernadero de Panamá por sector de política – PAN ECIRC</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-71fbcc4293f9c007eba8de2da594bbc4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<link href="../../../site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="../../../site_libs/tabwid-1.1.3/tabwid.js"></script>
+
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../documentos/estilos.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">PAN ECIRC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../../materiales/index.html" aria-current="page"> 
+<span class="menu-text">Materiales</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">Acerca de</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../materiales/calculos/c01-mapeo-sectores/index.html">Memorias de cálculo</a></li><li class="breadcrumb-item"><a href="../../../materiales/calculos/c05-emisiones-ghg/index.html">C5. Emisiones de GEI</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Materiales</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1a-metodologia/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1a. Metodología</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1b-plan-de-trabajo/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1b. Plan de trabajo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1c-sectores-economicos-priorizados/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1c. Sectores económicos priorizados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Memorias de cálculo</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c01-mapeo-sectores/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C1. Mapeo de sectores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c02-cuentas-sectoriales/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C2. Cuentas por actividad y sector</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c03-empleo-sectorial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C3. Empleo, género e informalidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c04-eslabonamientos/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C4. Eslabonamientos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c05-emisiones-ghg/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">C5. Emisiones de GEI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c06-recursos-y-residuos/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C6. Recursos y residuos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c07-inversion-y-estructura-empresarial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C7. Inversión y estructura empresarial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c08-base-sectorial-integrada/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C8. Base sectorial integrada</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Presentaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/presentaciones/01-ejemplo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación de ejemplo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción"><span class="header-section-number">1</span> Introducción</a></li>
+  <li><a href="#preámbulo" id="toc-preámbulo" class="nav-link" data-scroll-target="#preámbulo"><span class="header-section-number">2</span> Preámbulo</a></li>
+  <li><a href="#lectura-de-la-base-para-panamá" id="toc-lectura-de-la-base-para-panamá" class="nav-link" data-scroll-target="#lectura-de-la-base-para-panamá"><span class="header-section-number">3</span> Lectura de la base para Panamá</a></li>
+  <li><a href="#formato-largo" id="toc-formato-largo" class="nav-link" data-scroll-target="#formato-largo"><span class="header-section-number">4</span> Formato largo</a></li>
+  <li><a href="#asignación-de-categorías-del-ipcc-a-sectores" id="toc-asignación-de-categorías-del-ipcc-a-sectores" class="nav-link" data-scroll-target="#asignación-de-categorías-del-ipcc-a-sectores"><span class="header-section-number">5</span> Asignación de categorías del IPCC a sectores</a></li>
+  <li><a href="#emisiones-por-sector" id="toc-emisiones-por-sector" class="nav-link" data-scroll-target="#emisiones-por-sector"><span class="header-section-number">6</span> Emisiones por sector</a></li>
+  <li><a href="#intensidad-de-emisiones-por-valor-agregado" id="toc-intensidad-de-emisiones-por-valor-agregado" class="nav-link" data-scroll-target="#intensidad-de-emisiones-por-valor-agregado"><span class="header-section-number">7</span> Intensidad de emisiones por valor agregado</a></li>
+  <li><a href="#contraste-con-el-inventario-nacional" id="toc-contraste-con-el-inventario-nacional" class="nav-link" data-scroll-target="#contraste-con-el-inventario-nacional"><span class="header-section-number">8</span> Contraste con el inventario nacional</a></li>
+  <li><a href="#exportación" id="toc-exportación" class="nav-link" data-scroll-target="#exportación"><span class="header-section-number">9</span> Exportación</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">10</span> Referencias</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c05-emisiones-ghg/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../materiales/calculos/c01-mapeo-sectores/index.html">Memorias de cálculo</a></li><li class="breadcrumb-item"><a href="../../../materiales/calculos/c05-emisiones-ghg/index.html">C5. Emisiones de GEI</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Memoria de cálculo 5: emisiones de gases de efecto invernadero de Panamá por sector de política</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">emisiones</div>
+    <div class="quarto-category">gases de efecto invernadero</div>
+    <div class="quarto-category">EDGAR</div>
+    <div class="quarto-category">Panamá</div>
+    <div class="quarto-category">rstats</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Procesamiento de la base EDGAR para Panamá, 1970 a 2025, y asignación de las categorías del IPCC a los sectores de la Hoja de Ruta de Economía Circular
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Renato Vargas </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">22 de octubre de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introducción" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introducción</h1>
+<p>Esta memoria extrae de la base global EDGAR las emisiones de gases de efecto invernadero (GEI) de Panamá y las asigna a los seis sectores de la Hoja de Ruta de Economía Circular. Responde al criterio de emisiones de los Términos de Referencia de la consultoría.</p>
+<p>EDGAR (Emissions Database for Global Atmospheric Research) es una base del Centro Común de Investigación de la Comisión Europea que estima las emisiones de cada país con la metodología del Grupo Intergubernamental de Expertos sobre el Cambio Climático (IPCC) <span class="citation" data-cites="edgar2026ghg">(<a href="#ref-edgar2026ghg" role="doc-biblioref">European Commission, Joint Research Centre (JRC), 2026</a>)</span>. Usamos la versión que agrega todos los gases en toneladas equivalentes de dióxido de carbono con los potenciales de calentamiento a 100 años del Quinto Informe de Evaluación (AR5), por categoría de las directrices de 2006 del IPCC <span class="citation" data-cites="ipcc2006directrices">(<a href="#ref-ipcc2006directrices" role="doc-biblioref">Eggleston et&nbsp;al., 2006</a>)</span>.</p>
+<p>Hay tres límites que conviene tener presentes:</p>
+<ul>
+<li>EDGAR <strong>excluye el uso de la tierra, el cambio de uso de la tierra y la silvicultura</strong> (UTCUTS). Panamá reporta ese sector como un sumidero neto en su inventario nacional <span class="citation" data-cites="ghg-nid-2024">(<a href="#ref-ghg-nid-2024" role="doc-biblioref">Ministerio de Ambiente de Panamá, 2024, p. 62</a>)</span>, de modo que las emisiones brutas de esta base no equivalen al balance nacional.</li>
+<li>Las cifras son estimaciones globales con factores por defecto; el inventario nacional de MiAMBIENTE usa datos nacionales y no es directamente comparable. Esta memoria no concilia ambas fuentes.</li>
+<li>Las categorías del IPCC no coinciden con los sectores de política. Cuando una categoría atraviesa varios sectores, la asignamos al sector principal y lo anotamos.</li>
+</ul>
+</section>
+<section id="preámbulo" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Preámbulo</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limpiar el área de trabajo</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Funciones y constantes compartidas</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"materiales/calculos/scripts/funciones_comunes.R"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="lectura-de-la-base-para-panamá" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Lectura de la base para Panamá</h1>
+<p>La hoja <code>IPCC 2006</code> tiene unas 7.500 filas para todos los países. Las primeras diez filas son metadatos y la décima contiene los nombres de columna. Leemos la hoja como texto, fijamos los nombres, filtramos Panamá (código <code>PAN</code>) y convertimos los años a números.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>archivo_edgar <span class="ot">&lt;-</span> <span class="st">"data/EDGAR/EDGAR_AR5_GHG_1970_2025.xlsx"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>crudo <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  archivo_edgar,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">sheet =</span> <span class="st">"IPCC 2006"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_names =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="st">"text"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">.name_repair =</span> <span class="st">"minimal"</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Nombres de columna: la fila 10; las columnas finales sin nombre se rellenan</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>nombres <span class="ot">&lt;-</span> <span class="fu">as.character</span>(crudo[<span class="dv">10</span>, ])</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>nombres[<span class="fu">is.na</span>(nombres)] <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"extra"</span>, <span class="fu">seq_len</span>(<span class="fu">sum</span>(<span class="fu">is.na</span>(nombres))))</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>edgar <span class="ot">&lt;-</span> crudo[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>), ]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(edgar) <span class="ot">&lt;-</span> nombres</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>panama <span class="ot">&lt;-</span> edgar <span class="sc">|&gt;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Country_code_A3 <span class="sc">==</span> <span class="st">"PAN"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">"Y_"</span>), as.numeric))</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(panama)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 32 64</code></pre>
+</div>
+</div>
+<p>La base separa algunas categorías en emisiones de origen fósil y de biomasa. Muchas celdas están vacías (no hay estimación para ese año). Al sumar usamos <code>na.rm = TRUE</code>, es decir, tratamos la celda vacía como cero.</p>
+</section>
+<section id="formato-largo" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Formato largo</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>emisiones <span class="ot">&lt;-</span> panama <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">codigo_ipcc =</span> ipcc_code_2006_for_standard_report,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">categoria_ipcc =</span> ipcc_code_2006_for_standard_report_name,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">origen =</span> fossil_bio,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">starts_with</span>(<span class="st">"Y_"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">"Y_"</span>), <span class="at">names_to =</span> <span class="st">"anio"</span>, <span class="at">values_to =</span> <span class="st">"emisiones_gg"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">anio =</span> <span class="fu">as.numeric</span>(<span class="fu">str_remove</span>(anio, <span class="st">"Y_"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">emisiones_gg =</span> <span class="fu">sum</span>(emisiones_gg, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(anio, codigo_ipcc, categoria_ipcc)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Total nacional por año (Gg de CO2 equivalente, sin UTCUTS)</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>emisiones <span class="sc">|&gt;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_gg =</span> <span class="fu">sum</span>(emisiones_gg), <span class="at">.by =</span> anio) <span class="sc">|&gt;</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(anio <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1990</span>, <span class="dv">2000</span>, <span class="dv">2010</span>, <span class="dv">2018</span>, <span class="dv">2019</span>, <span class="dv">2020</span>, <span class="dv">2021</span>, <span class="dv">2022</span>, <span class="dv">2023</span>, <span class="dv">2024</span>, <span class="dv">2025</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 2
+    anio total_gg
+   &lt;dbl&gt;    &lt;dbl&gt;
+ 1  1990    6912.
+ 2  2000    9811.
+ 3  2010   15011.
+ 4  2018   16241.
+ 5  2019   19580.
+ 6  2020   16194.
+ 7  2021   17610.
+ 8  2022   18821.
+ 9  2023   19779.
+10  2024   19582.
+11  2025   19987.</code></pre>
+</div>
+</div>
+</section>
+<section id="asignación-de-categorías-del-ipcc-a-sectores" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Asignación de categorías del IPCC a sectores</h1>
+<p>Escribimos la tabla de asignación. Las razones de las asignaciones menos obvias se anotan en la columna <code>nota</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>asignacion_ipcc <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>codigo_ipcc, <span class="sc">~</span>sector_principal, <span class="sc">~</span>nota,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.A.1.a"</span>,  <span class="st">"Energía"</span>, <span class="st">"Generación de electricidad y calor"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.A.1.bc"</span>, <span class="st">"Energía"</span>, <span class="st">"Refinación y combustibles sólidos"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.A.2"</span>,    <span class="st">"Industrias"</span>, <span class="st">"Combustión en industria manufacturera y construcción; no se puede separar la construcción"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.A.3.a"</span>,  <span class="st">"Resto de la economía"</span>, <span class="st">"Aviación civil"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.A.3.b"</span>,  <span class="st">"Resto de la economía"</span>, <span class="st">"Transporte por carretera"</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.A.3.e"</span>,  <span class="st">"Resto de la economía"</span>, <span class="st">"Otro transporte"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.A.4"</span>,    <span class="st">"Resto de la economía"</span>, <span class="st">"Comercial, residencial y agropecuario; no se puede separar"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.B.1"</span>,    <span class="st">"Energía"</span>, <span class="st">"Emisiones fugitivas de combustibles sólidos"</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"1.B.2"</span>,    <span class="st">"Energía"</span>, <span class="st">"Emisiones fugitivas de petróleo y gas"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2.A.1"</span>,    <span class="st">"Industrias"</span>, <span class="st">"Producción de cemento"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2.A.2"</span>,    <span class="st">"Industrias"</span>, <span class="st">"Producción de cal"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2.A.3"</span>,    <span class="st">"Industrias"</span>, <span class="st">"Producción de vidrio"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2.A.4"</span>,    <span class="st">"Industrias"</span>, <span class="st">"Otros usos de carbonatos"</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2.D"</span>,      <span class="st">"Industrias"</span>, <span class="st">"Productos no energéticos de combustibles y uso de solventes"</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2.F"</span>,      <span class="st">"Resto de la economía"</span>, <span class="st">"Sustitutos de sustancias que agotan el ozono (refrigeración y climatización)"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2.G"</span>,      <span class="st">"Industrias"</span>, <span class="st">"Otra manufactura y uso de productos"</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3.A.1"</span>,    <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Fermentación entérica"</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3.A.2"</span>,    <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Manejo de estiércol"</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3.C.1"</span>,    <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Quema de biomasa"</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3.C.4"</span>,    <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Emisiones directas de N2O de suelos manejados"</span>,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3.C.5"</span>,    <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Emisiones indirectas de N2O de suelos manejados"</span>,</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3.C.6"</span>,    <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Emisiones indirectas de N2O del manejo de estiércol"</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"3.C.7"</span>,    <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Cultivo de arroz"</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">"4.A"</span>,      <span class="st">"Residuos"</span>, <span class="st">"Disposición de residuos sólidos"</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="st">"4.D"</span>,      <span class="st">"Residuos"</span>, <span class="st">"Aguas residuales; atañe también a recursos hídricos"</span>,</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">"4.E"</span>,      <span class="st">"Residuos"</span>, <span class="st">"Otros"</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">"5.A"</span>,      <span class="st">"Resto de la economía"</span>, <span class="st">"N2O indirecto por deposición atmosférica"</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Verificamos que todas las categorías de Panamá tengan asignación y que no sobre ninguna.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Categorías de EDGAR sin asignar</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(<span class="fu">unique</span>(emisiones<span class="sc">$</span>codigo_ipcc), asignacion_ipcc<span class="sc">$</span>codigo_ipcc)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Asignaciones sin categoría en EDGAR</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(asignacion_ipcc<span class="sc">$</span>codigo_ipcc, <span class="fu">unique</span>(emisiones<span class="sc">$</span>codigo_ipcc))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+</div>
+<p>Unimos las emisiones con la asignación y ordenamos los sectores.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>emisiones_categoria <span class="ot">&lt;-</span> emisiones <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(asignacion_ipcc, <span class="at">by =</span> <span class="st">"codigo_ipcc"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sector_principal =</span> <span class="fu">factor</span>(sector_principal, <span class="at">levels =</span> sectores_politica))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="emisiones-por-sector" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Emisiones por sector</h1>
+<p>Sumamos por sector y año, y calculamos la participación en el total nacional sin UTCUTS. Los sectores de recursos hídricos y de ciudades y construcción no tienen una categoría propia del IPCC: sus emisiones están dentro de residuos (aguas residuales) y de industrias (cemento y combustión), respectivamente.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>emisiones_sector <span class="ot">&lt;-</span> emisiones_categoria <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">emisiones_gg =</span> <span class="fu">sum</span>(emisiones_gg), <span class="at">.by =</span> <span class="fu">c</span>(anio, sector_principal)) <span class="sc">|&gt;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">participacion =</span> <span class="dv">100</span> <span class="sc">*</span> emisiones_gg <span class="sc">/</span> <span class="fu">sum</span>(emisiones_gg), <span class="at">.by =</span> anio) <span class="sc">|&gt;</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(anio, sector_principal)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>emisiones_sector <span class="sc">|&gt;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2023</span>) <span class="sc">|&gt;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">1</span>)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+   anio sector_principal        emisiones_gg participacion
+  &lt;dbl&gt; &lt;fct&gt;                          &lt;dbl&gt;         &lt;dbl&gt;
+1  2023 Residuos                       1898.           9.6
+2  2023 Energía                        4163.          21  
+3  2023 Industrias                     2328.          11.8
+4  2023 Agricultura y alimentos        3790.          19.2
+5  2023 Resto de la economía           7601.          38.4</code></pre>
+</div>
+</div>
+</section>
+<section id="intensidad-de-emisiones-por-valor-agregado" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Intensidad de emisiones por valor agregado</h1>
+<p>Combinamos las emisiones con el valor agregado de la memoria 2 para calcular toneladas de CO₂ equivalente por balboa de valor agregado. El cálculo solo es informativo para los sectores donde el sector de emisiones y el sector económico coinciden razonablemente: energía, residuos, industrias, y agricultura y alimentos. Para recursos hídricos y construcción no se calcula, porque sus emisiones están en categorías de otros sectores.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>cuentas_sector <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"cuentas_sector_2018_2024"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>intensidad_sector <span class="ot">&lt;-</span> emisiones_sector <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(cuentas_sector, anio, sector_principal, vab),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"anio"</span>, <span class="st">"sector_principal"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Gg de CO2e por millón de B/.; equivale a toneladas por millar de B/.</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">intensidad_gg_por_millon =</span> emisiones_gg <span class="sc">/</span> vab,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">intensidad_calculable =</span> sector_principal <span class="sc">%in%</span> <span class="fu">c</span>(</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Energía"</span>, <span class="st">"Residuos"</span>, <span class="st">"Industrias"</span>, <span class="st">"Agricultura y alimentos"</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">intensidad_gg_por_millon =</span> <span class="fu">if_else</span>(intensidad_calculable, intensidad_gg_por_millon, <span class="cn">NA_real_</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>intensidad_calculable)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>emisiones_sector <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2023</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(intensidad_sector, anio, sector_principal, vab, intensidad_gg_por_millon),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"anio"</span>, <span class="st">"sector_principal"</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Sector =</span> sector_principal,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Emisiones (Gg CO2e)</span><span class="st">`</span> <span class="ot">=</span> emisiones_gg,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Participación (%)</span><span class="st">`</span> <span class="ot">=</span> participacion,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Valor agregado (millones B/.)</span><span class="st">`</span> <span class="ot">=</span> vab,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Intensidad (Gg CO2e por millón B/.)</span><span class="st">`</span> <span class="ot">=</span> intensidad_gg_por_millon</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabla_ft</span>(<span class="at">digitos =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-emisiones-2023" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-emisiones-2023-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;1: Emisiones de GEI (sin UTCUTS) y valor agregado por sector, 2023
+</figcaption>
+<div aria-describedby="tbl-emisiones-2023-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-d8bad469{}.cl-84f4c6e9{font-family:'Arial';font-size:9pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-12bdf8a2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-59bf8534{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-baa840e6{width:1.476in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8f70b13c{width:1.434in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-81cf1af2{width:1.156in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-8b2b58c2{width:1.83in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-80179f37{width:2.198in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-eed4d2a6{width:1.476in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7b7743ec{width:1.434in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3ff32cc1{width:1.156in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dc153ce3{width:1.83in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-029450c1{width:2.198in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-084fcb06{width:1.476in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-c2955c1c{width:1.434in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-dbcb7455{width:1.156in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-30c6db5f{width:1.83in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a7a662bb{width:2.198in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-d8bad469"><thead><tr style="overflow-wrap:break-word;"><th class="cl-baa840e6"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Sector</span></p></th><th class="cl-8f70b13c"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Emisiones (Gg CO2e)</span></p></th><th class="cl-81cf1af2"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Participación (%)</span></p></th><th class="cl-8b2b58c2"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Valor agregado (millones B/.)</span></p></th><th class="cl-80179f37"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Intensidad (Gg CO2e por millón B/.)</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-eed4d2a6"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Residuos</span></p></td><td class="cl-7b7743ec"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1,897.8</span></p></td><td class="cl-3ff32cc1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">9.6</span></p></td><td class="cl-dc153ce3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">84.4</span></p></td><td class="cl-029450c1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">22.5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-eed4d2a6"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Energía</span></p></td><td class="cl-7b7743ec"><p class="cl-59bf8534"><span class="cl-84f4c6e9">4,163.1</span></p></td><td class="cl-3ff32cc1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">21.0</span></p></td><td class="cl-dc153ce3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1,695.7</span></p></td><td class="cl-029450c1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2.5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-eed4d2a6"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Industrias</span></p></td><td class="cl-7b7743ec"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2,327.8</span></p></td><td class="cl-3ff32cc1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">11.8</span></p></td><td class="cl-dc153ce3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2,296.8</span></p></td><td class="cl-029450c1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.0</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-eed4d2a6"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Agricultura y alimentos</span></p></td><td class="cl-7b7743ec"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3,789.7</span></p></td><td class="cl-3ff32cc1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">19.2</span></p></td><td class="cl-dc153ce3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3,945.1</span></p></td><td class="cl-029450c1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.0</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-084fcb06"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Resto de la economía</span></p></td><td class="cl-c2955c1c"><p class="cl-59bf8534"><span class="cl-84f4c6e9">7,600.8</span></p></td><td class="cl-dbcb7455"><p class="cl-59bf8534"><span class="cl-84f4c6e9">38.4</span></p></td><td class="cl-30c6db5f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">59,279.3</span></p></td><td class="cl-a7a662bb"><p class="cl-59bf8534"><span class="cl-84f4c6e9"></span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="contraste-con-el-inventario-nacional" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Contraste con el inventario nacional</h1>
+<p>El Documento de Inventario Nacional 2024 de MiAMBIENTE reporta las emisiones de 2021 por sector del IPCC <span class="citation" data-cites="ghg-nid-2024">(<a href="#ref-ghg-nid-2024" role="doc-biblioref">Ministerio de Ambiente de Panamá, 2024, p. 62</a>, tabla 2.2)</span>. Transcribimos esas cifras (en kilotoneladas de CO₂ equivalente) y las comparamos con las de EDGAR para el mismo año. Los dos inventarios usan datos de actividad y factores diferentes, y la comparación sirve solo para ver el orden de magnitud.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>nacional_2021 <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>grupo_ipcc, <span class="sc">~</span>nacional_kt,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Energía"</span>, <span class="fl">13440.0</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Procesos industriales y uso de productos"</span>, <span class="fl">1616.5</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Agricultura"</span>, <span class="fl">4150.2</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Residuos"</span>, <span class="fl">1312.6</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>edgar_2021 <span class="ot">&lt;-</span> emisiones_categoria <span class="sc">|&gt;</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2021</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">grupo_ipcc =</span> <span class="fu">case_when</span>(</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_starts</span>(codigo_ipcc, <span class="st">"1"</span>) <span class="sc">~</span> <span class="st">"Energía"</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_starts</span>(codigo_ipcc, <span class="st">"2"</span>) <span class="sc">~</span> <span class="st">"Procesos industriales y uso de productos"</span>,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_starts</span>(codigo_ipcc, <span class="st">"3"</span>) <span class="sc">~</span> <span class="st">"Agricultura"</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">str_starts</span>(codigo_ipcc, <span class="st">"4"</span>) <span class="sc">~</span> <span class="st">"Residuos"</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Otros (N2O indirecto)"</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">edgar_kt =</span> <span class="fu">sum</span>(emisiones_gg), <span class="at">.by =</span> grupo_ipcc)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>contraste_inventario <span class="ot">&lt;-</span> nacional_2021 <span class="sc">|&gt;</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(edgar_2021, <span class="at">by =</span> <span class="st">"grupo_ipcc"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">razon_edgar_nacional =</span> edgar_kt <span class="sc">/</span> nacional_kt)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>contraste_inventario <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Sector del IPCC</span><span class="st">`</span> <span class="ot">=</span> grupo_ipcc,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Inventario nacional</span><span class="st">`</span> <span class="ot">=</span> nacional_kt,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">EDGAR =</span> edgar_kt,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">EDGAR / nacional</span><span class="st">`</span> <span class="ot">=</span> razon_edgar_nacional</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabla_ft</span>(<span class="at">digitos =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-contraste-inventario" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-contraste-inventario-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;2: Emisiones de 2021 según el inventario nacional y según EDGAR (kt CO2e, sin UTCUTS)
+</figcaption>
+<div aria-describedby="tbl-contraste-inventario-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-d8bad469{}.cl-84f4c6e9{font-family:'Arial';font-size:9pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-12bdf8a2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-59bf8534{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-b4202a0c{width:2.49in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-76d22e2e{width:1.26in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-07d01da3{width:0.767in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-536d8062{width:1.225in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-b1120288{width:2.49in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6c443729{width:1.26in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f99a94d3{width:0.767in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f3ef86c6{width:1.225in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9b6f2bdb{width:2.49in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-59eecabb{width:1.26in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9a63a937{width:0.767in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6989d6dc{width:1.225in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-d8bad469"><thead><tr style="overflow-wrap:break-word;"><th class="cl-b4202a0c"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Sector del IPCC</span></p></th><th class="cl-76d22e2e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Inventario nacional</span></p></th><th class="cl-07d01da3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">EDGAR</span></p></th><th class="cl-536d8062"><p class="cl-59bf8534"><span class="cl-84f4c6e9">EDGAR / nacional</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-b1120288"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Energía</span></p></td><td class="cl-6c443729"><p class="cl-59bf8534"><span class="cl-84f4c6e9">13,440.00</span></p></td><td class="cl-f99a94d3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">10,626.74</span></p></td><td class="cl-f3ef86c6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.79</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b1120288"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Procesos industriales y uso de productos</span></p></td><td class="cl-6c443729"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1,616.50</span></p></td><td class="cl-f99a94d3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1,322.41</span></p></td><td class="cl-f3ef86c6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.82</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-b1120288"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Agricultura</span></p></td><td class="cl-6c443729"><p class="cl-59bf8534"><span class="cl-84f4c6e9">4,150.20</span></p></td><td class="cl-f99a94d3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3,790.36</span></p></td><td class="cl-f3ef86c6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.91</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-9b6f2bdb"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Residuos</span></p></td><td class="cl-59eecabb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1,312.60</span></p></td><td class="cl-9a63a937"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1,792.82</span></p></td><td class="cl-6989d6dc"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.37</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="exportación" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Exportación</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(contraste_inventario, <span class="st">"contraste_edgar_inventario_nacional_2021"</span>, <span class="at">hoja =</span> <span class="st">"contraste"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(emisiones_categoria, <span class="st">"emisiones_panama_categoria_ipcc"</span>, <span class="at">hoja =</span> <span class="st">"categoria"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(emisiones_sector, <span class="st">"emisiones_sector_1970_2025"</span>, <span class="at">hoja =</span> <span class="st">"sector"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(intensidad_sector, <span class="st">"intensidad_emisiones_sector"</span>, <span class="at">hoja =</span> <span class="st">"intensidad"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(asignacion_ipcc, <span class="st">"asignacion_ipcc_sector"</span>, <span class="at">hoja =</span> <span class="st">"asignacion"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>La serie <code>emisiones_panama_categoria_ipcc</code> conserva toda la historia de 1970 a 2025 por categoría. <code>emisiones_sector_1970_2025</code> y <code>intensidad_emisiones_sector</code> son las tablas que usan los documentos.</p>
+</section>
+<section id="referencias" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Referencias</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-ipcc2006directrices" class="csl-entry" role="listitem">
+Eggleston, H. S., Buendia, L., Miwa, K., Ngara, T., &amp; Tanabe, K. (Eds.). (2006). <em>Directrices del IPCC de 2006 para los inventarios nacionales de gases de efecto invernadero</em>. Instituto de Estrategias Ambientales Globales (IGES), para el Grupo Intergubernamental de Expertos sobre el Cambio Climático. <a href="https://www.ipcc-nggip.iges.or.jp/public/2006gl/spanish/index.html">https://www.ipcc-nggip.iges.or.jp/public/2006gl/spanish/index.html</a>
+</div>
+<div id="ref-edgar2026ghg" class="csl-entry" role="listitem">
+European Commission, Joint Research Centre (JRC). (2026). <em><span>EDGAR</span> (Emissions Database for Global Atmospheric Research), <span>EDGAR_2026_GHG</span>: emisiones de gases de efecto invernadero por país y categoría, 1970-2025, potenciales de calentamiento AR5</em>. <a href="https://edgar.jrc.ec.europa.eu/dataset_ghg2026">https://edgar.jrc.ec.europa.eu/dataset_ghg2026</a>
+</div>
+<div id="ref-ghg-nid-2024" class="csl-entry" role="listitem">
+Ministerio de Ambiente de Panamá. (2024). <em>Documento de Inventario Nacional 2024: Inventario Nacional de Gases de Efecto Invernadero de Panamá 2000-2021</em>. <span>Ministerio de Ambiente de Panamá</span>. <a href="https://transparencia-climatica.miambiente.gob.pa/wp-content/uploads/2024/07/2024_DIN_PA_vfinal.pdf">https://transparencia-climatica.miambiente.gob.pa/wp-content/uploads/2024/07/2024_DIN_PA_vfinal.pdf</a>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c05-emisiones-ghg/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></div></div></footer></body></html>

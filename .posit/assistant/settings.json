@@ -1,0 +1,31 @@
+{
+  "permission": {
+    "bash": {
+      "cd *": "allow",
+      "unzip *": "allow",
+      "sed *": "allow",
+      "head *": "allow",
+      "cat *": "allow",
+      "python3 *": "allow",
+      "which *": "allow",
+      "ls *": "allow",
+      "Rscript *": "allow"
+    },
+    "executeCode": {
+      "*": "allow"
+    },
+    "task": {
+      "general": "allow"
+    },
+    "webfetch": {
+      "https://www.ecolex.org/*": "allow",
+      "https://www.fao.org/*": "allow",
+      "https://www.bing.com/*": "allow",
+      "https://html.duckduckgo.com/*": "allow",
+      "https://www.unepfi.org/*": "allow",
+      "https://search.brave.com/*": "allow",
+      "https://lite.duckduckgo.com/*": "allow",
+      "https://eur-lex.europa.eu/*": "allow"
+    }
+  }
+}

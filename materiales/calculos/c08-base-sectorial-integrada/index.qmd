@@ -1,0 +1,409 @@
+---
+title: "Memoria de cálculo 8: base sectorial integrada para el análisis de los sectores priorizados"
+description: "Integración de los indicadores de producto, empleo, comercio exterior, inversión, estructura empresarial, emisiones, recursos, recuperación de materiales y eslabonamientos por sector de la Hoja de Ruta de Economía Circular"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - base integrada
+  - indicadores sectoriales
+  - economía circular
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Esta memoria junta en una sola base los indicadores de las memorias 2 a 7, de modo que cada sector de la Hoja de Ruta de Economía Circular [@miambiente2024HojaRutaEC] tenga un valor para cada criterio de evaluación de los Términos de Referencia. La base resultante, `data/outputs/sectores_priorizados.rds`, es la fuente de verdad del documento de análisis sectorial.
+
+Cada indicador lleva su año, su unidad, la memoria que lo calcula y una **bandera de calidad**:
+
+- **Alta:** dato oficial desagregable a las actividades del sector, sin supuestos de asignación.
+- **Media:** dato oficial que requiere un supuesto de asignación (por ejemplo, de producto a actividad o de sección a sector).
+- **Baja:** dato disponible solo para un grupo de sectores, de una sección más amplia, o de una fuente externa con cobertura limitada.
+- **Sin dato:** el criterio no tiene una fuente cuantitativa disponible; se trata cualitativamente en el documento.
+
+Se evalúan los seis sectores de política. La categoría "Resto de la economía" se incluye como referencia para calcular participaciones, pero no entra en las comparaciones.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+
+seis_sectores <- sectores_politica[1:6]
+```
+
+# Lectura de las salidas anteriores
+
+```{r}
+#| label: lectura
+
+cuentas <- leer_salida("cuentas_sector_2018_2024")
+crecimiento <- leer_salida("crecimiento_vab_sector")
+empleo <- leer_salida("empleo_sector_2018_2024")
+empleo_perfil <- leer_salida("empleo_sector_perfil_2024")
+enlaces <- leer_salida("eslabonamientos_sector_mip2018")
+emisiones <- leer_salida("emisiones_sector_1970_2025")
+intensidad <- leer_salida("intensidad_emisiones_sector")
+energia <- leer_salida("energia_sector_2018_2024")
+agua <- leer_salida("agua_uso_sector_2022")
+ied <- leer_salida("ied_grupo_sector_2022_2024")
+estructura <- leer_salida("estructura_empresarial_sector_2022")
+composicion <- leer_salida("residuos_composicion_2021")
+otros_residuos <- leer_salida("residuos_otros_indicadores")
+```
+
+# Indicadores por criterio
+
+Construimos cada criterio como una tabla de tres columnas: sector, indicador y valor, con su metadato. Al final se unen.
+
+## Producto interno bruto
+
+```{r}
+#| label: crit-pib
+
+pib <- bind_rows(
+  cuentas |>
+    filter(anio == 2024) |>
+    transmute(sector_principal, indicador = "Valor agregado bruto", valor = vab,
+              unidad = "millones de B/.", anio = 2024),
+  cuentas |>
+    filter(anio == 2024) |>
+    transmute(sector_principal, indicador = "Participación en el valor agregado", valor = participacion_vab,
+              unidad = "%", anio = 2024),
+  crecimiento |>
+    transmute(sector_principal, indicador = "Crecimiento anual compuesto del valor agregado",
+              valor = tcac_vab_2018_2024, unidad = "% anual (2018-2024)", anio = 2024)
+) |>
+  mutate(criterio = "PIB", memoria = "c02", calidad = "Alta")
+```
+
+## Empleo
+
+```{r}
+#| label: crit-empleo
+
+empleo_2024 <- empleo |> filter(anio == 2024)
+
+empleo_crit <- bind_rows(
+  empleo_2024 |>
+    transmute(sector_principal, indicador = "Puestos de trabajo", valor = puestos,
+              unidad = "puestos", anio = 2024, calidad = "Alta"),
+  empleo_2024 |>
+    transmute(sector_principal, indicador = "Participación en el empleo", valor = participacion_empleo,
+              unidad = "%", anio = 2024, calidad = "Alta"),
+  empleo_2024 |>
+    transmute(sector_principal, indicador = "Remuneración media por asalariado", valor = remuneracion_media,
+              unidad = "miles de B/. al año", anio = 2024, calidad = "Alta"),
+  empleo_perfil |>
+    transmute(sector_principal, indicador = "Mujeres en el empleo (estimado)", valor = pct_mujeres_est,
+              unidad = "%", anio = 2024, calidad = "Media"),
+  empleo_perfil |>
+    transmute(sector_principal, indicador = "Empleo informal (estimado)", valor = pct_informal_est,
+              unidad = "%", anio = 2024, calidad = "Media")
+) |>
+  mutate(criterio = "Empleo", memoria = "c03")
+```
+
+## Comercio exterior y competitividad
+
+La competitividad se aproxima con tres indicadores: las exportaciones, el saldo comercial y la apertura (exportaciones sobre producción). El coeficiente de importación de insumos de la matriz insumo-producto mide la dependencia de insumos importados.
+
+```{r}
+#| label: crit-comercio
+
+comercio_2024 <- cuentas |>
+  filter(anio == 2024) |>
+  mutate(
+    saldo = exportaciones - importaciones,
+    apertura = 100 * exportaciones / produccion
+  )
+
+comercio <- bind_rows(
+  comercio_2024 |>
+    transmute(sector_principal, indicador = "Exportaciones", valor = exportaciones,
+              unidad = "millones de B/.", anio = 2024, calidad = "Media"),
+  comercio_2024 |>
+    transmute(sector_principal, indicador = "Importaciones", valor = importaciones,
+              unidad = "millones de B/.", anio = 2024, calidad = "Media"),
+  comercio_2024 |>
+    transmute(sector_principal, indicador = "Saldo comercial", valor = saldo,
+              unidad = "millones de B/.", anio = 2024, calidad = "Media"),
+  comercio_2024 |>
+    transmute(sector_principal, indicador = "Exportaciones sobre producción", valor = apertura,
+              unidad = "%", anio = 2024, calidad = "Media"),
+  enlaces |>
+    transmute(sector_principal, indicador = "Importaciones de insumos sobre producción",
+              valor = 100 * coef_importacion, unidad = "% (2018)", anio = 2018, calidad = "Media")
+) |>
+  mutate(criterio = "Comercio exterior", memoria = "c02 y c04")
+```
+
+## Inversión
+
+La inversión extranjera directa solo se publica para la sección de electricidad, gas y agua en conjunto. Repetimos el valor del grupo en los tres sectores que contiene y lo marcamos como calidad baja.
+
+```{r}
+#| label: crit-inversion
+
+ied_flujo <- ied |>
+  filter(variable == "flujo") |>
+  summarize(valor = sum(miles_balboas) / 1000, .by = grupo_sector)
+
+ied_posicion <- ied |>
+  filter(variable == "posicion", anio == 2024) |>
+  summarize(valor = sum(miles_balboas) / 1000, .by = grupo_sector)
+
+# Un sector por fila; los tres del grupo conjunto reciben el mismo valor
+grupo_de_sector <- tibble(
+  sector_principal = factor(sectores_politica, levels = sectores_politica),
+  grupo_sector = c(
+    "Energía, recursos hídricos y residuos (conjunto)",
+    "Energía, recursos hídricos y residuos (conjunto)",
+    "Energía, recursos hídricos y residuos (conjunto)",
+    "Industrias", "Agricultura y alimentos", "Ciudades y construcción",
+    "Resto de la economía"
+  )
+)
+
+inversion <- bind_rows(
+  grupo_de_sector |>
+    left_join(ied_flujo, by = "grupo_sector") |>
+    transmute(sector_principal, indicador = "IED, flujo acumulado 2022-2024", valor,
+              unidad = "millones de B/.", anio = 2024),
+  grupo_de_sector |>
+    left_join(ied_posicion, by = "grupo_sector") |>
+    transmute(sector_principal, indicador = "IED, posición al cierre", valor,
+              unidad = "millones de B/.", anio = 2024)
+) |>
+  mutate(
+    criterio = "Inversión", memoria = "c07",
+    calidad = if_else(
+      sector_principal %in% c("Residuos", "Energía", "Recursos hídricos"), "Baja", "Media"
+    )
+  )
+```
+
+## Concentración de mercado
+
+```{r}
+#| label: crit-concentracion
+
+grupo_estructura <- tibble(
+  sector_principal = factor(sectores_politica, levels = sectores_politica),
+  grupo_sector = c(
+    "Recursos hídricos y residuos", "Energía", "Recursos hídricos y residuos",
+    "Industrias", "Agricultura y alimentos", "Ciudades y construcción",
+    NA
+  )
+)
+
+concentracion <- bind_rows(
+  grupo_estructura |>
+    left_join(estructura, by = "grupo_sector") |>
+    transmute(sector_principal, indicador = "Empresas en la sección CIIU principal", valor = empresas,
+              unidad = "empresas (2022)", anio = 2022),
+  grupo_estructura |>
+    left_join(estructura, by = "grupo_sector") |>
+    transmute(sector_principal, indicador = "Empresas grandes en la sección", valor = pct_grande,
+              unidad = "% de las empresas (2022)", anio = 2022)
+) |>
+  filter(!is.na(valor)) |>
+  mutate(criterio = "Concentración de mercado", memoria = "c07", calidad = "Baja")
+```
+
+## Emisiones de gases de efecto invernadero
+
+```{r}
+#| label: crit-emisiones
+
+emisiones_2023 <- emisiones |> filter(anio == 2023)
+intensidad_2023 <- intensidad |> filter(anio == 2023)
+
+emisiones_crit <- bind_rows(
+  emisiones_2023 |>
+    transmute(sector_principal, indicador = "Emisiones de GEI (sin UTCUTS)", valor = emisiones_gg,
+              unidad = "Gg CO2e", anio = 2023),
+  emisiones_2023 |>
+    transmute(sector_principal, indicador = "Participación en las emisiones", valor = participacion,
+              unidad = "%", anio = 2023),
+  intensidad_2023 |>
+    transmute(sector_principal, indicador = "Intensidad de emisiones", valor = intensidad_gg_por_millon,
+              unidad = "Gg CO2e por millón de B/.", anio = 2023)
+) |>
+  filter(!is.na(valor)) |>
+  mutate(criterio = "Emisiones de GEI", memoria = "c05", calidad = "Media")
+```
+
+## Uso de recursos
+
+```{r}
+#| label: crit-recursos
+
+recursos <- bind_rows(
+  energia |>
+    filter(anio == 2023) |>
+    transmute(sector_principal, indicador = "Consumo de energía", valor = bep_miles,
+              unidad = "miles de bep", anio = 2023),
+  energia |>
+    filter(anio == 2023) |>
+    transmute(sector_principal, indicador = "Intensidad energética", valor = intensidad_bep_miles_por_millon,
+              unidad = "miles de bep por millón de B/.", anio = 2023),
+  agua |>
+    transmute(sector_principal, indicador = "Extracción de agua", valor = millones_m3,
+              unidad = "millones de m3", anio = 2022)
+) |>
+  mutate(criterio = "Uso de recursos", memoria = "c06", calidad = "Media")
+```
+
+El balance energético no tiene el consumo de recursos hídricos y construcción como líneas propias, y la extracción de agua solo existe para tres usos. Esos sectores quedan sin valor en esos indicadores.
+
+## Potencial de recuperación de materiales
+
+El potencial se mide por las toneladas anuales de residuos con un material recuperable asociadas a cada sector: los residuos orgánicos al sector de agricultura y alimentos, los materiales manufacturados (plástico, papel y cartón, vidrio, metal, textiles, caucho y cuero) al sector de industrias, los residuos de construcción y demolición al sector de ciudades y construcción, y el total de residuos sólidos municipales al sector de residuos, que los gestiona.
+
+```{r}
+#| label: crit-recuperacion
+
+toneladas_material <- composicion |> select(material, toneladas_anio)
+
+t_organicos <- toneladas_material |> filter(material == "Orgánicos") |> pull(toneladas_anio)
+t_manufacturados <- toneladas_material |>
+  filter(material %in% c("Plástico", "Papel y cartón", "Vidrio", "Metal", "Textiles", "Caucho y cuero")) |>
+  summarize(t = sum(toneladas_anio)) |> pull(t)
+t_total_rsm <- sum(toneladas_material$toneladas_anio)
+t_cyd <- otros_residuos |> filter(str_starts(indicador, "Construcción")) |> pull(valor)
+
+recuperacion <- tribble(
+  ~sector_principal, ~indicador, ~valor, ~unidad, ~anio, ~calidad,
+  "Agricultura y alimentos", "Residuos orgánicos municipales", t_organicos, "t/año", 2021, "Baja",
+  "Industrias", "Materiales manufacturados en residuos municipales", t_manufacturados, "t/año", 2021, "Baja",
+  "Ciudades y construcción", "Residuos de construcción y demolición", t_cyd, "t/año", 2015, "Baja",
+  "Residuos", "Residuos sólidos municipales gestionados", t_total_rsm, "t/año", 2021, "Baja"
+) |>
+  mutate(
+    sector_principal = factor(sector_principal, levels = sectores_politica),
+    criterio = "Potencial de recuperación", memoria = "c06"
+  )
+```
+
+## Eslabonamientos
+
+```{r}
+#| label: crit-eslabonamientos
+
+eslabonamientos <- bind_rows(
+  enlaces |> transmute(sector_principal, indicador = "Enlace hacia atrás (agregado)", valor = enlace_atras,
+                       unidad = "multiplicador", anio = 2018),
+  enlaces |> transmute(sector_principal, indicador = "Enlace hacia adelante (agregado)", valor = enlace_adelante,
+                       unidad = "multiplicador", anio = 2018),
+  enlaces |> transmute(sector_principal, indicador = "Multiplicador de empleo", valor = mult_empleo,
+                       unidad = "puestos por millón de B/.", anio = 2018),
+  enlaces |> transmute(sector_principal, indicador = "Multiplicador de valor agregado", valor = mult_vab,
+                       unidad = "B/. por B/. de demanda final", anio = 2018)
+) |>
+  mutate(criterio = "Eslabonamientos", memoria = "c04", calidad = "Media")
+```
+
+Los multiplicadores agregados incluyen las compras entre actividades del mismo sector, por lo que sirven para comparar entre sectores pero no con los de actividades individuales. La memoria 4 entrega los de las 76 actividades.
+
+# Base integrada
+
+```{r}
+#| label: integracion
+
+sectores_priorizados <- bind_rows(
+  pib, empleo_crit, comercio, inversion, concentracion,
+  emisiones_crit, recursos, recuperacion, eslabonamientos
+) |>
+  mutate(
+    sector_principal = factor(sector_principal, levels = sectores_politica),
+    criterio = factor(criterio, levels = c(
+      "PIB", "Empleo", "Comercio exterior", "Inversión", "Concentración de mercado",
+      "Emisiones de GEI", "Uso de recursos", "Potencial de recuperación", "Eslabonamientos"
+    ))
+  ) |>
+  select(criterio, indicador, sector_principal, valor, unidad, anio, calidad, memoria) |>
+  arrange(criterio, indicador, sector_principal)
+
+# Número de indicadores por criterio y calidad
+count(sectores_priorizados, criterio, calidad)
+```
+
+Dos aspectos de los Términos de Referencia no tienen indicadores cuantitativos en la base: la formación bruta de capital por actividad, que ningún cuadro público de Panamá desagrega, y las barreras de entrada y salida de los mercados. Se tratan en el documento de análisis de forma cualitativa. La competitividad internacional se aproxima solo con el comercio exterior, porque no hay un índice de ventajas comparativas por sector con la información disponible.
+
+# Matriz de relevancia sectorial
+
+Para ofrecer una lectura comparativa construimos una matriz de relevancia con una selección de indicadores, donde cada sector recibe un puntaje de 1 a 5 según el lugar que ocupa entre los seis sectores en cada indicador. El puntaje 5 corresponde al mayor valor. Es un ordenamiento relativo y no una medida de importancia absoluta.
+
+Dos advertencias sobre la matriz:
+
+- Los pesos son iguales como punto de partida. Los sectores de recursos hídricos y de ciudades y construcción no tienen emisiones propias en la base (están en residuos e industrias), y su puntaje medio se calcula con cinco indicadores. Los pesos definitivos deben acordarse con la CEPAL y el Ministerio de Ambiente, para que la matriz no incorpore las preferencias del consultor.
+- Un valor alto no siempre indica un mayor atractivo para una política de economía circular. Un sector con muchas emisiones tiene más presión climática pero no necesariamente más viabilidad. Por eso la matriz se presenta como insumo y no como un ranking de priorización.
+
+```{r}
+#| label: matriz-relevancia
+
+indicadores_matriz <- c(
+  "Valor agregado bruto",
+  "Puestos de trabajo",
+  "Exportaciones",
+  "Emisiones de GEI (sin UTCUTS)",
+  "Enlace hacia atrás (agregado)",
+  "Enlace hacia adelante (agregado)"
+)
+
+matriz <- sectores_priorizados |>
+  filter(indicador %in% indicadores_matriz, sector_principal %in% seis_sectores) |>
+  mutate(
+    # Rango de menor a mayor entre los sectores con dato en el indicador
+    rango = rank(valor, ties.method = "average"),
+    puntaje = 1 + 4 * (rango - 1) / (sum(!is.na(valor)) - 1),
+    .by = indicador
+  ) |>
+  select(indicador, sector_principal, valor, puntaje)
+
+matriz_ancha <- matriz |>
+  select(sector_principal, indicador, puntaje) |>
+  pivot_wider(names_from = indicador, values_from = puntaje) |>
+  mutate(
+    n_indicadores = rowSums(!is.na(pick(all_of(indicadores_matriz)))),
+    puntaje_medio = rowMeans(pick(all_of(indicadores_matriz)), na.rm = TRUE)
+  ) |>
+  arrange(desc(puntaje_medio))
+
+matriz_ancha
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(sectores_priorizados, "sectores_priorizados", hoja = "indicadores")
+guardar_salida(matriz, "matriz_relevancia_sectorial", hoja = "matriz")
+guardar_salida(matriz_ancha, "matriz_relevancia_sectorial_ancha", hoja = "matriz_ancha")
+```
+
+# Referencias
+
+::: {#refs}
+:::

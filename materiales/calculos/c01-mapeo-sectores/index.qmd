@@ -1,0 +1,283 @@
+---
+title: "Memoria de cálculo 1: mapeo de sectores de política a actividades del SCN"
+description: "Equivalencia entre los seis sectores de la Hoja de Ruta de Economía Circular de Panamá y las actividades económicas de las cuentas nacionales"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - mapeo sectorial
+  - economía circular
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Esta memoria construye la tabla de equivalencias que conecta los sectores priorizados por la política de economía circular de Panamá con las 80 actividades económicas de las cuentas nacionales del Instituto Nacional de Estadística y Censo (INEC). Las demás memorias de cálculo y los documentos de la consultoría usan esa tabla para agrupar cifras de producción, empleo, comercio, emisiones y eslabonamientos por sector.
+
+La Hoja de Ruta de Economía Circular con enfoque de cambio climático [@miambiente2024HojaRutaEC] prioriza seis sectores: residuos, recursos hídricos, energía, industrias, agricultura y alimentos, y ciudades y construcción. La Ley 502 de 2025 [@panama2025Ley502] crea el marco legal, pero no define sectores ni lista actividades; su artículo 10 ordena un Plan Estratégico Nacional con guías técnicas por actividad económica, que todavía no existe. Por eso la equivalencia con las actividades del Sistema de Cuentas Nacionales (SCN) es un trabajo propio de la consultoría y se documenta aquí para que pueda revisarse y corregirse.
+
+## Regla de asignación
+
+Una actividad puede ser relevante para más de un sector. Para que los totales sumen sin doble conteo, cada actividad tiene un único **sector principal**, y una lista de **sectores secundarios** que sirve para análisis de vínculos pero no para sumar. Las actividades sin vínculo directo identificado en las fuentes quedan en "Resto de la economía".
+
+El campo `tipo_vinculo` clasifica el papel de la actividad en la transición circular:
+
+- **Núcleo:** su producto principal es la gestión de residuos, agua, energía o construcción.
+- **Intensivo:** genera residuos, usa materiales, agua o energía en volumen, o abastece de insumos a un sector núcleo.
+- **Habilitante:** presta servicios financieros, de conocimiento o de comercialización que la ley o la Hoja de Ruta mencionan como condición de la transición.
+- **Sin vínculo directo:** la actividad no aparece en las fuentes.
+
+El campo `origen` distingue si la fuente menciona la actividad (`Fuente`) o si el vínculo se infiere del flujo de materiales (`Inferido`).
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+```
+
+# Actividades del SCN
+
+Las actividades salen de la base consolidada de cuadros de oferta y utilización [@inec2026cou], que documenta `data/inec/pan_scn_oficial.md`. Tomamos los códigos y nombres únicos, y la sección de la Clasificación Industrial Internacional Uniforme (CIIU Rev. 4) a la que pertenece cada actividad.
+
+```{r}
+#| label: actividades
+
+scn <- readRDS("data/inec/pan_scn_oficial.RDS")
+
+actividades <- scn |>
+  filter(!is.na(`Código Clasificación Actividades`)) |>
+  distinct(
+    cod_scn = `Código Clasificación Actividades`,
+    actividad = `Descripción Actividades`,
+    ciiu_seccion = `CIIU Secciones`
+  ) |>
+  mutate(actividad = str_squish(actividad))
+
+nrow(actividades)
+```
+
+# Correspondencia con la matriz insumo-producto
+
+La matriz insumo-producto de 2018 [@inec2024mip] tiene 76 actividades, identificadas de `AE01` a `AE76`. Es un poco más agregada que el SCN: junta la pesca con la acuicultura, reúne el comercio de zona franca, al por mayor y al por menor en una sola actividad, y combina dos actividades de apoyo al transporte. La tabla siguiente asocia cada código del SCN con el código de la matriz.
+
+```{r}
+#| label: puente-mip
+
+puente_mip <- tribble(
+  ~cod_scn, ~cod_mip,
+  "01.1", "AE01", "02.1", "AE02", "03.1", "AE03", "04.1", "AE04",
+  "05.1", "AE05", "06.1", "AE06", "07.1", "AE07", "08.1", "AE08",
+  "08.2", "AE09", "08.3", "AE10", "08.4", "AE11", "09.1", "AE12",
+  "10.1", "AE13", "11.1", "AE14", "12.1", "AE14", "13.1", "AE15",
+  "14.1", "AE16", "15.1", "AE17", "16.1", "AE18", "17.1", "AE19",
+  "18.1", "AE20", "19.1", "AE21", "19.2", "AE22", "20.1", "AE23",
+  "21.1", "AE24", "22.1", "AE25", "23.1", "AE26", "24.1", "AE27",
+  "25.1", "AE28", "26.1", "AE29", "27.1", "AE30", "28.1", "AE31",
+  "29.1", "AE32", "30.1", "AE33", "31.1", "AE34", "31.2", "AE35",
+  "32.1", "AE36", "33.1", "AE37", "34.1", "AE38", "35.1", "AE39",
+  "35.2", "AE40", "36.1", "AE41", "36.2", "AE42", "36.3", "AE43",
+  "37.1", "AE44", "38.1", "AE44", "38.2", "AE44", "38.3", "AE45",
+  "39.1", "AE46", "39.2", "AE47", "39.3", "AE48", "39.4", "AE49",
+  "39.5", "AE50", "39.6", "AE52", "39.7", "AE51", "39.8", "AE52",
+  "39.9", "AE53", "40.1", "AE54", "40.2", "AE55", "41.1", "AE56",
+  "41.2", "AE57", "42.1", "AE58", "42.2", "AE59", "42.3", "AE60",
+  "43.1", "AE61", "43.2", "AE62", "44.1", "AE63", "44.2", "AE64",
+  "44.3", "AE65", "44.4", "AE66", "44.5", "AE67", "44.6", "AE68",
+  "45.1", "AE69", "46.1", "AE70", "47.1", "AE71", "48.1", "AE72",
+  "49.1", "AE73", "50.1", "AE74", "50.2", "AE75", "50.3", "AE76"
+)
+```
+
+```{r}
+#| label: puente-mip-filas
+
+nrow(puente_mip)
+```
+
+Las 80 actividades del SCN se reparten en las 76 de la matriz. Los pares se escribieron cuatro por línea para ahorrar espacio, pero `tribble()` los lee de a dos valores y produce una fila por par.
+
+# Asignación a sectores de política
+
+Escribimos la asignación por grupos de actividades. Cada bloque indica el sector principal, los sectores secundarios, el tipo de vínculo, el origen del vínculo y la fuente con página. Las páginas de la Hoja de Ruta [@miambiente2024HojaRutaEC] y de la revisión bibliográfica que la acompaña [@pnud2024RevBiblioEC] son las páginas impresas de cada documento.
+
+```{r}
+#| label: asignacion
+
+asignacion <- tribble(
+  ~cod_scn, ~sector_principal, ~sectores_secundarios, ~tipo_vinculo, ~origen, ~evidencia,
+
+  # Agricultura y alimentos
+  "01.1", "Agricultura y alimentos", "Recursos hídricos", "Intensivo", "Fuente", "HR p. 47; RB p. 63-66",
+  "02.1", "Agricultura y alimentos", "Recursos hídricos", "Intensivo", "Fuente", "HR p. 47; RB p. 63-66",
+  "03.1", "Agricultura y alimentos", "Recursos hídricos", "Intensivo", "Fuente", "HR p. 47; RB p. 63-66",
+  "04.1", "Agricultura y alimentos", "Recursos hídricos", "Intensivo", "Fuente", "HR p. 47; RB p. 63-66",
+  "05.1", "Agricultura y alimentos", "Recursos hídricos", "Intensivo", "Fuente", "HR p. 47; RB p. 63-66",
+  "06.1", "Agricultura y alimentos", "Recursos hídricos", "Intensivo", "Fuente", "HR p. 47; RB p. 63-66",
+  "07.1", "Agricultura y alimentos", "Recursos hídricos", "Intensivo", "Fuente", "HR p. 47; RB p. 63-66",
+  "08.1", "Agricultura y alimentos", "Energía", "Intensivo", "Fuente", "HR p. 44; RB p. 63",
+  "08.2", "Agricultura y alimentos", "Energía", "Intensivo", "Fuente", "HR p. 44; RB p. 63",
+  "08.3", "Agricultura y alimentos", "Energía", "Intensivo", "Fuente", "HR p. 44; RB p. 63",
+  "08.4", "Agricultura y alimentos", "Energía", "Intensivo", "Fuente", "HR p. 44; RB p. 63",
+  "09.1", "Agricultura y alimentos", "", "Intensivo", "Fuente", "RB p. 63, 65",
+  "10.1", "Agricultura y alimentos", "", "Intensivo", "Fuente", "RB p. 63, 65",
+  "11.1", "Agricultura y alimentos", "", "Intensivo", "Inferido", "Ley 502, art. 5 y 9 (ARAP en el Consejo)",
+  "12.1", "Agricultura y alimentos", "", "Intensivo", "Inferido", "Ley 502, art. 5 y 9 (ARAP en el Consejo)",
+  "14.1", "Agricultura y alimentos", "Industrias", "Intensivo", "Fuente", "HR p. 56-57; RB p. 60",
+  "15.1", "Agricultura y alimentos", "Industrias", "Intensivo", "Fuente", "HR p. 56-57; RB p. 60",
+  "16.1", "Agricultura y alimentos", "Industrias", "Intensivo", "Fuente", "HR p. 56-57; RB p. 60",
+  "17.1", "Agricultura y alimentos", "Industrias", "Intensivo", "Fuente", "HR p. 56-57; RB p. 60",
+  "18.1", "Agricultura y alimentos", "Industrias", "Intensivo", "Fuente", "HR p. 56-57; RB p. 60",
+  "19.1", "Agricultura y alimentos", "Industrias", "Intensivo", "Fuente", "HR p. 56-57; RB p. 60",
+  "19.2", "Agricultura y alimentos", "Industrias", "Intensivo", "Fuente", "HR p. 56-57; RB p. 60",
+
+  # Industrias
+  "20.1", "Industrias", "Residuos; Agricultura y alimentos", "Intensivo", "Inferido", "HR p. 42 (depósito y devolución de envases)",
+  "21.1", "Industrias", "", "Intensivo", "Fuente", "RB p. 60",
+  "22.1", "Industrias", "", "Intensivo", "Inferido", "Flujo de materiales",
+  "23.1", "Industrias", "Ciudades y construcción", "Intensivo", "Inferido", "Flujo de materiales",
+  "24.1", "Industrias", "Residuos", "Intensivo", "Fuente", "RB p. 60",
+  "25.1", "Industrias", "", "Intensivo", "Fuente", "RB p. 60",
+  "26.1", "Industrias", "Agricultura y alimentos", "Intensivo", "Fuente", "RB p. 60",
+  "27.1", "Industrias", "", "Intensivo", "Inferido", "Flujo de materiales",
+  "28.1", "Industrias", "Residuos", "Intensivo", "Fuente", "Ley 187, art. 8-10; Ley 33, art. 34",
+  "29.1", "Industrias", "Ciudades y construcción", "Intensivo", "Fuente", "HR p. 57; RB p. 61, 66-68",
+  "30.1", "Industrias", "Ciudades y construcción", "Intensivo", "Fuente", "HR p. 57",
+  "31.1", "Industrias", "Ciudades y construcción", "Intensivo", "Fuente", "HR p. 48, 57",
+  "31.2", "Industrias", "Ciudades y construcción", "Intensivo", "Fuente", "HR p. 48, 57",
+  "32.1", "Industrias", "", "Intensivo", "Fuente", "RB p. 60",
+  "33.1", "Industrias", "", "Intensivo", "Fuente", "HR p. 46, 59; Ley 502, art. 5",
+
+  # Energía
+  "34.1", "Energía", "Recursos hídricos", "Núcleo", "Fuente", "HR p. 30, 43-44; RB p. 50-55",
+
+  # Recursos hídricos
+  "35.1", "Recursos hídricos", "", "Núcleo", "Fuente", "HR p. 45; RB p. 56-57",
+
+  # Residuos
+  "35.2", "Residuos", "Agricultura y alimentos; Ciudades y construcción", "Núcleo", "Fuente", "HR p. 29-30, 41-43, 56-57; Ley 33",
+
+  # Ciudades y construcción
+  "36.1", "Ciudades y construcción", "", "Núcleo", "Fuente", "HR p. 30, 48, 57; RB p. 66-68",
+  "36.2", "Ciudades y construcción", "", "Núcleo", "Fuente", "HR p. 30, 48, 57; RB p. 66-68",
+  "36.3", "Ciudades y construcción", "", "Núcleo", "Fuente", "HR p. 30, 48, 57; RB p. 66-68",
+
+  # Comercio, transporte y servicios con vínculo
+  "37.1", "Resto de la economía", "Residuos", "Habilitante", "Inferido", "HR p. 42-43 (puntos de retorno)",
+  "38.1", "Resto de la economía", "Residuos; Agricultura y alimentos", "Habilitante", "Fuente", "HR p. 42-43, 56",
+  "38.2", "Resto de la economía", "Residuos; Agricultura y alimentos", "Habilitante", "Fuente", "HR p. 42-43, 56; Ley 187, art. 7",
+  "38.3", "Resto de la economía", "Industrias", "Habilitante", "Fuente", "Ley 502, art. 5 (reparación y mantenimiento)",
+  "39.1", "Resto de la economía", "Energía; Ciudades y construcción", "Intensivo", "Fuente", "HR p. 30; RB p. 50, 54",
+  "39.4", "Resto de la economía", "Energía; Agricultura y alimentos", "Intensivo", "Fuente", "RB p. 50, 54",
+  "39.5", "Resto de la economía", "Recursos hídricos", "Intensivo", "Fuente", "RB p. 56; Ley 33, art. 2",
+  "40.2", "Resto de la economía", "Residuos; Agricultura y alimentos", "Intensivo", "Fuente", "HR p. 56; Ley 33, art. 34; Ley 187, art. 9",
+  "42.1", "Resto de la economía", "Transversal", "Habilitante", "Fuente", "Ley 502, art. 2.6; HR p. 46",
+  "44.2", "Resto de la economía", "Ciudades y construcción", "Habilitante", "Inferido", "RB p. 67-68",
+  "44.3", "Resto de la economía", "Transversal", "Habilitante", "Fuente", "Ley 502, art. 4; HR p. 40",
+  "45.1", "Resto de la economía", "Transversal", "Habilitante", "Fuente", "Ley 502, art. 7; HR p. 40",
+  "48.1", "Resto de la economía", "Industrias", "Habilitante", "Inferido", "Ley 502, art. 5 (reparación)",
+  "50.1", "Resto de la economía", "Ciudades y construcción", "Habilitante", "Fuente", "HR p. 48-49; Ley 502, art. 12"
+)
+
+nrow(asignacion)
+```
+
+Las actividades que no aparecen en `asignacion` se asignan a "Resto de la economía" con tipo "Sin vínculo directo". La minería (`13.1`) queda aquí porque ninguna fuente de la política la menciona, aunque suministra áridos a la construcción; el análisis de materiales la retomará.
+
+# Tabla de equivalencias final
+
+Unimos las actividades, el puente con la matriz y la asignación.
+
+```{r}
+#| label: equivalencias
+
+mapeo <- actividades |>
+  left_join(puente_mip, by = "cod_scn") |>
+  left_join(asignacion, by = "cod_scn") |>
+  mutate(
+    sector_principal = replace_na(sector_principal, "Resto de la economía"),
+    sectores_secundarios = replace_na(sectores_secundarios, ""),
+    tipo_vinculo = replace_na(tipo_vinculo, "Sin vínculo directo"),
+    origen = replace_na(origen, "Sin evidencia"),
+    evidencia = replace_na(evidencia, ""),
+    sector_principal = factor(sector_principal, levels = sectores_politica)
+  ) |>
+  arrange(cod_scn)
+```
+
+```{r}
+#| label: tbl-mapeo-completo
+#| tbl-cap: "Mapeo detallado de las 80 actividades del SCN a los sectores de política"
+
+mapeo |>
+  transmute(
+    `Código SCN` = cod_scn,
+    Actividad = actividad,
+    `Código MIP` = cod_mip,
+    `Sector principal` = sector_principal,
+    `Sectores secundarios` = sectores_secundarios,
+    Vínculo = tipo_vinculo,
+    Origen = origen,
+    Evidencia = evidencia
+  ) |>
+  tabla_ft(digitos = 0)
+```
+
+Verificamos que ninguna actividad quedó sin código de la matriz, que cada código de la asignación existe en el SCN y que el sector principal es único por actividad.
+
+```{r}
+#| label: verificacion
+
+# Actividades sin código de la matriz
+sum(is.na(mapeo$cod_mip))
+
+# Códigos de la asignación que no existen en el SCN
+setdiff(asignacion$cod_scn, actividades$cod_scn)
+
+# Una fila por actividad
+anyDuplicated(mapeo$cod_scn)
+```
+
+La siguiente tabla resume cuántas actividades quedan en cada sector principal.
+
+```{r}
+#| label: tbl-resumen
+#| tbl-cap: "Actividades del SCN por sector principal de política"
+
+mapeo |>
+  count(sector_principal, name = "actividades") |>
+  tabla_ft(digitos = 0)
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(mapeo, "mapeo_sectores_scn", hoja = "mapeo")
+```
+
+El archivo `data/outputs/mapeo_sectores_scn.rds` (y su versión en Excel) es la tabla que usan las memorias siguientes. Para cambiar la asignación de una actividad se edita el bloque `asignacion` de esta memoria y se vuelve a ejecutar.
+
+# Referencias
+
+::: {#refs}
+:::

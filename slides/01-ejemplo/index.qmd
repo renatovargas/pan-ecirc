@@ -1,0 +1,68 @@
+---
+title: "Presentación de ejemplo"
+subtitle: "Estructura mínima de una presentación revealjs"
+author:
+  - name: "Renato Vargas"
+    affiliations:
+      - name: CEPAL
+lang: es
+bibliography: refs.bib
+csl: ../../assets/apa-es.csl
+format:
+  revealjs:
+    theme: [simple, ../pstyles.scss]
+    # Escala de las fórmulas (MathJax 2); se define antes de que cargue MathJax
+    include-in-header:
+      - text: |
+          <script>
+            window.MathJax = {
+              "HTML-CSS": { scale: 80 }
+            };
+          </script>
+    footer: "Presentación de ejemplo"
+execute:
+  echo: true
+---
+
+## Temas a tratar {.theme-content}
+
+1.  Una diapositiva con texto y fórmulas.
+2.  Una diapositiva con código de R.
+3.  Descarga de archivos de ejemplo.
+4.  Bibliografía.
+
+## Texto y fórmulas {#texto}
+
+La producción total se obtiene con la inversa de Leontief [@millerblair2022]:
+
+$$
+\mathbf{x} = (\mathbf{I} - \mathbf{A})^{-1} \mathbf{f}
+$$
+
+El texto de [énfasis]{.emphasis} usa el color de acento del tema.
+
+## Código de R
+
+Las rutas en R son relativas a la raíz del proyecto, no a esta carpeta.
+
+```{r}
+#| echo: true
+datos <- read.csv("data/examples/ejemplo.csv")
+datos
+```
+
+##  {.theme-blank .center}
+
+::: {style="text-align: center"}
+
+**Descargar los archivos de ejemplo:**
+
+| | |
+| :--- | :----------: |
+| [CSV:]{.emphasis} | [ejemplo.csv](../../data/examples/ejemplo.csv){.button download="ejemplo.csv"} |
+:::
+
+## Bibliografía
+
+::: {#refs}
+:::

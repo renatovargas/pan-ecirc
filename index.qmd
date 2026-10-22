@@ -1,0 +1,15 @@
+---
+title: "Economía circular en Panamá"
+---
+
+Sitio de materiales relacionados con la consultoría "Consultoría para el desarrollo e identificación de instrumentos económicos para aumentar los flujos de recursos hacia la economía circular y potenciar inversiones en iniciativas de circularidad en Panamá" elaborados por Renato Vargas para la CEPAL.
+
+# Contenido
+
+Todo el material está en la sección [Materiales](materiales/index.qmd), que se divide en tres grupos.
+
+**Documentos.** Informes de la consultoría: metodología, plan de trabajo y análisis de los sectores económicos priorizados.
+
+**Memorias de cálculo.** Procesamiento paso a paso, en código de R, de las bases de datos que sustentan los documentos.
+
+**Presentaciones.** Diapositivas relacionadas con el avance de la consultoría.

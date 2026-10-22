@@ -1,0 +1,17 @@
+---
+title: "Acerca de"
+---
+
+# Sobre este sitio
+
+Sitio de materiales de trabajo de la CEPAL. El código fuente está en https://github.com/renatovargas/pan-ecirc.
+
+# Autoría
+
+Renato Vargas, CEPAL.
+
+# Descargo de responsabilidad
+
+Las opiniones, interpretaciones y conclusiones que aparecen en este sitio son las de sus autores. No representan necesariamente las opiniones de la institución, y no deben atribuirse a ella.
+
+Los materiales tienen fines informativos y formativos.

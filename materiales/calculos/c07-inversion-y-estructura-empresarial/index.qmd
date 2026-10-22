@@ -1,0 +1,266 @@
+---
+title: "Memoria de cálculo 7: inversión extranjera y estructura empresarial por sector"
+description: "Inversión extranjera directa por sección CIIU y estructura de tamaño de las empresas de Panamá en los sectores de la Hoja de Ruta, como aproximación a la inversión y a la concentración de mercado"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - inversión extranjera directa
+  - estructura empresarial
+  - concentración
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Los Términos de Referencia piden evaluar las **inversiones** de cada sector, con énfasis en la inversión privada, y la **concentración de mercado y las barreras de entrada y salida**. Panamá no publica en forma abierta ni la formación de capital por actividad ni índices de concentración por sector. Esta memoria construye aproximaciones con las fuentes que sí existen y deja constancia de sus límites:
+
+- **Inversión:** la inversión extranjera directa (IED) por sección de la Clasificación Industrial Internacional Uniforme (CIIU Rev. 4) para 2022 a 2024 [@inec2026ied]. Es un flujo y una posición de capital de no residentes, no la inversión total ni la privada nacional.
+- **Estructura empresarial:** el Directorio de Empresas y Locales de 2022 del INEC [@inec2022directorio] da el número de empresas por tamaño de ingresos y por clase de actividad, con el personal y los ingresos de cada clase.
+
+Ninguna de las dos fuentes mide concentración en sentido estricto (cuotas de mercado, índices de Herfindahl y Hirschman). El número de empresas y su tamaño son indicios de la estructura del mercado; los análisis de competencia de la Autoridad de Protección al Consumidor y Defensa de la Competencia (ACODECO) no están disponibles en forma pública para los sectores de interés.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+source("materiales/calculos/scripts/lectores_inec.R")
+```
+
+# Inversión extranjera directa
+
+## Lectura
+
+El archivo `ied_actividad_2022_24_tidy.csv` contiene los cuadros 7 a 9 del boletín del INEC en formato largo: la posición de inversión al cierre, el flujo del año y la renta, por sección de actividad. Los valores están en miles de balboas.
+
+```{r}
+#| label: ied-lectura
+
+ied <- read_csv("data/inversion/ied_actividad_2022_24_tidy.csv", show_col_types = FALSE) |>
+  pivot_longer(c(`2022`, `2023`, `2024`), names_to = "anio", values_to = "miles_balboas") |>
+  mutate(anio = as.numeric(anio))
+
+distinct(ied, variable)
+```
+
+## Asignación a sectores
+
+Los cuadros del INEC agrupan la electricidad, el gas y el agua en una sola línea, que contiene tres de nuestros sectores (energía, recursos hídricos y residuos). No es posible separarlos, así que los tratamos como un grupo.
+
+```{r}
+#| label: ied-asignacion
+
+asignacion_ied <- tribble(
+  ~actividad, ~grupo_sector,
+  "Agricultura, ganadería, caza, silvicultura y pesca", "Agricultura y alimentos",
+  "Explotación de minas y canteras", "Resto de la economía",
+  "Industrias manufactureras", "Industrias",
+  "Suministro de electridad, gas y agua", "Energía, recursos hídricos y residuos (conjunto)",
+  "Construcción", "Ciudades y construcción"
+)
+
+ied_grupo <- ied |>
+  filter(actividad != "TOTAL") |>
+  left_join(asignacion_ied, by = "actividad") |>
+  mutate(grupo_sector = replace_na(grupo_sector, "Resto de la economía")) |>
+  summarize(miles_balboas = sum(miles_balboas), .by = c(variable, anio, grupo_sector))
+
+# Control: la suma de las actividades debe aproximar el total (puede haber diferencias de redondeo)
+ied |>
+  summarize(
+    suma_actividades = sum(miles_balboas[actividad != "TOTAL"]),
+    total_publicado = sum(miles_balboas[actividad == "TOTAL"]),
+    .by = c(variable, anio)
+  ) |>
+  mutate(diferencia = suma_actividades - total_publicado) |>
+  arrange(variable, anio)
+```
+
+```{r}
+#| label: tbl-ied
+#| tbl-cap: "Flujo de inversión extranjera directa por grupo de sectores, 2022 a 2024 (miles de B/.)"
+
+ied_grupo |>
+  filter(variable == "flujo") |>
+  pivot_wider(names_from = anio, values_from = miles_balboas) |>
+  rename(`Grupo de sectores` = grupo_sector) |>
+  select(-variable) |>
+  tabla_ft(digitos = 0)
+```
+
+Los flujos de un año pueden ser negativos (desinversión o repatriación de capital), lo que ocurre en algunos sectores en 2022 y 2023. Por eso resumimos con la posición acumulada y con el flujo de tres años.
+
+# Estructura de tamaño de las empresas
+
+## Directorio por sección
+
+El cuadro 10 del Directorio da el número de empresas por tamaño según los ingresos: micro (hasta B/. 150.000), pequeña (hasta B/. 1.000.000), mediana (hasta B/. 2.500.000) y grande (más de B/. 2.500.000), con los umbrales de la Ley 8 de 2000 [@ampyme2017politica]. Las filas de sección están en el orden de la CIIU, sin la administración pública ni los hogares.
+
+```{r}
+#| label: directorio-seccion
+
+secciones <- c("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "U")
+
+directorio_seccion <- leer_cuadro_inec(
+  "data/empresas/inec-directorio2022-cuadro10-ingresos-sector.xlsx",
+  n_cifras = 5,
+  desde = 10
+) |>
+  filter(etiqueta != "TOTAL") |>
+  mutate(seccion = secciones) |>
+  select(
+    seccion, descripcion = etiqueta,
+    empresas = v1, micro = v2, pequena = v3, mediana = v4, grande = v5
+  ) |>
+  mutate(
+    pct_micro = 100 * micro / empresas,
+    pct_grande = 100 * grande / empresas
+  )
+
+# Control: las secciones deben sumar el total publicado (75.797 empresas)
+sum(directorio_seccion$empresas)
+```
+
+## Clases de actividad relevantes
+
+El cuadro 12 da empresas, personal, ingresos y sueldos por clase de actividad (cuatro dígitos de la CIIU). Lo leemos completo y escogemos las clases más relacionadas con los sectores de política.
+
+```{r}
+#| label: directorio-clases
+
+directorio_clases <- leer_cuadro_inec(
+  "data/empresas/inec-directorio2022-cuadro12-clase-actividad.xlsx",
+  n_cifras = 4,
+  desde = 11
+) |>
+  rename(
+    empresas = v1,
+    personal = v2,
+    ingresos_miles_balboas = v3,
+    sueldos_balboas = v4
+  )
+
+nrow(directorio_clases)
+```
+
+Escogemos las clases con expresiones regulares sobre la etiqueta y las asignamos a un sector. Las clases de residuos incluyen la recolección y el tratamiento de desechos y el procesamiento y la recuperación de materiales; las de industrias, las de plástico, cemento y hormigón.
+
+```{r}
+#| label: clases-clave
+
+clases_clave <- tribble(
+  ~patron, ~sector_principal,
+  "^Recolección de desechos", "Residuos",
+  "^Tratamiento y eliminación de desechos", "Residuos",
+  "^Procesamiento y recuperación de materiales", "Residuos",
+  "^Captación, tratamiento y suministro de agua", "Recursos hídricos",
+  "^Generación, transmisión y distribución de energía eléctrica", "Energía",
+  "^Fabricación de productos de plástico", "Industrias",
+  "^Fabricación de cemento, cal y yeso", "Industrias",
+  "^Fabricación de artículos de hormigón", "Industrias"
+)
+
+directorio_clave <- clases_clave |>
+  rowwise() |>
+  mutate(
+    fila = list(filter(directorio_clases, str_detect(etiqueta, patron)))
+  ) |>
+  unnest(fila) |>
+  ungroup() |>
+  mutate(
+    sector_principal = factor(sector_principal, levels = sectores_politica),
+    ingresos_por_empresa = ingresos_miles_balboas / empresas,
+    personal_por_empresa = personal / empresas
+  ) |>
+  select(sector_principal, etiqueta, empresas, personal, ingresos_miles_balboas,
+         ingresos_por_empresa, personal_por_empresa)
+
+# Comprobamos que cada patrón encontró exactamente una clase, salvo recolección y tratamiento (dos cada uno)
+directorio_clave |> count(etiqueta)
+```
+
+```{r}
+#| label: tbl-clases-clave
+#| tbl-cap: "Empresas, personal e ingresos de las clases de actividad más relacionadas con los sectores de política, 2022"
+
+directorio_clave |>
+  mutate(etiqueta = str_trunc(etiqueta, 62)) |>
+  select(
+    Sector = sector_principal,
+    Clase = etiqueta,
+    Empresas = empresas,
+    Personal = personal,
+    `Ingresos (miles B/.)` = ingresos_miles_balboas,
+    `Personal por empresa` = personal_por_empresa
+  ) |>
+  tabla_ft(digitos = 1)
+```
+
+## Estructura de tamaño por sector
+
+Para comparar los sectores calculamos la proporción de empresas grandes y micro en la sección donde cada sector tiene su núcleo: agricultura (A), industrias (C), energía (D), agua, residuos y recursos hídricos (E) y construcción (F). Las secciones agrupan actividades que pertenecen a otros sectores de política: la sección C incluye la agroindustria de alimentos, y la E reúne agua y residuos. Es una caracterización a nivel de sección.
+
+```{r}
+#| label: estructura-sector
+
+seccion_a_sector <- tribble(
+  ~seccion, ~grupo_sector,
+  "A", "Agricultura y alimentos",
+  "C", "Industrias",
+  "D", "Energía",
+  "E", "Recursos hídricos y residuos",
+  "F", "Ciudades y construcción"
+)
+
+estructura_sector <- directorio_seccion |>
+  inner_join(seccion_a_sector, by = "seccion") |>
+  select(grupo_sector, seccion, empresas, micro, pequena, mediana, grande, pct_micro, pct_grande)
+```
+
+```{r}
+#| label: tbl-estructura-sector
+#| tbl-cap: "Empresas por tamaño de ingresos en la sección CIIU principal de cada sector, 2022"
+
+estructura_sector |>
+  select(
+    Sector = grupo_sector, Sección = seccion, Empresas = empresas,
+    Micro = micro, Pequeña = pequena, Mediana = mediana, Grande = grande,
+    `Micro (%)` = pct_micro, `Grande (%)` = pct_grande
+  ) |>
+  tabla_ft(digitos = 1)
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(ied_grupo, "ied_grupo_sector_2022_2024", hoja = "ied")
+guardar_salida(directorio_seccion, "empresas_seccion_tamano_2022", hoja = "seccion")
+guardar_salida(directorio_clave, "empresas_clases_clave_2022", hoja = "clases")
+guardar_salida(estructura_sector, "estructura_empresarial_sector_2022", hoja = "estructura")
+```
+
+# Referencias
+
+::: {#refs}
+:::

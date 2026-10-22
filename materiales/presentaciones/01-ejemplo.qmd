@@ -1,0 +1,17 @@
+---
+title: "Presentación de ejemplo"
+subtitle: "Estructura mínima de una presentación revealjs"
+---
+
+::::{.slide-embed}
+<iframe class="slide-deck" src="../../slides/01-ejemplo/index.html" title="Presentación de ejemplo" loading="lazy"></iframe>
+::::
+
+::::{.slide-links}
+[⛶ Pantalla completa](../../slides/01-ejemplo/index.html){target="_blank"}
+::::
+
+## Objetivos
+
+- Mostrar la estructura mínima de una presentación
+- Mostrar cómo se cita y se descargan archivos de ejemplo

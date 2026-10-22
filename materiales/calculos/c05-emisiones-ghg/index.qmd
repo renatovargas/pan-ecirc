@@ -1,0 +1,297 @@
+---
+title: "Memoria de cálculo 5: emisiones de gases de efecto invernadero de Panamá por sector de política"
+description: "Procesamiento de la base EDGAR para Panamá, 1970 a 2025, y asignación de las categorías del IPCC a los sectores de la Hoja de Ruta de Economía Circular"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - emisiones
+  - gases de efecto invernadero
+  - EDGAR
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Esta memoria extrae de la base global EDGAR las emisiones de gases de efecto invernadero (GEI) de Panamá y las asigna a los seis sectores de la Hoja de Ruta de Economía Circular. Responde al criterio de emisiones de los Términos de Referencia de la consultoría.
+
+EDGAR (Emissions Database for Global Atmospheric Research) es una base del Centro Común de Investigación de la Comisión Europea que estima las emisiones de cada país con la metodología del Grupo Intergubernamental de Expertos sobre el Cambio Climático (IPCC) [@edgar2026ghg]. Usamos la versión que agrega todos los gases en toneladas equivalentes de dióxido de carbono con los potenciales de calentamiento a 100 años del Quinto Informe de Evaluación (AR5), por categoría de las directrices de 2006 del IPCC [@ipcc2006directrices].
+
+Hay tres límites que conviene tener presentes:
+
+- EDGAR **excluye el uso de la tierra, el cambio de uso de la tierra y la silvicultura** (UTCUTS). Panamá reporta ese sector como un sumidero neto en su inventario nacional [@ghg-nid-2024, p. 62], de modo que las emisiones brutas de esta base no equivalen al balance nacional.
+- Las cifras son estimaciones globales con factores por defecto; el inventario nacional de MiAMBIENTE usa datos nacionales y no es directamente comparable. Esta memoria no concilia ambas fuentes.
+- Las categorías del IPCC no coinciden con los sectores de política. Cuando una categoría atraviesa varios sectores, la asignamos al sector principal y lo anotamos.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+library(readxl)
+```
+
+# Lectura de la base para Panamá
+
+La hoja `IPCC 2006` tiene unas 7.500 filas para todos los países. Las primeras diez filas son metadatos y la décima contiene los nombres de columna. Leemos la hoja como texto, fijamos los nombres, filtramos Panamá (código `PAN`) y convertimos los años a números.
+
+```{r}
+#| label: lectura-edgar
+
+archivo_edgar <- "data/EDGAR/EDGAR_AR5_GHG_1970_2025.xlsx"
+
+crudo <- read_excel(
+  archivo_edgar,
+  sheet = "IPCC 2006",
+  col_names = FALSE,
+  col_types = "text",
+  .name_repair = "minimal"
+)
+
+# Nombres de columna: la fila 10; las columnas finales sin nombre se rellenan
+nombres <- as.character(crudo[10, ])
+nombres[is.na(nombres)] <- paste0("extra", seq_len(sum(is.na(nombres))))
+
+edgar <- crudo[-(1:10), ]
+names(edgar) <- nombres
+
+panama <- edgar |>
+  filter(Country_code_A3 == "PAN") |>
+  mutate(across(starts_with("Y_"), as.numeric))
+
+dim(panama)
+```
+
+La base separa algunas categorías en emisiones de origen fósil y de biomasa. Muchas celdas están vacías (no hay estimación para ese año). Al sumar usamos `na.rm = TRUE`, es decir, tratamos la celda vacía como cero.
+
+# Formato largo
+
+```{r}
+#| label: formato-largo
+
+emisiones <- panama |>
+  select(
+    codigo_ipcc = ipcc_code_2006_for_standard_report,
+    categoria_ipcc = ipcc_code_2006_for_standard_report_name,
+    origen = fossil_bio,
+    starts_with("Y_")
+  ) |>
+  pivot_longer(starts_with("Y_"), names_to = "anio", values_to = "emisiones_gg") |>
+  mutate(anio = as.numeric(str_remove(anio, "Y_"))) |>
+  summarize(
+    emisiones_gg = sum(emisiones_gg, na.rm = TRUE),
+    .by = c(anio, codigo_ipcc, categoria_ipcc)
+  )
+
+# Total nacional por año (Gg de CO2 equivalente, sin UTCUTS)
+emisiones |>
+  summarize(total_gg = sum(emisiones_gg), .by = anio) |>
+  filter(anio %in% c(1990, 2000, 2010, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025))
+```
+
+# Asignación de categorías del IPCC a sectores
+
+Escribimos la tabla de asignación. Las razones de las asignaciones menos obvias se anotan en la columna `nota`.
+
+```{r}
+#| label: asignacion-ipcc
+
+asignacion_ipcc <- tribble(
+  ~codigo_ipcc, ~sector_principal, ~nota,
+  "1.A.1.a",  "Energía", "Generación de electricidad y calor",
+  "1.A.1.bc", "Energía", "Refinación y combustibles sólidos",
+  "1.A.2",    "Industrias", "Combustión en industria manufacturera y construcción; no se puede separar la construcción",
+  "1.A.3.a",  "Resto de la economía", "Aviación civil",
+  "1.A.3.b",  "Resto de la economía", "Transporte por carretera",
+  "1.A.3.e",  "Resto de la economía", "Otro transporte",
+  "1.A.4",    "Resto de la economía", "Comercial, residencial y agropecuario; no se puede separar",
+  "1.B.1",    "Energía", "Emisiones fugitivas de combustibles sólidos",
+  "1.B.2",    "Energía", "Emisiones fugitivas de petróleo y gas",
+  "2.A.1",    "Industrias", "Producción de cemento",
+  "2.A.2",    "Industrias", "Producción de cal",
+  "2.A.3",    "Industrias", "Producción de vidrio",
+  "2.A.4",    "Industrias", "Otros usos de carbonatos",
+  "2.D",      "Industrias", "Productos no energéticos de combustibles y uso de solventes",
+  "2.F",      "Resto de la economía", "Sustitutos de sustancias que agotan el ozono (refrigeración y climatización)",
+  "2.G",      "Industrias", "Otra manufactura y uso de productos",
+  "3.A.1",    "Agricultura y alimentos", "Fermentación entérica",
+  "3.A.2",    "Agricultura y alimentos", "Manejo de estiércol",
+  "3.C.1",    "Agricultura y alimentos", "Quema de biomasa",
+  "3.C.4",    "Agricultura y alimentos", "Emisiones directas de N2O de suelos manejados",
+  "3.C.5",    "Agricultura y alimentos", "Emisiones indirectas de N2O de suelos manejados",
+  "3.C.6",    "Agricultura y alimentos", "Emisiones indirectas de N2O del manejo de estiércol",
+  "3.C.7",    "Agricultura y alimentos", "Cultivo de arroz",
+  "4.A",      "Residuos", "Disposición de residuos sólidos",
+  "4.D",      "Residuos", "Aguas residuales; atañe también a recursos hídricos",
+  "4.E",      "Residuos", "Otros",
+  "5.A",      "Resto de la economía", "N2O indirecto por deposición atmosférica"
+)
+```
+
+Verificamos que todas las categorías de Panamá tengan asignación y que no sobre ninguna.
+
+```{r}
+#| label: verifica-asignacion
+
+# Categorías de EDGAR sin asignar
+setdiff(unique(emisiones$codigo_ipcc), asignacion_ipcc$codigo_ipcc)
+
+# Asignaciones sin categoría en EDGAR
+setdiff(asignacion_ipcc$codigo_ipcc, unique(emisiones$codigo_ipcc))
+```
+
+Unimos las emisiones con la asignación y ordenamos los sectores.
+
+```{r}
+#| label: emisiones-categoria
+
+emisiones_categoria <- emisiones |>
+  left_join(asignacion_ipcc, by = "codigo_ipcc") |>
+  mutate(sector_principal = factor(sector_principal, levels = sectores_politica))
+```
+
+# Emisiones por sector
+
+Sumamos por sector y año, y calculamos la participación en el total nacional sin UTCUTS. Los sectores de recursos hídricos y de ciudades y construcción no tienen una categoría propia del IPCC: sus emisiones están dentro de residuos (aguas residuales) y de industrias (cemento y combustión), respectivamente.
+
+```{r}
+#| label: emisiones-sector
+
+emisiones_sector <- emisiones_categoria |>
+  summarize(emisiones_gg = sum(emisiones_gg), .by = c(anio, sector_principal)) |>
+  mutate(participacion = 100 * emisiones_gg / sum(emisiones_gg), .by = anio) |>
+  arrange(anio, sector_principal)
+
+emisiones_sector |>
+  filter(anio == 2023) |>
+  mutate(across(where(is.numeric), \(x) round(x, 1)))
+```
+
+# Intensidad de emisiones por valor agregado
+
+Combinamos las emisiones con el valor agregado de la memoria 2 para calcular toneladas de CO₂ equivalente por balboa de valor agregado. El cálculo solo es informativo para los sectores donde el sector de emisiones y el sector económico coinciden razonablemente: energía, residuos, industrias, y agricultura y alimentos. Para recursos hídricos y construcción no se calcula, porque sus emisiones están en categorías de otros sectores.
+
+```{r}
+#| label: intensidad
+
+cuentas_sector <- leer_salida("cuentas_sector_2018_2024")
+
+intensidad_sector <- emisiones_sector |>
+  inner_join(
+    select(cuentas_sector, anio, sector_principal, vab),
+    by = c("anio", "sector_principal")
+  ) |>
+  mutate(
+    # Gg de CO2e por millón de B/.; equivale a toneladas por millar de B/.
+    intensidad_gg_por_millon = emisiones_gg / vab,
+    intensidad_calculable = sector_principal %in% c(
+      "Energía", "Residuos", "Industrias", "Agricultura y alimentos"
+    ),
+    intensidad_gg_por_millon = if_else(intensidad_calculable, intensidad_gg_por_millon, NA_real_)
+  ) |>
+  select(-intensidad_calculable)
+```
+
+```{r}
+#| label: tbl-emisiones-2023
+#| tbl-cap: "Emisiones de GEI (sin UTCUTS) y valor agregado por sector, 2023"
+
+emisiones_sector |>
+  filter(anio == 2023) |>
+  left_join(
+    select(intensidad_sector, anio, sector_principal, vab, intensidad_gg_por_millon),
+    by = c("anio", "sector_principal")
+  ) |>
+  select(
+    Sector = sector_principal,
+    `Emisiones (Gg CO2e)` = emisiones_gg,
+    `Participación (%)` = participacion,
+    `Valor agregado (millones B/.)` = vab,
+    `Intensidad (Gg CO2e por millón B/.)` = intensidad_gg_por_millon
+  ) |>
+  tabla_ft(digitos = 1)
+```
+
+# Contraste con el inventario nacional
+
+El Documento de Inventario Nacional 2024 de MiAMBIENTE reporta las emisiones de 2021 por sector del IPCC [@ghg-nid-2024, p. 62, tabla 2.2]. Transcribimos esas cifras (en kilotoneladas de CO₂ equivalente) y las comparamos con las de EDGAR para el mismo año. Los dos inventarios usan datos de actividad y factores diferentes, y la comparación sirve solo para ver el orden de magnitud.
+
+```{r}
+#| label: contraste-inventario
+
+nacional_2021 <- tribble(
+  ~grupo_ipcc, ~nacional_kt,
+  "Energía", 13440.0,
+  "Procesos industriales y uso de productos", 1616.5,
+  "Agricultura", 4150.2,
+  "Residuos", 1312.6
+)
+
+edgar_2021 <- emisiones_categoria |>
+  filter(anio == 2021) |>
+  mutate(
+    grupo_ipcc = case_when(
+      str_starts(codigo_ipcc, "1") ~ "Energía",
+      str_starts(codigo_ipcc, "2") ~ "Procesos industriales y uso de productos",
+      str_starts(codigo_ipcc, "3") ~ "Agricultura",
+      str_starts(codigo_ipcc, "4") ~ "Residuos",
+      TRUE ~ "Otros (N2O indirecto)"
+    )
+  ) |>
+  summarize(edgar_kt = sum(emisiones_gg), .by = grupo_ipcc)
+
+contraste_inventario <- nacional_2021 |>
+  left_join(edgar_2021, by = "grupo_ipcc") |>
+  mutate(razon_edgar_nacional = edgar_kt / nacional_kt)
+```
+
+```{r}
+#| label: tbl-contraste-inventario
+#| tbl-cap: "Emisiones de 2021 según el inventario nacional y según EDGAR (kt CO2e, sin UTCUTS)"
+
+contraste_inventario |>
+  select(
+    `Sector del IPCC` = grupo_ipcc,
+    `Inventario nacional` = nacional_kt,
+    EDGAR = edgar_kt,
+    `EDGAR / nacional` = razon_edgar_nacional
+  ) |>
+  tabla_ft(digitos = 2)
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(contraste_inventario, "contraste_edgar_inventario_nacional_2021", hoja = "contraste")
+guardar_salida(emisiones_categoria, "emisiones_panama_categoria_ipcc", hoja = "categoria")
+guardar_salida(emisiones_sector, "emisiones_sector_1970_2025", hoja = "sector")
+guardar_salida(intensidad_sector, "intensidad_emisiones_sector", hoja = "intensidad")
+guardar_salida(asignacion_ipcc, "asignacion_ipcc_sector", hoja = "asignacion")
+```
+
+La serie `emisiones_panama_categoria_ipcc` conserva toda la historia de 1970 a 2025 por categoría. `emisiones_sector_1970_2025` y `intensidad_emisiones_sector` son las tablas que usan los documentos.
+
+# Referencias
+
+::: {#refs}
+:::

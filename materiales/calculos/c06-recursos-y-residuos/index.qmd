@@ -1,0 +1,418 @@
+---
+title: "Memoria de cálculo 6: uso de recursos, residuos y potencial de recuperación de materiales"
+description: "Energía por sector de consumo, agua por uso, consumo doméstico de materiales, generación y composición de residuos, y señales de recuperación comercial de materiales secundarios en Panamá"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - energía
+  - agua
+  - materiales
+  - residuos
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Los Términos de Referencia incluyen dos criterios de evaluación sectorial que las cuentas nacionales no cubren: el **uso de recursos** (agua, energía o gas, materiales) y el **potencial de recuperación y uso de materiales secundarios**. Esta memoria reúne las fuentes oficiales y de organismos internacionales disponibles para Panamá y las lleva a una forma comparable con los sectores de la Hoja de Ruta de Economía Circular.
+
+La calidad de la información es desigual y conviene decirlo de entrada:
+
+- **Energía:** el Balance Energético Nacional de la Secretaría Nacional de Energía [@sne2026balances] da el consumo final por sector de consumo y fuente. Es la mejor serie de la memoria.
+- **Agua:** solo hay extracciones por tipo de uso a nivel nacional, derivadas de AQUASTAT por el Banco Mundial [@worldbank2026agua]. No hay datos por actividad económica.
+- **Materiales:** hay un solo indicador agregado, el consumo material doméstico [@un2026sdgmateriales]. No se puede desagregar por sector.
+- **Residuos:** el Banco Mundial [@worldbank2026wwaste] reúne las cifras de generación y composición, con fuente primaria en el diagnóstico nacional de 2017 [@aaud2017PNGIR]. No hay una serie anual ni un registro de recicladores.
+- **Recuperación:** la señal observable es el comercio exterior de desechos y desperdicios [@uncomtrade2026], que es una cota inferior de la recuperación, porque no mide el reciclaje que ocurre dentro del país.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+library(readxl)
+
+cuentas_sector <- leer_salida("cuentas_sector_2018_2024")
+```
+
+# Energía por sector de consumo
+
+## Lectura de los balances
+
+El archivo tiene una hoja por año con el balance de energía en miles de barriles equivalentes de petróleo (10³ bep). Las filas son los flujos (producción, transformación, consumo por sector) y las columnas son las fuentes; la última columna con encabezado `TOTAL` suma todas las fuentes. Leemos las hojas de 2018 a 2024.
+
+```{r}
+#| label: lectura-balances
+
+archivo_balance <- "data/energia/balances_energia_1970-2025.xls"
+hojas_balance <- excel_sheets(archivo_balance)
+
+# Las hojas de datos se llaman "C-BE-n BalEne,AA"; n = año - 1969
+hojas_anio <- tibble(hoja = hojas_balance) |>
+  filter(str_starts(hoja, "C-BE-")) |>
+  mutate(anio = 1969 + as.numeric(str_extract(hoja, "(?<=C-BE-)\\d+"))) |>
+  filter(anio %in% 2018:2024)
+
+hojas_anio
+```
+
+Para cada hoja buscamos la columna `TOTAL` y extraemos los flujos de consumo que nos interesan.
+
+```{r}
+#| label: extraccion-balances
+
+flujos_consumo <- c(
+  "TRANSPORTE", "MINAS Y CANTERAS", "ALIMENTOS, BEBIDAS Y TABACO",
+  "INDUSTRIA NO ESPECIFICADA", "RESIDENCIAL", "COMERCIAL Y SERVICIOS PÚBLICOS",
+  "AGRICULTURA Y SILVICULTURA", "PESCA", "OTROS CONSUMOS",
+  "CONSUMO NO ENERGÉTICO", "CONSUMO PROPIO", "PÉRDIDAS TOTALES"
+)
+
+leer_balance <- function(hoja, anio) {
+  b <- read_excel(archivo_balance, sheet = hoja, col_names = FALSE,
+                  col_types = "text", .name_repair = "minimal")
+  col_total <- which(str_squish(as.character(unlist(b[4, ]))) == "TOTAL")[1]
+  tibble(
+    anio = anio,
+    flujo = str_squish(b[[1]]),
+    bep_miles = suppressWarnings(as.numeric(b[[col_total]]))
+  ) |>
+    filter(flujo %in% flujos_consumo) |>
+    mutate(bep_miles = replace_na(bep_miles, 0))
+}
+
+energia_flujos <- map2(hojas_anio$hoja, hojas_anio$anio, leer_balance) |>
+  list_rbind()
+```
+
+Comprobamos que cada año tiene los once flujos.
+
+```{r}
+#| label: verifica-balances
+
+count(energia_flujos, anio)
+```
+
+## Asignación a sectores
+
+La asignación sigue la lógica de la memoria 1. El balance no separa la construcción ni las industrias manufactureras distintas de alimentos y bebidas: la "industria no especificada" incluye lo que no está en minería ni en alimentos, y en la práctica contiene casi todo el consumo del resto de la manufactura y de la construcción. El consumo propio y las pérdidas son del propio sector de la energía.
+
+```{r}
+#| label: asignacion-energia
+
+asignacion_energia <- tribble(
+  ~flujo, ~sector_principal,
+  "TRANSPORTE", "Resto de la economía",
+  "MINAS Y CANTERAS", "Resto de la economía",
+  "ALIMENTOS, BEBIDAS Y TABACO", "Agricultura y alimentos",
+  "INDUSTRIA NO ESPECIFICADA", "Industrias",
+  "RESIDENCIAL", "Resto de la economía",
+  "COMERCIAL Y SERVICIOS PÚBLICOS", "Resto de la economía",
+  "AGRICULTURA Y SILVICULTURA", "Agricultura y alimentos",
+  "PESCA", "Agricultura y alimentos",
+  "OTROS CONSUMOS", "Resto de la economía",
+  "CONSUMO NO ENERGÉTICO", "Industrias",
+  "CONSUMO PROPIO", "Energía",
+  "PÉRDIDAS TOTALES", "Energía"
+)
+
+energia_sector <- energia_flujos |>
+  left_join(asignacion_energia, by = "flujo") |>
+  mutate(sector_principal = factor(sector_principal, levels = sectores_politica)) |>
+  summarize(bep_miles = sum(bep_miles), .by = c(anio, sector_principal)) |>
+  left_join(
+    select(cuentas_sector, anio, sector_principal, vab),
+    by = c("anio", "sector_principal")
+  ) |>
+  mutate(
+    # Miles de bep por millón de B/. de valor agregado
+    intensidad_bep_miles_por_millon = bep_miles / vab
+  )
+```
+
+Las pérdidas totales (transformación, transmisión y distribución) y el consumo propio de los productores de electricidad se asignan al sector de energía. Los sectores de recursos hídricos y de ciudades y construcción no aparecen en el balance con consumo identificable, y quedan ausentes de la tabla. Los transportes, el consumo residencial y el comercial quedan en "Resto de la economía".
+
+```{r}
+#| label: tbl-energia-2023
+#| tbl-cap: "Consumo de energía por sector de política, 2023 (miles de barriles equivalentes de petróleo)"
+
+energia_sector |>
+  filter(anio == 2023) |>
+  select(
+    Sector = sector_principal,
+    `Consumo (10³ bep)` = bep_miles,
+    `Valor agregado (millones B/.)` = vab,
+    `Intensidad (10³ bep por millón B/.)` = intensidad_bep_miles_por_millon
+  ) |>
+  tabla_ft(digitos = 2)
+```
+
+# Agua
+
+El Banco Mundial publica, a partir de AQUASTAT, la extracción anual de agua dulce de Panamá y su reparto entre agricultura, industria y uso doméstico. La serie de volumen total es prácticamente constante (1,21 mil millones de metros cúbicos entre 2016 y 2022), lo que sugiere que parte de la serie se interpola o repite valores de un año base. Tratamos el reparto como una caracterización estructural y no como un dato anual.
+
+```{r}
+#| label: agua
+
+agua <- read_csv("data/agua/bm_agua_panama.csv", show_col_types = FALSE)
+
+agua_2022 <- agua |>
+  filter(anio == 2022, codigo %in% c(
+    "ER.H2O.FWTL.K3", "ER.H2O.FWAG.ZS", "ER.H2O.FWIN.ZS", "ER.H2O.FWDM.ZS"
+  )) |>
+  select(codigo, valor) |>
+  pivot_wider(names_from = codigo, values_from = valor) |>
+  transmute(
+    total_millones_m3 = ER.H2O.FWTL.K3 * 1000,
+    agricultura = total_millones_m3 * ER.H2O.FWAG.ZS / 100,
+    industria = total_millones_m3 * ER.H2O.FWIN.ZS / 100,
+    domestico = total_millones_m3 * ER.H2O.FWDM.ZS / 100
+  )
+
+agua_2022
+```
+
+Asignamos la extracción a los sectores así: la agricultura al sector de agricultura y alimentos; la industria al sector de industrias, que en AQUASTAT incluye el agua de refrigeración de la generación térmica y la manufactura, y el uso doméstico al sector de recursos hídricos, que es el que entrega el agua a hogares y servicios. Esa última asignación es un convenio de lectura: la extracción para uso doméstico es una demanda de los hogares, atendida por el sector.
+
+```{r}
+#| label: agua-sector
+
+agua_sector <- agua_2022 |>
+  pivot_longer(c(agricultura, industria, domestico), names_to = "uso", values_to = "millones_m3") |>
+  mutate(
+    sector_principal = case_when(
+      uso == "agricultura" ~ "Agricultura y alimentos",
+      uso == "industria" ~ "Industrias",
+      uso == "domestico" ~ "Recursos hídricos"
+    ),
+    sector_principal = factor(sector_principal, levels = sectores_politica),
+    anio = 2022,
+    participacion = 100 * millones_m3 / total_millones_m3
+  ) |>
+  select(anio, sector_principal, uso, millones_m3, participacion)
+
+agua_sector
+```
+
+# Consumo material doméstico
+
+El consumo material doméstico (DMC, por sus siglas en inglés) es la extracción doméstica más las importaciones menos las exportaciones físicas de materiales. El archivo de las Naciones Unidas trae la serie por tipo de materia prima. Aquí usamos el total nacional porque no hay forma de repartirlo por sector.
+
+```{r}
+#| label: materiales
+
+dmc <- read_csv("data/materiales/sdg_materiales_panama.csv", show_col_types = FALSE) |>
+  filter(serie == "EN_MAT_DOMCMPT") |>
+  summarize(dmc_toneladas = sum(valor), .by = anio) |>
+  arrange(anio)
+
+# Intensidad material: toneladas por millón de B/. de valor agregado total (años en común)
+dmc_intensidad <- dmc |>
+  filter(anio %in% 2018:2022) |>
+  left_join(
+    cuentas_sector |> summarize(vab_total = sum(vab), .by = anio),
+    by = "anio"
+  ) |>
+  mutate(dmc_millones_t = dmc_toneladas / 1e6, t_por_millon_bal = dmc_toneladas / vab_total)
+
+dmc_intensidad
+```
+
+El consumo material doméstico casi se duplica entre 2018 y 2019. La fuente no desagrega por tipo en el archivo que usamos, y el salto coincide en el tiempo con el inicio de la producción de la mina de cobre, de modo que probablemente refleja la extracción de minerales metálicos. Es una hipótesis que habría que verificar con la base completa del Panel Internacional de Recursos del PNUMA.
+
+# Residuos
+
+## Generación y composición
+
+Leemos la fila de Panamá de la base de residuos del Banco Mundial. Es un archivo de dos columnas, variable y valor, con la composición en fracciones del peso de los residuos sólidos municipales (RSM).
+
+```{r}
+#| label: residuos-lectura
+
+residuos_crudo <- read_csv("data/residuos/wwaste3_panama_extracto.csv", show_col_types = FALSE)
+
+# Extrae un valor numérico por nombre de variable
+valor <- function(nombre) as.numeric(residuos_crudo$valor[residuos_crudo$variable == nombre])
+
+generacion_2021 <- valor("MSW generation (t/y)")
+generacion_2021
+```
+
+```{r}
+#| label: composicion
+
+composicion <- tibble(
+  material = c("Orgánicos", "Vidrio", "Metal", "Papel y cartón", "Plástico",
+               "Caucho y cuero", "Madera", "Textiles", "Residuos electrónicos",
+               "Peligrosos", "Otros"),
+  fraccion = c(
+    valor("Composition - food  (% weight MSW)"),
+    valor("Composition - glass  (% weight MSW)"),
+    valor("Composition - metal (% weight MSW)"),
+    valor("Composition - paper & cardboard (% weight MSW)"),
+    valor("Composition - plastic (% weight MSW)"),
+    valor("Composition - rubber & leather  (% weight MSW)"),
+    valor("Composition - wood (% weight MSW)"),
+    valor("Composition - textiles (% weight MSW)"),
+    valor("Composition - electrical and electronic equipment (% weight MSW)"),
+    valor("Composition - hazardous (% weight MSW)"),
+    valor("Composition - other (% weight MSW)")
+  )
+) |>
+  mutate(
+    porcentaje = 100 * fraccion,
+    toneladas_anio = fraccion * generacion_2021
+  )
+
+# Las fracciones deben sumar 1
+sum(composicion$fraccion)
+```
+
+La composición del Banco Mundial (33 % de orgánicos) difiere de la que indica el Plan Nacional de Gestión Integral de Residuos, que reporta 44,5 % de orgánicos en los residuos domésticos [@aaud2017PNGIR, p. 70]. Ambas cifras remiten al diagnóstico nacional de 2017 y las diferencias de definición no están documentadas en las fuentes. No resolvemos la discrepancia aquí. Usamos las cifras del Banco Mundial porque cubren toda la composición con una sola metodología, y advertimos que el potencial de valorización de orgánicos podría ser mayor.
+
+## Residuos no municipales y cobertura
+
+```{r}
+#| label: residuos-otros
+
+otros_residuos <- tibble(
+  indicador = c(
+    "Construcción y demolición (t/año, 2015)",
+    "Residuos eléctricos y electrónicos (t/año, 2020)",
+    "Residuos médicos (t/año, 2020)",
+    "Cobertura de recolección (% del peso)",
+    "Trabajadores formales de residuos (personas)"
+  ),
+  valor = c(
+    valor("Non-MSW - construction and demolition waste (t/year)"),
+    valor("Non-MSW - electrical and electronic equipment (t/year)"),
+    valor("Non-MSW - medical waste (t/year)"),
+    # La base trae la cobertura como fracción; la pasamos a porcentaje
+    100 * valor("Collection coverage - total (% weight MSW)"),
+    valor("Formal waste workers")
+  )
+)
+
+otros_residuos
+```
+
+## Recuperación comercial observada
+
+Los desechos y desperdicios de metales, papel, plástico y vidrio que Panamá exporta son la parte de la recuperación que pasa por el comercio exterior. Tomamos las partidas del Sistema Armonizado de UN Comtrade: 7204 (desperdicios de hierro y acero), 4707 (papel y cartón para reciclar), 3915 (desechos de plástico), 7001 (vidrio de desecho), 7404 (cobre), 7602 (aluminio) y 8549 (desechos electrónicos).
+
+```{r}
+#| label: comercio-desechos
+
+partidas <- tribble(
+  ~cmdCode, ~material,
+  "7204", "Metal",
+  "7404", "Metal",
+  "7602", "Metal",
+  "4707", "Papel y cartón",
+  "3915", "Plástico",
+  "7001", "Vidrio",
+  "8549", "Residuos electrónicos"
+)
+
+exportacion_desechos <- read_csv(
+  "data/comercio/comtrade_panama_hs2_hs4_2021_2025.csv",
+  show_col_types = FALSE,
+  col_types = cols(cmdCode = col_character())
+) |>
+  filter(flowCode == "X", cmdCode %in% partidas$cmdCode) |>
+  left_join(partidas, by = "cmdCode") |>
+  summarize(
+    toneladas = sum(netWgt) / 1000,
+    valor_usd = sum(primaryValue),
+    .by = c(period, material)
+  ) |>
+  rename(anio = period)
+```
+
+Contrastamos las toneladas exportadas con la cantidad de cada material en los residuos sólidos municipales de 2021. El cociente indica el orden de magnitud de la recuperación que sale por el comercio exterior. Las exportaciones de desperdicios incluyen material de origen industrial y de otras fuentes, y el reciclaje que ocurre dentro del país queda fuera, de modo que el cociente sobrestima o subestima la tasa de reciclaje según el material.
+
+```{r}
+#| label: contraste-desechos
+
+contraste_recuperacion <- exportacion_desechos |>
+  filter(anio == 2021) |>
+  left_join(
+    select(composicion, material, generacion_msm_t = toneladas_anio),
+    by = "material"
+  ) |>
+  mutate(razon_exportacion_generacion = 100 * toneladas / generacion_msm_t)
+
+contraste_recuperacion
+```
+
+Para los metales la razón supera con amplitud el 100 %, lo que confirma que los desperdicios que se exportan no provienen solo de los residuos municipales: incluyen chatarra industrial, de construcción y de otros orígenes. Para plástico, papel y vidrio las razones son menores al 10 %.
+
+```{r}
+#| label: tbl-recuperacion
+#| tbl-cap: "Exportaciones de desechos y generación estimada en residuos municipales, 2021"
+
+contraste_recuperacion |>
+  select(
+    Material = material,
+    `Exportado (t)` = toneladas,
+    `Generado en RSM (t)` = generacion_msm_t,
+    `Exportado / generado (%)` = razon_exportacion_generacion
+  ) |>
+  tabla_ft(digitos = 1)
+```
+
+# Tabla integrada de uso de recursos por sector
+
+Resumimos para 2022 y 2023 lo que tenemos por sector: energía (2023), agua (2022). El resto de indicadores es nacional y se queda en sus propias tablas.
+
+```{r}
+#| label: recursos-sector
+
+recursos_sector <- energia_sector |>
+  filter(anio == 2023) |>
+  select(sector_principal, energia_bep_miles = bep_miles, energia_intensidad = intensidad_bep_miles_por_millon) |>
+  left_join(
+    select(agua_sector, sector_principal, agua_millones_m3 = millones_m3, agua_participacion = participacion),
+    by = "sector_principal"
+  )
+
+recursos_sector
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(energia_flujos, "energia_flujos_consumo_2018_2024", hoja = "flujos")
+guardar_salida(energia_sector, "energia_sector_2018_2024", hoja = "sector")
+guardar_salida(agua_sector, "agua_uso_sector_2022", hoja = "agua")
+guardar_salida(dmc_intensidad, "materiales_dmc_2018_2022", hoja = "dmc")
+guardar_salida(composicion, "residuos_composicion_2021", hoja = "composicion")
+guardar_salida(otros_residuos, "residuos_otros_indicadores", hoja = "otros")
+guardar_salida(exportacion_desechos, "exportaciones_desechos_2021_2025", hoja = "desechos")
+guardar_salida(contraste_recuperacion, "recuperacion_contraste_2021", hoja = "contraste")
+guardar_salida(recursos_sector, "recursos_sector_resumen", hoja = "resumen")
+```
+
+# Referencias
+
+::: {#refs}
+:::

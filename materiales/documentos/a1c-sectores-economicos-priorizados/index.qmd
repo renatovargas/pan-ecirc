@@ -1,0 +1,1059 @@
+---
+title: "Análisis de los sectores económicos priorizados para la economía circular en Panamá"
+subtitle: "Caracterización sectorial, eslabonamientos productivos e instrumentos de política"
+author:
+  - name: "Renato Vargas"
+    affiliation: "Consultor para la Comisión Económica para América Latina y el Caribe (CEPAL)"
+date: "2026-10-22"
+lang: es
+categories:
+  - economía circular
+  - sectores priorizados
+  - Panamá
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+crossref:
+  tbl-title: "Cuadro"
+  fig-title: "Figura"
+  tbl-prefix: "Cuadro"
+  fig-prefix: "Figura"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../estilos.css
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    reference-doc: ../../../assets/reference.docx
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: preparacion
+
+# Funciones, constantes y formato compartidos
+source("materiales/calculos/scripts/funciones_comunes.R")
+
+seis <- sectores_politica[1:6]
+
+# Bases fuente de verdad (data/outputs)
+si <- leer_salida("sectores_priorizados")
+cuentas <- leer_salida("cuentas_sector_2018_2024")
+crecimiento <- leer_salida("crecimiento_vab_sector")
+empleo <- leer_salida("empleo_sector_2018_2024")
+empleo_perfil <- leer_salida("empleo_sector_perfil_2024")
+enlaces_sector <- leer_salida("eslabonamientos_sector_mip2018")
+enlaces_act <- leer_salida("eslabonamientos_actividad_mip2018")
+emisiones_sector <- leer_salida("emisiones_sector_1970_2025")
+intensidad <- leer_salida("intensidad_emisiones_sector")
+contraste_inv <- leer_salida("contraste_edgar_inventario_nacional_2021")
+composicion <- leer_salida("residuos_composicion_2021")
+otros_res <- leer_salida("residuos_otros_indicadores")
+desechos <- leer_salida("exportaciones_desechos_2021_2025")
+contraste_rec <- leer_salida("recuperacion_contraste_2021")
+empresas_clave <- leer_salida("empresas_clases_clave_2022")
+estructura_emp <- leer_salida("estructura_empresarial_sector_2022")
+dmc <- leer_salida("materiales_dmc_2018_2022")
+mapeo <- leer_salida("mapeo_sectores_scn")
+matriz_ancha <- leer_salida("matriz_relevancia_sectorial_ancha")
+
+# Valor de un indicador de la base integrada
+val <- function(indicador, sector) {
+  si |> filter(indicador == !!indicador, sector_principal == !!sector) |> pull(valor)
+}
+
+# Cifras de resumen
+part_vab_seis <- sum(cuentas$participacion_vab[cuentas$anio == 2024 & cuentas$sector_principal %in% seis])
+part_emp_seis <- sum(empleo$participacion_empleo[empleo$anio == 2024 & empleo$sector_principal %in% seis])
+vab_total <- cuentas |> summarize(v = sum(vab), .by = anio)
+vab_total_2024 <- vab_total$v[vab_total$anio == 2024]
+emis_total_2023 <- sum(emisiones_sector$emisiones_gg[emisiones_sector$anio == 2023])
+rsm_mt <- sum(composicion$toneladas_anio) / 1e6
+dmc_2022 <- dmc$dmc_millones_t[dmc$anio == 2022]
+desechos_2024 <- desechos |> filter(anio == 2024) |> summarize(t = sum(toneladas), .by = material)
+toneladas_2024 <- setNames(desechos_2024$t, desechos_2024$material)
+```
+
+# Resumen ejecutivo {.unnumbered}
+
+Este documento caracteriza, con las estadísticas oficiales disponibles, los sectores de la economía de Panamá que la política de economía circular ha priorizado, y propone instrumentos de política pública, principalmente económicos, que pueden promover la circularidad en ellos. Es una base común de datos y de propuestas para quienes participan en el diseño, la regulación y el financiamiento de la transición circular del país.
+
+Los sectores analizados son los seis de la Hoja de Ruta de Economía Circular con enfoque de cambio climático [@miambiente2024HojaRutaEC]: residuos, energía, recursos hídricos, industrias, agricultura y alimentos, y ciudades y construcción. La Ley 502 de 2025 [@panama2025Ley502] fija el marco legal de la transición, pero no lista sectores ni actividades económicas. Para conectar los sectores con las estadísticas se asignó cada una de las 80 actividades de las cuentas nacionales a un sector principal. Luego se evaluaron los criterios siguientes: producto interno bruto, empleo con desglose por género y condición laboral, comercio exterior, inversión, estructura de mercado, emisiones de gases de efecto invernadero, uso de recursos, potencial de recuperación de materiales y eslabonamientos productivos.
+
+Los principales hallazgos son los siguientes.
+
+- **Peso económico.** Los seis sectores generan `r formato_es(part_vab_seis, 1)` % del valor agregado y concentran `r formato_es(part_emp_seis, 1)` % de los puestos de trabajo de 2024. La construcción es el más grande por valor agregado (`r formato_es(val("Participación en el valor agregado", "Ciudades y construcción"), 1)` %), y agricultura y alimentos el más grande por empleo (`r formato_es(val("Participación en el empleo", "Agricultura y alimentos"), 1)` %). Los sectores de residuos, recursos hídricos y energía son pequeños en las cuentas nacionales: ninguno supera `r formato_es(max(val("Participación en el valor agregado", "Residuos"), val("Participación en el valor agregado", "Recursos hídricos"), val("Participación en el valor agregado", "Energía")), 1)` % del valor agregado. La energía crece `r formato_es(val("Crecimiento anual compuesto del valor agregado", "Energía"), 1)` % anual entre 2018 y 2024 a precios corrientes.
+- **Empleo e informalidad.** La informalidad estimada es alta en agricultura y alimentos (`r formato_es(val("Empleo informal (estimado)", "Agricultura y alimentos"), 0)` %), construcción (`r formato_es(val("Empleo informal (estimado)", "Ciudades y construcción"), 0)` %) e industrias (`r formato_es(val("Empleo informal (estimado)", "Industrias"), 0)` %). La participación de las mujeres es baja en construcción (`r formato_es(val("Mujeres en el empleo (estimado)", "Ciudades y construcción"), 0)` %) y en agricultura (`r formato_es(val("Mujeres en el empleo (estimado)", "Agricultura y alimentos"), 0)` %), y cercana a la mitad en industrias (`r formato_es(val("Mujeres en el empleo (estimado)", "Industrias"), 0)` %).
+- **Residuos.** El sector formal de residuos aporta `r formato_es(val("Valor agregado bruto", "Residuos"), 0)` millones de balboas de valor agregado. La generación de residuos sólidos municipales se estima en `r formato_es(rsm_mt, 2)` millones de toneladas al año, y casi dos tercios son orgánicos, plásticos y papel y cartón. Las estadísticas no permiten medir el reciclaje que ocurre dentro del país.
+- **Emisiones.** Según la base EDGAR, las emisiones sin uso de la tierra fueron de `r formato_es(emis_total_2023 / 1000, 1)` millones de toneladas de CO₂ equivalente en 2023. Energía y agricultura concentran el `r formato_es(sum(emisiones_sector$participacion[emisiones_sector$anio == 2023 & emisiones_sector$sector_principal %in% c("Energía", "Agricultura y alimentos")]), 0)` % de ellas.
+- **Eslabonamientos.** Con la matriz insumo-producto de 2018, agricultura y alimentos tiene los encadenamientos más fuertes hacia atrás y hacia adelante entre los seis sectores. La electricidad es una actividad de impulso hacia adelante. El sector de residuos, aunque pequeño, genera `r formato_es(val("Multiplicador de empleo", "Residuos"), 0)` puestos de trabajo por millón de balboas de demanda final, el segundo valor más alto después de agricultura y alimentos.
+- **Calidad de la información.** Varios criterios solo pueden evaluarse a nivel de sección económica o con supuestos de asignación. La formación bruta de capital por actividad, las barreras de entrada y el reciclaje informal no tienen indicadores públicos. El documento registra estas brechas y las traduce en solicitudes de información para las siguientes etapas del trabajo.
+
+La propuesta final de este documento organiza catorce instrumentos en dos tiempos. En el primero se sitúan las condiciones habilitantes (registro de productores e importadores, formalización de recicladores de base, trazabilidad e información) y los instrumentos de financiamiento y compras que no dependen de ellas. En el segundo, los instrumentos que sí dependen de un registro operativo: responsabilidad extendida del productor con ecomodulación, depósito y retorno, tarifas y contenido reciclado. Cada instrumento se describe con ejemplos de otros países y con su aplicación a los datos de Panamá.
+
+# Lista de cuadros y figuras {.unnumbered}
+
+**Cuadros**
+
+- @tbl-sectores: Sectores de política y actividades del Sistema de Cuentas Nacionales
+- @tbl-estructura: Valor agregado y empleo por sector, 2024
+- @tbl-genero: Empleo por género, informalidad y remuneración, 2024
+- @tbl-comercio: Comercio exterior por sector, 2024
+- @tbl-inversion: Inversión extranjera directa por grupo de sectores
+- @tbl-estructura-emp: Estructura de tamaño de las empresas, 2022
+- @tbl-clases: Empresas de las clases de actividad más relacionadas con los sectores, 2022
+- @tbl-emisiones: Emisiones de gases de efecto invernadero por sector, 2023
+- @tbl-energia-agua: Uso de energía y de agua por sector
+- @tbl-residuos: Composición de los residuos sólidos municipales, 2021
+- @tbl-recuperacion: Exportaciones de desechos y generación estimada, 2021
+- @tbl-enlaces: Eslabonamientos por sector, 2018
+- @tbl-actividades: Eslabonamientos de actividades seleccionadas, 2018
+- @tbl-matriz: Matriz de relevancia sectorial
+- @tbl-instrumentos: Instrumentos propuestos, sectores y respaldo en los datos
+- @tbl-paquetes: Paquete de instrumentos propuesto por sector
+- @tbl-brechas: Brechas de información y tratamiento
+- @tbl-siglas: Glosario de siglas
+- @tbl-anexo-mapeo: Mapeo detallado de las 80 actividades del SCN a los sectores de política (anexo)
+
+**Figuras**
+
+- @fig-vab-empleo: Participación en el valor agregado y en el empleo, 2024
+- @fig-emisiones: Emisiones de gases de efecto invernadero por sector, 2018 a 2025
+- @fig-composicion: Composición de los residuos sólidos municipales
+- @fig-enlaces: Encadenamientos de las 76 actividades de la matriz insumo-producto, 2018
+
+# Introducción
+
+Panamá aprobó en noviembre de 2025 la Ley 502, que dicta normas para la implementación de la economía circular como estrategia ambiental [@panama2025Ley502]. La ley crea el Consejo Nacional de Economía Circular y ordena un Plan Estratégico Nacional con lineamientos para guías técnicas por actividad económica y para la responsabilidad extendida del productor (REP). Crea además una plataforma de indicadores en el Sistema Nacional de Información Ambiental. La reglamentación corresponde al Ministerio de Ambiente (MiAMBIENTE).
+
+El Ministerio de Ambiente solicitó el apoyo técnico de la CEPAL para implementar la estrategia nacional de economía circular, y este documento forma parte de esa cooperación, financiada por el programa CEPAL-BMZ/GIZ "Promoviendo la Economía Circular".
+
+Su propósito es caracterizar con datos los sectores donde coinciden la necesidad y la oportunidad de circularidad, y proponer a partir de ellos los instrumentos de política que merecen una evaluación más detallada. Está pensado para quienes serán consultados sobre esas propuestas: instituciones públicas, sistema financiero, sector privado, academia y sociedad civil.
+
+La metodología se describe en un documento complementario. Las cifras provienen de bases de datos construidas con estadísticas oficiales, cuyos pasos de cálculo se documentan en memorias de cálculo públicas.
+
+# Objetivos y alcance
+
+## Objetivo general
+
+Caracterizar los principales sectores económicos de Panamá, con énfasis en los sectores priorizados por las políticas de economía circular y considerando los eslabonamientos productivos, como base para identificar instrumentos de política pública, principalmente económicos, que promuevan la circularidad.
+
+## Objetivos específicos
+
+1. Establecer una equivalencia reproducible entre los sectores de política y las actividades económicas de las estadísticas oficiales.
+2. Evaluar cada sector según los criterios siguientes: producto interno bruto; empleo con desglose por género y condición formal o informal; exportaciones, importaciones y competitividad; inversión, principalmente privada; concentración de mercado y barreras de entrada y salida; emisiones de gases de efecto invernadero; uso de recursos; y potencial de recuperación de materiales secundarios.
+3. Cuantificar los eslabonamientos productivos entre las actividades y entre los sectores.
+4. Identificar las brechas de información que condicionan la evaluación y proponer cómo cerrarlas.
+5. Proponer, con base en los datos y en la experiencia internacional, los instrumentos de política pública que pueden promover la circularidad en cada sector, y describirlos con ejemplos.
+
+## Alcance
+
+El análisis cubre el período 2018 a 2024 para las cuentas nacionales y el empleo, y los años más recientes disponibles para el resto de los criterios. La matriz insumo-producto es de 2018. Los valores monetarios están en balboas corrientes. Los instrumentos que se proponen son candidatos a evaluación; el documento no estima su costo fiscal ni sus efectos.
+
+# Antecedentes
+
+## Marco legal y de política
+
+La Ley 502 establece como finalidades, entre otras, reducir la generación de desechos, fomentar la valorización de residuos, establecer la REP como mecanismo para mitigar los impactos ambientales de los productos durante todo su ciclo de vida, fomentar empleos verdes e incentivar el emprendimiento sostenible mediante el acceso al financiamiento [@panama2025Ley502, art. 2]. Incorpora además criterios de sostenibilidad y economía circular a las compras públicas [@panama2025Ley502, art. 12]. Los incentivos fiscales, las tarifas de la REP y los indicadores específicos quedan a cargo de la reglamentación y del Consejo.
+
+La Hoja de Ruta de Economía Circular con enfoque de cambio climático, elaborada por MiAMBIENTE con el Programa de las Naciones Unidas para el Desarrollo (PNUD), priorizó seis sectores por su potencial de reducir emisiones o de adaptarse al cambio climático. Definió además siete líneas de acción transversal, entre ellas el marco regulatorio, la producción circular con incentivos y la innovación [@miambiente2024HojaRutaEC, p. 7 y 29-32]. Su meta es cualitativa y está fijada al año 2050. Las metas cuantitativas vigentes figuran en el Plan Nacional de Gestión Integral de Residuos 2017-2027, que propone destinar al menos la mitad de los residuos a la reutilización y el reciclaje y tratar el 75 % de los recogidos [@aaud2017PNGIR, p. 7-8].
+
+Otros instrumentos son la Ley 33 de 2018, que establece la política Basura Cero [@panama2018Ley33], y la Ley 187 de 2020, que regula el reemplazo progresivo de los plásticos de un solo uso [@panama2020Ley187]. En el ámbito financiero, la Taxonomía de Finanzas Sostenibles de Panamá incluye la transición hacia una economía circular entre sus objetivos [@sbp2024TaxonomiaPanama], y el Marco de Financiamiento Sostenible de la República contempla una categoría de economía circular para bonos temáticos [@mef2024MarcoFinanciamientoSostenible].
+
+## Experiencia regional
+
+La CEPAL analizó nueve hojas de ruta de economía circular de América Latina y el Caribe, con 261 iniciativas. Los instrumentos económicos representan una cuarta parte de las iniciativas del eje de políticas y las estrategias de financiamiento solo el 7 %. La Comisión concluye que hay un amplio espacio para buscar fuentes y diseñar estrategias de financiamiento de la transición [@cepal2022HojasRuta, p. 26-27]. El sector de residuos concentra el 31 % de las iniciativas regionales [@cepal2022HojasRuta, p. 30].
+
+# Fuentes y método
+
+El documento usa conjuntos de datos construidos para este análisis y documentados en memorias de cálculo:
+
+- **Cuentas económicas por actividad y sector.** Producción, valor agregado, exportaciones e importaciones de 2018 a 2024, a partir de los cuadros de oferta y utilización del Instituto Nacional de Estadística y Censo (INEC) [@inec2026cou].
+- **Empleo.** Puestos de trabajo y remuneración por actividad de la matriz de empleo de las cuentas nacionales [@inec2026empleo], complementados con la composición por sexo y la informalidad por sección de actividad de la Encuesta de Mercado Laboral [@inec2026eml; @ilo2026ilostat].
+- **Eslabonamientos.** La matriz insumo-producto de 2018, de 76 actividades [@inec2024mip], procesada con el método estándar de análisis insumo-producto [@millerblair2022].
+- **Recursos y ambiente.** Emisiones de la base EDGAR [@edgar2026ghg], balances de energía [@sne2026balances], extracciones de agua [@worldbank2026agua], residuos [@worldbank2026wwaste] y comercio de desechos [@uncomtrade2026].
+- **Inversión y estructura empresarial.** Inversión extranjera directa y directorio de empresas del INEC [@inec2026ied; @inec2022directorio].
+
+**Asignación de actividades a sectores.** Cada actividad tiene un único sector principal, de modo que los totales suman sin doble conteo. Los sectores secundarios y el tipo de vínculo se registran para el análisis de relaciones, pero no se suman. Las actividades sin vínculo identificado en las fuentes de política quedan en "Resto de la economía". El @tbl-sectores resume el resultado; la tabla completa con las 80 actividades y su evidencia es una de las bases de datos del proyecto.
+
+```{r}
+#| label: tbl-sectores
+#| tbl-cap: "Sectores de política y actividades del Sistema de Cuentas Nacionales"
+
+mapeo |>
+  filter(sector_principal %in% seis) |>
+  summarize(
+    `Actividades` = n(),
+    `Actividades principales` = paste(
+      str_trunc(actividad[seq_len(min(3, n()))], 38), collapse = "; "
+    ),
+    .by = sector_principal
+  ) |>
+  rename(Sector = sector_principal) |>
+  tabla_ft_es(digitos = 0)
+```
+
+*Fuente: elaboración propia con base en la Hoja de Ruta [@miambiente2024HojaRutaEC] y en las cuentas nacionales [@inec2026cou].*
+
+**Calidad de los indicadores.** Cada indicador de la base integrada tiene una bandera: alta si es un dato oficial desagregable al sector; media si requiere un supuesto de asignación; baja si solo existe para un grupo de sectores o una sección más amplia. La sección de limitaciones detalla los casos.
+
+# Estructura económica y empleo
+
+## Producto y valor agregado
+
+Los seis sectores suman `r formato_es(part_vab_seis, 1)` % del valor agregado bruto de 2024, que fue de `r formato_es(vab_total_2024, 0)` millones de balboas. Ciudades y construcción es el mayor, con `r formato_es(val("Valor agregado bruto", "Ciudades y construcción"), 0)` millones de balboas, y le siguen agricultura y alimentos (`r formato_es(val("Valor agregado bruto", "Agricultura y alimentos"), 0)`), industrias (`r formato_es(val("Valor agregado bruto", "Industrias"), 0)`) y energía (`r formato_es(val("Valor agregado bruto", "Energía"), 0)`). Residuos y recursos hídricos son pequeños.
+
+Entre 2018 y 2024 el valor agregado a precios corrientes de energía y de agricultura y alimentos creció por encima del 6 % anual, y el de industrias cayó `r formato_es(abs(val("Crecimiento anual compuesto del valor agregado", "Industrias")), 1)` % anual. Las tasas mezclan variaciones de precios y de cantidades. El valor agregado total pasó de `r formato_es(vab_total$v[vab_total$anio == 2019], 0)` millones de balboas en 2019 a `r formato_es(vab_total$v[vab_total$anio == 2020], 0)` en 2020, el año de la pandemia, y la cifra de 2024 es provisional.
+
+```{r}
+#| label: tbl-estructura
+#| tbl-cap: "Valor agregado y empleo por sector, 2024"
+
+cuentas |>
+  filter(anio == 2024, sector_principal %in% seis) |>
+  select(sector_principal, vab, participacion_vab) |>
+  left_join(
+    crecimiento |> select(sector_principal, tcac_vab_2018_2024),
+    by = "sector_principal"
+  ) |>
+  left_join(
+    empleo |> filter(anio == 2024) |> select(sector_principal, puestos, participacion_empleo),
+    by = "sector_principal"
+  ) |>
+  transmute(
+    Sector = sector_principal,
+    `Valor agregado (millones B/.)` = vab,
+    `Participación (%)` = participacion_vab,
+    `Crecimiento anual 2018-2024 (%)` = tcac_vab_2018_2024,
+    Puestos = puestos,
+    `Participación en el empleo (%)` = participacion_empleo
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = c("Valor agregado (millones B/.)", "Puestos"))
+```
+
+*Fuente: elaboración propia con datos del INEC [@inec2026cou; @inec2026empleo]. Valores a precios corrientes; 2024 es provisional.*
+
+```{r}
+#| label: fig-vab-empleo
+#| fig-cap: "Participación en el valor agregado y en el empleo de los seis sectores de política, 2024 (porcentaje del total nacional)"
+#| fig-width: 7
+#| fig-height: 3.6
+
+cuentas |>
+  filter(anio == 2024, sector_principal %in% seis) |>
+  select(sector_principal, vab = participacion_vab) |>
+  left_join(
+    empleo |> filter(anio == 2024) |> select(sector_principal, empleo = participacion_empleo),
+    by = "sector_principal"
+  ) |>
+  pivot_longer(c(vab, empleo), names_to = "medida", values_to = "porcentaje") |>
+  mutate(medida = recode(medida, vab = "Valor agregado", empleo = "Empleo")) |>
+  ggplot(aes(x = porcentaje, y = fct_rev(sector_principal), fill = medida)) +
+  geom_col(position = "dodge") +
+  labs(x = "Porcentaje del total nacional", y = NULL) +
+  tema_grafico()
+```
+
+La participación de agricultura y alimentos en el empleo (`r formato_es(val("Participación en el empleo", "Agricultura y alimentos"), 1)` %) es más de cuatro veces su participación en el valor agregado (`r formato_es(val("Participación en el valor agregado", "Agricultura y alimentos"), 1)` %), lo que indica una baja productividad media por puesto. En construcción ocurre lo contrario: su participación en el valor agregado es el doble de su participación en el empleo. Estos desbalances importan para los instrumentos, porque una política que eleve costos en un sector intensivo en empleo y de baja productividad tendrá efectos distributivos distintos de una que se aplique en un sector intensivo en capital.
+
+## Empleo, género y condición laboral
+
+El empleo se mide en puestos de trabajo de la matriz de empleo de las cuentas nacionales, que cubre 2018 a 2024. Esa fuente no distingue sexo ni formalidad. Para estimar ambos se aplicó a cada actividad el perfil de su sección de actividad de la Encuesta de Mercado Laboral. La estimación supone que todas las actividades de una sección tienen la misma proporción de mujeres y la misma tasa de informalidad que la sección completa. Es una imputación proporcional, útil para comparar sectores pero no para describir una actividad individual.
+
+```{r}
+#| label: tbl-genero
+#| tbl-cap: "Empleo por género, informalidad y remuneración, 2024 (estimaciones por imputación de la sección de actividad)"
+
+empleo_perfil |>
+  filter(sector_principal %in% seis) |>
+  left_join(
+    empleo |> filter(anio == 2024) |> select(sector_principal, remuneracion_media),
+    by = "sector_principal"
+  ) |>
+  arrange(match(sector_principal, seis)) |>
+  transmute(
+    Sector = sector_principal,
+    Puestos = puestos,
+    `Mujeres (%)` = pct_mujeres_est,
+    `Informales (%)` = pct_informal_est,
+    `Remuneración media por asalariado (miles B/.)` = remuneracion_media
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = "Puestos")
+```
+
+*Fuente: elaboración propia con datos del INEC [@inec2026empleo; @inec2026eml] y de la OIT [@ilo2026ilostat]. Perfil por sección de 2025 aplicado a los puestos de 2024.*
+
+Tres lecturas se desprenden del @tbl-genero. Primero, los sectores con más empleo (agricultura y alimentos, construcción, industrias) son también los de mayor informalidad estimada, por encima del 60 %. Segundo, la participación de las mujeres es baja en construcción y en agricultura, y de alrededor del `r formato_es(val("Mujeres en el empleo (estimado)", "Industrias"), 0)` % en industrias, lo que importa para los instrumentos que involucren capacitación, formalización o acceso a financiamiento. Tercero, la remuneración media por asalariado es la más alta en energía y la más baja en agricultura y alimentos.
+
+Dos salvedades afectan la lectura de los sectores pequeños. Los puestos de las cuentas nacionales en electricidad (sección D) y en agua y desechos (sección E) equivalen a 0,3 y 0,5 veces los ocupados de la encuesta, de modo que el empleo de estos sectores puede ser de dos a tres veces mayor que el que muestra el @tbl-genero. Además, la encuesta no tiene una categoría para los recicladores de base, y las fuentes consultadas no los cuantifican con datos recientes. El registro de 2010 identifica 6.085 segregadores urbanos [@res-bid-eval2010, p. 143], y la Ley 33 de 2018 y la Ley 502 reconocen su inclusión [@panama2018Ley33; @panama2025Ley502, art. 10].
+
+## Comercio exterior y competitividad
+
+Las cuentas nacionales registran el comercio por producto. Para llevarlo a las actividades se asignó cada producto a la actividad que lo produce en el país, y los productos con menos de la mitad de oferta nacional (reexportaciones, como los combustibles de bunker) se agruparon aparte. Por eso los resultados por sector son indicios de orientación exportadora y ofrecen una aproximación gruesa de la competitividad.
+
+```{r}
+#| label: tbl-comercio
+#| tbl-cap: "Comercio exterior por sector, 2024 (millones de balboas corrientes)"
+
+si |>
+  filter(
+    sector_principal %in% seis,
+    indicador %in% c("Exportaciones", "Importaciones", "Saldo comercial", "Exportaciones sobre producción")
+  ) |>
+  select(sector_principal, indicador, valor) |>
+  pivot_wider(names_from = indicador, values_from = valor) |>
+  transmute(
+    Sector = sector_principal,
+    Exportaciones,
+    Importaciones,
+    `Saldo comercial`,
+    `Exportaciones sobre producción (%)` = `Exportaciones sobre producción`
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = c("Exportaciones", "Importaciones", "Saldo comercial"))
+```
+
+*Fuente: elaboración propia con datos del INEC [@inec2026cou]. Los productos de residuos, agua y construcción no tienen comercio registrado en las cuentas nacionales, y el valor cero indica esa ausencia.*
+
+Industrias y agricultura y alimentos tienen saldos comerciales negativos (`r formato_es(val("Saldo comercial", "Industrias"), 0)` y `r formato_es(val("Saldo comercial", "Agricultura y alimentos"), 0)` millones de balboas, respectivamente) y exportan `r formato_es(val("Exportaciones sobre producción", "Industrias"), 0)` % y `r formato_es(val("Exportaciones sobre producción", "Agricultura y alimentos"), 0)` % de su producción. Las exportaciones totales del país se concentran en servicios y reexportaciones, que están en "Resto de la economía". Para la economía circular esto sugiere que los instrumentos sobre bienes dependen más de la importación que de la producción nacional, un rasgo importante para el diseño de la REP, pues los obligados serán en buena parte importadores.
+
+Como referencia del comercio de materiales recuperables, en 2024 Panamá exportó unas `r formato_es(toneladas_2024[["Metal"]] / 1000, 0)` mil toneladas de desperdicios de metales, `r formato_es(toneladas_2024[["Papel y cartón"]] / 1000, 0)` mil toneladas de papel y cartón para reciclar y `r formato_es(toneladas_2024[["Plástico"]] / 1000, 1)` mil toneladas de desechos de plástico [@uncomtrade2026]. Esas cifras son la señal de recuperación que sale por el comercio exterior; el reciclaje interno queda fuera de la medición.
+
+## Inversión y estructura de mercado
+
+Panamá no publica la formación bruta de capital por actividad. La aproximación disponible es la inversión extranjera directa (IED) por sección de actividad del INEC, que combina electricidad, gas y agua en una sola línea. El @tbl-inversion muestra el flujo y la posición.
+
+```{r}
+#| label: tbl-inversion
+#| tbl-cap: "Inversión extranjera directa por grupo de sectores (millones de balboas)"
+
+si |>
+  filter(indicador %in% c("IED, flujo acumulado 2022-2024", "IED, posición al cierre"), sector_principal %in% seis) |>
+  select(sector_principal, indicador, valor) |>
+  pivot_wider(names_from = indicador, values_from = valor) |>
+  transmute(
+    Sector = sector_principal,
+    `Flujo acumulado 2022-2024` = `IED, flujo acumulado 2022-2024`,
+    `Posición al cierre de 2024` = `IED, posición al cierre`
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = c("Flujo acumulado 2022-2024", "Posición al cierre de 2024"))
+```
+
+*Fuente: elaboración propia con datos del INEC [@inec2026ied]. Energía, recursos hídricos y residuos comparten un solo valor porque la fuente los reúne en la sección de electricidad, gas y agua. Cifras preliminares.*
+
+La IED acumulada de 2022 a 2024 en el grupo de energía, agua y residuos fue de `r formato_es(val("IED, flujo acumulado 2022-2024", "Energía"), 0)` millones de balboas, la mayor entre los seis sectores. En industrias fue de `r formato_es(val("IED, flujo acumulado 2022-2024", "Industrias"), 0)`, en construcción de `r formato_es(val("IED, flujo acumulado 2022-2024", "Ciudades y construcción"), 0)` y en agricultura de `r formato_es(val("IED, flujo acumulado 2022-2024", "Agricultura y alimentos"), 0)`. La inversión privada nacional no está cubierta por esta cifra.
+
+Respecto de la estructura de mercado, el Directorio de Empresas de 2022 del INEC permite comparar el tamaño de las empresas en la sección donde cada sector tiene su núcleo [@inec2022directorio]. Las empresas grandes, con ingresos superiores a 2,5 millones de balboas, son `r formato_es(val("Empresas grandes en la sección", "Energía"), 0)` % en electricidad, gas y vapor, frente a menos de `r formato_es(ceiling(max(val("Empresas grandes en la sección", "Industrias"), val("Empresas grandes en la sección", "Agricultura y alimentos"), val("Empresas grandes en la sección", "Ciudades y construcción"))), 0)` % en industrias, agricultura y construcción.
+
+```{r}
+#| label: tbl-estructura-emp
+#| tbl-cap: "Estructura de tamaño de las empresas en la sección principal de cada sector, 2022"
+
+estructura_emp |>
+  transmute(
+    Sector = grupo_sector,
+    Empresas = empresas,
+    Micro = micro,
+    Pequeña = pequena,
+    Mediana = mediana,
+    Grande = grande,
+    `Grandes (%)` = pct_grande
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = c("Empresas", "Micro", "Pequeña", "Mediana", "Grande"))
+```
+
+*Fuente: elaboración propia con datos del Directorio de Empresas y Locales 2022 [@inec2022directorio]. Tamaño según ingresos anuales con los umbrales de la Ley 8 de 2000 [@ampyme2017politica]. Cada sección agrupa actividades de varios sectores de política.*
+
+```{r}
+#| label: tbl-clases
+#| tbl-cap: "Empresas, personal e ingresos de las clases de actividad más relacionadas con los sectores, 2022"
+
+empresas_clave |>
+  mutate(etiqueta = str_trunc(etiqueta, 58)) |>
+  transmute(
+    Sector = sector_principal,
+    Clase = etiqueta,
+    Empresas = empresas,
+    Personal = personal,
+    `Personal por empresa` = personal_por_empresa
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = c("Empresas", "Personal"))
+```
+
+*Fuente: elaboración propia con datos del Directorio de Empresas y Locales 2022 [@inec2022directorio].*
+
+El @tbl-clases muestra mercados con pocos oferentes en varias clases clave: 13 empresas fabrican cemento, cal y yeso, 49 fabrican productos de plástico y 120 operan en generación, transmisión y distribución eléctrica. En residuos, la recolección de desechos no peligrosos tiene 31 empresas con un promedio de `r formato_es(empresas_clave$personal_por_empresa[str_detect(empresas_clave$etiqueta, "^Recolección de desechos no")], 0)` empleados, y el procesamiento y la recuperación de materiales tiene 77 empresas con menos de cuatro empleados en promedio. Los conteos sugieren concentración en algunas clases y atomización en la recuperación de materiales, pero no son participaciones de mercado. La autoridad de competencia no publica estudios sectoriales para estas clases, y las barreras de entrada y salida requieren un análisis cualitativo con entrevistas a los actores de cada mercado.
+
+# Presión ambiental y recursos
+
+## Emisiones de gases de efecto invernadero
+
+La base EDGAR estima las emisiones de Panamá por categoría del IPCC desde 1970. No incluye el uso de la tierra y la silvicultura, que el inventario nacional reporta como sumidero neto [@ghg-nid-2024, p. 62]. Para el año común de 2021, las emisiones de EDGAR equivalen a entre `r formato_es(100 * min(contraste_inv$razon_edgar_nacional[contraste_inv$grupo_ipcc != "Residuos"]), 0)` % y `r formato_es(100 * max(contraste_inv$razon_edgar_nacional[contraste_inv$grupo_ipcc != "Residuos"]), 0)` % de las del inventario nacional en energía, procesos industriales y agricultura, y a `r formato_es(100 * contraste_inv$razon_edgar_nacional[contraste_inv$grupo_ipcc == "Residuos"], 0)` % en residuos, de modo que las dos fuentes no coinciden. El análisis usa EDGAR porque ofrece una serie continua y comparable por categoría; el inventario nacional será la referencia para la medición oficial.
+
+```{r}
+#| label: tbl-emisiones
+#| tbl-cap: "Emisiones de gases de efecto invernadero por sector, 2023 (sin uso de la tierra)"
+
+emisiones_sector |>
+  filter(anio == 2023) |>
+  left_join(
+    intensidad |> filter(anio == 2023) |> select(sector_principal, intensidad_gg_por_millon),
+    by = "sector_principal"
+  ) |>
+  transmute(
+    Sector = sector_principal,
+    `Emisiones (Gg CO2e)` = emisiones_gg,
+    `Participación (%)` = participacion,
+    `Intensidad (Gg CO2e por millón de B/.)` = intensidad_gg_por_millon
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = "Emisiones (Gg CO2e)")
+```
+
+*Fuente: elaboración propia con datos de EDGAR [@edgar2026ghg]. Recursos hídricos y construcción no tienen una categoría propia del IPCC; sus emisiones están en residuos (aguas residuales) e industrias (cemento y combustión). La intensidad se calcula solo donde el sector de emisiones y el sector económico coinciden.*
+
+```{r}
+#| label: fig-emisiones
+#| fig-cap: "Emisiones de gases de efecto invernadero por sector de política, 2018 a 2025 (Gg de CO2 equivalente, sin uso de la tierra)"
+#| fig-width: 7
+#| fig-height: 3.6
+
+emisiones_sector |>
+  filter(anio >= 2018) |>
+  ggplot(aes(x = anio, y = emisiones_gg, color = sector_principal)) +
+  geom_line() +
+  scale_y_continuous(labels = \(x) formato_es(x, 0)) +
+  labs(x = NULL, y = "Gg de CO2 equivalente") +
+  tema_grafico()
+```
+
+El sector de residuos tiene la intensidad de emisiones más alta (`r formato_es(val("Intensidad de emisiones", "Residuos"), 1)` Gg por millón de balboas de valor agregado, contra `r formato_es(val("Intensidad de emisiones", "Energía"), 1)` en energía y cerca de 1 en industrias y agricultura). La cifra refleja que el valor agregado del sector formal de residuos es pequeño frente a las emisiones de la disposición de residuos, que se generan en todo el territorio. Mejorar la gestión de los residuos orgánicos y la captura de metano tiene un potencial de mitigación proporcionalmente grande.
+
+## Energía, agua y materiales
+
+El Balance Energético Nacional registra el consumo final por sector de consumo [@sne2026balances]. Entre los sectores con dato, industrias es el de mayor intensidad energética, con `r formato_es(val("Intensidad energética", "Industrias"), 2)` miles de barriles equivalentes de petróleo por millón de balboas de valor agregado. La asignación del balance a los sectores de política es parcial: construcción y recursos hídricos no aparecen con consumo propio. Para el agua solo se dispone de la extracción nacional por tipo de uso, de la cual el 62,7 % corresponde al uso doméstico y el 36,8 % a la agricultura [@worldbank2026agua].
+
+```{r}
+#| label: tbl-energia-agua
+#| tbl-cap: "Uso de energía (2023) y de agua (2022) por sector"
+
+energia_t <- si |>
+  filter(indicador %in% c("Consumo de energía", "Intensidad energética"), sector_principal %in% seis) |>
+  select(sector_principal, indicador, valor) |>
+  pivot_wider(names_from = indicador, values_from = valor)
+
+agua_t <- si |>
+  filter(indicador == "Extracción de agua", sector_principal %in% seis) |>
+  select(sector_principal, `Extracción de agua` = valor)
+
+tibble(sector_principal = factor(seis, levels = sectores_politica)) |>
+  left_join(energia_t, by = "sector_principal") |>
+  left_join(agua_t, by = "sector_principal") |>
+  transmute(
+    Sector = sector_principal,
+    `Energía (10³ bep)` = `Consumo de energía`,
+    `Intensidad (10³ bep por millón de B/.)` = `Intensidad energética`,
+    `Agua extraída (millones de m³)` = `Extracción de agua`
+  ) |>
+  tabla_ft_es(digitos = 2, enteros = c("Energía (10³ bep)", "Agua extraída (millones de m³)"))
+```
+
+*Fuente: elaboración propia con datos de la Secretaría Nacional de Energía [@sne2026balances] y del Banco Mundial [@worldbank2026agua]. Las celdas vacías indican que la fuente no asigna consumo a ese sector. El sector de energía incluye consumo propio y pérdidas; el agua del sector de recursos hídricos es el uso doméstico y de servicios que abastece.*
+
+El consumo material doméstico, el único indicador de materiales disponible, fue de `r formato_es(dmc_2022, 0)` millones de toneladas en 2022 para el total de la economía. Casi se duplicó entre 2018 y 2019 y no se puede asignar a sectores, por lo que se trata como una limitación.
+
+## Residuos y potencial de recuperación
+
+El Banco Mundial estima la generación de residuos sólidos municipales en `r formato_es(rsm_mt, 2)` millones de toneladas al año para 2021, equivalentes a 1,25 kilogramos por habitante por día, con una cobertura de recolección del `r formato_es(otros_res$valor[str_detect(otros_res$indicador, "Cobertura")], 0)` % del peso [@worldbank2026wwaste]. La composición proviene del diagnóstico nacional de 2017 [@aaud2017PNGIR].
+
+```{r}
+#| label: fig-composicion
+#| fig-cap: "Composición de los residuos sólidos municipales de Panamá (porcentaje del peso)"
+#| fig-width: 7
+#| fig-height: 3.4
+
+composicion |>
+  ggplot(aes(x = porcentaje, y = reorder(material, porcentaje))) +
+  geom_col() +
+  labs(x = "Porcentaje del peso", y = NULL) +
+  tema_grafico()
+```
+
+La fracción orgánica (33 %), el plástico (17,2 %) y el papel y cartón (13,7 %) suman casi dos tercios de los residuos. El Plan Nacional de Gestión Integral de Residuos reporta un porcentaje de orgánicos mayor, de 44,5 % [@aaud2017PNGIR, p. 70], y la diferencia no está explicada en las fuentes. A estos flujos se suman los residuos de construcción y demolición, estimados en 1,07 millones de toneladas al año [@worldbank2026wwaste], y los residuos eléctricos y electrónicos, de los que el Monitor Global de Residuos Electrónicos documenta 54 millones de kilogramos generados y 0,1 millones recolectados y reciclados formalmente [@res-gem2024, p. 132].
+
+```{r}
+#| label: tbl-residuos
+#| tbl-cap: "Composición de los residuos sólidos municipales, 2021"
+
+composicion |>
+  transmute(
+    Material = material,
+    `Porcentaje del peso` = porcentaje,
+    `Toneladas por año` = toneladas_anio
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = "Toneladas por año")
+```
+
+*Fuente: elaboración propia con datos del Banco Mundial [@worldbank2026wwaste], con base en el diagnóstico nacional de 2017.*
+
+Para dimensionar la recuperación comercial observada se contrastaron las exportaciones de desechos de 2021 con las toneladas de cada material en los residuos municipales. Las razones son menores al 10 % para plástico, papel y vidrio, y superan el 100 % para los metales, lo que indica que la chatarra exportada proviene en buena parte de fuentes no municipales.
+
+```{r}
+#| label: tbl-recuperacion
+#| tbl-cap: "Exportaciones de desechos y generación estimada en residuos municipales, 2021"
+
+contraste_rec |>
+  transmute(
+    Material = material,
+    `Exportado (t)` = toneladas,
+    `Generado en residuos municipales (t)` = generacion_msm_t,
+    `Exportado sobre generado (%)` = razon_exportacion_generacion
+  ) |>
+  tabla_ft_es(digitos = 1, enteros = c("Exportado (t)", "Generado en residuos municipales (t)"))
+```
+
+*Fuente: elaboración propia con datos de UN Comtrade [@uncomtrade2026] y del Banco Mundial [@worldbank2026wwaste]. El cociente indica un orden de magnitud: las exportaciones incluyen material de origen industrial y de otras fuentes, y el reciclaje dentro del país queda fuera.*
+
+# Eslabonamientos productivos
+
+Los eslabonamientos se calcularon con la matriz insumo-producto de 2018 de 76 actividades [@inec2024mip]. El encadenamiento hacia atrás mide cuánta producción nacional adicional exige una actividad cuando crece su producción, y el encadenamiento hacia adelante mide cuánta producción nacional adicional se genera cuando aumenta la demanda final de todas las actividades [@millerblair2022]. Los índices dividen cada medida entre el promedio de las 76 actividades.
+
+```{r}
+#| label: tbl-enlaces
+#| tbl-cap: "Eslabonamientos por sector, matriz insumo-producto de Panamá, 2018"
+
+enlaces_sector |>
+  filter(sector_principal %in% seis) |>
+  transmute(
+    Sector = sector_principal,
+    `Enlace hacia atrás` = enlace_atras,
+    `Enlace hacia adelante` = enlace_adelante,
+    `Multiplicador de valor agregado` = mult_vab,
+    `Multiplicador de empleo (puestos por millón de B/.)` = mult_empleo,
+    `Importaciones de insumos (%)` = 100 * coef_importacion
+  ) |>
+  tabla_ft_es(digitos = 2)
+```
+
+*Fuente: elaboración propia con datos del INEC [@inec2024mip]. Los multiplicadores agregados incluyen las compras entre actividades del mismo sector, por lo que solo son comparables entre sectores y no con los de actividades individuales.*
+
+Agricultura y alimentos tiene los valores más altos de enlace hacia atrás y hacia adelante, y el multiplicador de empleo más alto de los seis sectores. Le sigue industrias en el enlace hacia atrás y energía en el enlace hacia adelante. La importación de insumos intermedios es más alta en industrias (`r formato_es(100 * enlaces_sector$coef_importacion[enlaces_sector$sector_principal == "Industrias"], 0)` % de la producción) y en agricultura y alimentos (`r formato_es(100 * enlaces_sector$coef_importacion[enlaces_sector$sector_principal == "Agricultura y alimentos"], 0)` %).
+
+```{r}
+#| label: fig-enlaces
+#| fig-cap: "Índices de encadenamiento hacia atrás y hacia adelante de las 76 actividades de la matriz insumo-producto, 2018"
+#| fig-width: 7
+#| fig-height: 4.5
+
+etiquetas <- c("AE38", "AE39", "AE40", "AE41", "AE31", "AE32", "AE23")
+
+enlaces_act |>
+  ggplot(aes(x = indice_atras, y = indice_adelante, color = sector_principal)) +
+  geom_hline(yintercept = 1, linetype = "dashed") +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  geom_point() +
+  geom_text(
+    data = enlaces_act |> filter(cod_mip %in% etiquetas),
+    aes(label = cod_mip), vjust = -0.8, size = 3, show.legend = FALSE
+  ) +
+  labs(x = "Índice de encadenamiento hacia atrás", y = "Índice de encadenamiento hacia adelante") +
+  tema_grafico()
+```
+
+*Fuente: elaboración propia con datos del INEC [@inec2024mip]. Códigos: AE23 bebidas y tabaco; AE31 caucho y plástico; AE32 cemento, cal y yeso; AE38 electricidad, gas y vapor; AE39 agua; AE40 recogida y tratamiento de desechos; AE41 construcción de edificios.*
+
+La clasificación de las 76 actividades arroja `r sum(enlaces_act$clasificacion == "Clave")` actividades clave (ambos índices superiores a 1), `r sum(enlaces_act$clasificacion == "Arrastre (hacia atrás)")` de arrastre, `r sum(enlaces_act$clasificacion == "Impulso (hacia adelante)")` de impulso y `r sum(enlaces_act$clasificacion == "Independiente")` independientes. El @tbl-actividades muestra las actividades núcleo.
+
+```{r}
+#| label: tbl-actividades
+#| tbl-cap: "Eslabonamientos de actividades seleccionadas, matriz insumo-producto de Panamá, 2018"
+
+enlaces_act |>
+  filter(cod_mip %in% c("AE38", "AE39", "AE40", "AE41", "AE42", "AE43", "AE31", "AE32", "AE23", "AE27")) |>
+  transmute(
+    Actividad = str_trunc(actividad_mip, 44),
+    `Índice atrás` = indice_atras,
+    `Índice adelante` = indice_adelante,
+    `Multiplicador de empleo` = mult_empleo,
+    Clasificación = clasificacion
+  ) |>
+  tabla_ft_es(digitos = 2)
+```
+
+*Fuente: elaboración propia con datos del INEC [@inec2024mip].*
+
+La electricidad es una actividad de impulso hacia adelante, con un índice de `r formato_es(enlaces_act$indice_adelante[enlaces_act$cod_mip == "AE38"], 2)`: es un insumo de muchas actividades. La recogida y el tratamiento de desechos se clasifica como independiente, con encadenamientos cercanos al promedio y un multiplicador de empleo de `r formato_es(enlaces_act$mult_empleo[enlaces_act$cod_mip == "AE40"], 1)` puestos por millón de balboas de demanda final. Sus principales compradores intermedios son la administración pública, la salud y la enseñanza, lo que refleja que la recolección es un servicio que presta en buena parte la administración local. Sus principales proveedores son los servicios financieros, la reparación de maquinaria y el comercio.
+
+# Síntesis por sector
+
+Para ofrecer una lectura comparativa se construyó una matriz de relevancia: cada sector recibe un puntaje de 1 a 5 en seis indicadores, según su lugar entre los seis sectores. Los pesos son iguales por ahora y deberán acordarse con las instituciones competentes, para que la matriz no incorpore las preferencias de quien la elaboró. Un puntaje alto indica más peso económico, de empleo, de comercio, de emisiones o de encadenamientos, y no necesariamente mayor potencial circular o mayor viabilidad.
+
+```{r}
+#| label: tbl-matriz
+#| tbl-cap: "Matriz de relevancia sectorial (puntaje de 1 a 5 según el lugar entre los seis sectores)"
+
+matriz_ancha |>
+  transmute(
+    Sector = sector_principal,
+    `Valor agregado` = `Valor agregado bruto`,
+    Empleo = `Puestos de trabajo`,
+    Exportaciones,
+    Emisiones = `Emisiones de GEI (sin UTCUTS)`,
+    `Enlace atrás` = `Enlace hacia atrás (agregado)`,
+    `Enlace adelante` = `Enlace hacia adelante (agregado)`,
+    `Puntaje medio` = puntaje_medio
+  ) |>
+  tabla_ft_es(digitos = 1)
+```
+
+*Fuente: elaboración propia con la base integrada de sectores. Una celda vacía indica que el sector no tiene el indicador (las emisiones de recursos hídricos y construcción están en otras categorías).*
+
+La matriz ordena a agricultura y alimentos, industrias y construcción por encima de energía, recursos hídricos y residuos. Esa lectura mide tamaño. Para la economía circular, el sector de residuos tiene un papel que sus indicadores económicos no reflejan: gestiona los flujos de material, tiene la mayor intensidad de emisiones, su empleo formal es pequeño frente a una población recicladora mayormente informal, y su cadena de recuperación se extiende a las industrias, la construcción y los alimentos. Por eso la síntesis se organiza también en torno a flujos de material y no solo a actividades.
+
+- **Agricultura y alimentos.** Es el mayor empleador y el sector con más eslabonamientos. Su informalidad estimada es la más alta y su productividad por puesto, la más baja. La fracción orgánica de los residuos y los subproductos agroindustriales son el flujo de material relevante.
+- **Industrias.** Reúne la manufactura de plástico, papel, cemento, metales y otras ramas que usan o generan materiales recuperables. Tiene el mayor coeficiente de importación de insumos y un valor agregado en descenso entre 2018 y 2024 a precios corrientes. Es el sector donde la REP y el contenido reciclado actúan sobre el diseño de los productos.
+- **Ciudades y construcción.** Es el mayor sector por valor agregado y genera residuos de construcción y demolición por más de un millón de toneladas al año. Tiene alta informalidad y poca participación de mujeres. Su encadenamiento con las industrias de cemento y de minerales no metálicos es el vínculo material más importante.
+- **Energía.** Crece rápido, paga los salarios más altos, emplea directamente a pocas personas y tiene la estructura de empresas más concentrada, con casi cuatro de cada diez empresas grandes. Es el principal emisor entre los sectores con categoría propia.
+- **Recursos hídricos.** Es el sector más pequeño después de residuos por valor agregado, con una extracción dominada por el uso doméstico. Sus emisiones están en la categoría de aguas residuales, dentro de residuos.
+- **Residuos.** Es pequeño en las cuentas nacionales, intensivo en empleo y en emisiones, y con una cadena de recuperación atomizada en microempresas. Es el sector donde la formalización y la trazabilidad son prerrequisitos de cualquier tarifa o impuesto.
+
+# Instrumentos de política pública que pueden promover la circularidad en Panamá
+
+Esta sección propone un conjunto de instrumentos de política pública, principalmente económicos, que pueden promover la circularidad en los sectores priorizados. La propuesta parte de tres elementos: lo que los datos de las secciones anteriores indican sobre cada sector, el mandato legal que ya existe en Panamá, y la experiencia de otros países con instrumentos equivalentes. Los instrumentos se agrupan en las familias que reconocen la Ley 502 y la literatura internacional: normativos y regulatorios, tributarios y tarifarios, financieros, de promoción y facilitación de inversiones, y de capacidades y conciencia ambiental. Se añade una familia de instrumentos habilitantes (registro, trazabilidad y formalización), porque la experiencia revisada indica que los demás dependen de ella.
+
+La clasificación sigue a la Unión Europea, cuya Directiva marco de residuos enumera instrumentos económicos y otras medidas en su anexo IV bis [@ue2018Directiva851], y a la tipología de la Agencia Alemana de Cooperación Internacional (GIZ), que distingue mecanismos públicos, público-privados, basados en la responsabilidad extendida del productor y privados [@giz2026InstrumentosFinancieros]. La evidencia de efectos es desigual. Hay evaluaciones para los impuestos a las bolsas plásticas, los sistemas de depósito y los impuestos al vertido, y hay metas legales pero pocos resultados oficiales de cumplimiento para la REP y la ecomodulación. Cuando una cifra internacional no pudo contrastarse con su fuente primaria, la propuesta no se apoya en ella.
+
+## Lo que los datos indican para el diseño
+
+Seis rasgos de la economía panameña, documentados en este análisis, condicionan qué instrumentos son pertinentes y en qué orden.
+
+1. **Los residuos son el nudo de la transición y su sector formal es muy pequeño.** El país genera `r formato_es(rsm_mt, 2)` millones de toneladas de residuos municipales al año, el servicio recolecta el `r formato_es(otros_res$valor[str_detect(otros_res$indicador, "Cobertura")], 0)` % del peso, y el sector de residuos aporta menos del 0,2 % del valor agregado con la mayor intensidad de emisiones entre los sectores con categoría propia. La recuperación de materiales se reparte entre 77 empresas con menos de cuatro empleados en promedio, y el único conteo disponible de segregadores urbanos (6.085 personas en 2010) es antiguo [@res-bid-eval2010, p. 143]. Esto señala que el financiamiento del servicio y la formalización de quienes recuperan materiales son anteriores a cualquier meta de reciclaje.
+2. **Los obligados de una REP serán sobre todo importadores.** Industrias y agricultura y alimentos tienen saldos comerciales negativos, y los aparatos electrónicos son un ejemplo extremo: el país genera 54 millones de kilogramos de residuos electrónicos al año y documenta 0,1 millones recolectados y reciclados formalmente [@res-gem2024, p. 132]. Un instrumento que recaiga sobre quien pone el producto en el mercado necesita un registro de importadores por partida arancelaria, con apoyo de la aduana.
+3. **La informalidad es alta justo donde hay más empleo.** Agricultura y alimentos, construcción e industrias superan el 60 % de informalidad estimada, y las mujeres son una fracción pequeña del empleo en construcción y agricultura. Un cargo que encarezca insumos o productos sin acompañamiento recae sobre unidades pequeñas que no pueden trasladarlo, de modo que los instrumentos de costo deben combinarse con apoyo financiero y técnico.
+4. **Los flujos de material de mayor volumen tienen destinos conocidos.** Los orgánicos (entre 33 % y 44,5 % de los residuos municipales, según la fuente), el plástico y el papel y cartón (31 % entre ambos) y los residuos de construcción y demolición (más de un millón de toneladas al año) suman las mayores cantidades. Los metales ya se comercian: Panamá exportó unas `r formato_es(toneladas_2024[["Metal"]] / 1000, 0)` mil toneladas de desperdicios metálicos en 2024. La demanda de material secundario existe para el metal y parece más débil para el plástico, el papel y el vidrio, donde las exportaciones de desechos no superan el 10 % de lo que se genera.
+5. **La construcción y el cemento concentran una oportunidad de demanda.** Construcción es el mayor sector por valor agregado (`r formato_es(val("Participación en el valor agregado", "Ciudades y construcción"), 1)` %) y se abastece de una industria de cemento con 13 empresas. Esta combinación permite que una norma de contenido reciclado o una regla de compras públicas cree demanda de áridos y bloques recuperados con pocos interlocutores.
+6. **Energía y agua son pequeñas en valor agregado, pero atraen inversión y tienen marcos de financiamiento.** El grupo de electricidad, gas y agua recibió la mayor inversión extranjera directa de 2022 a 2024, y casi cuatro de cada diez empresas de electricidad son grandes. El Marco de Financiamiento Sostenible de la República ya incluye categorías de economía circular y de tratamiento sostenible de agua [@mef2024MarcoFinanciamientoSostenible, p. 22-24], y la Hoja de Ruta señala pérdidas de cerca del 40 % del agua producida [@pnud2024RevBiblioEC, p. 56-57].
+
+## Una secuencia en dos tiempos
+
+La economía panameña recurre con frecuencia a incentivos e impuestos sobre bienes importados, y sin registros y controles adecuados resulta difícil sostener nuevos gravámenes o tarifas. La experiencia internacional apunta en la misma dirección: los impuestos y las prohibiciones pierden eficacia sin fiscalización [@eea2023EconomicInstruments], y los sistemas de depósito sufren fraude cuando el control de fronteras es débil [@pinos2018InstrumentosEcuador, p. 130]. Por eso la propuesta se ordena en dos tiempos.
+
+- **Primer tiempo: condiciones habilitantes.** Registro de productores e importadores, trazabilidad de flujos, formalización de recicladores, reglamento de la Ley 502 y plataforma de indicadores. Son instrumentos de bajo costo fiscal que crean la base de información y de control de los demás.
+- **Segundo tiempo: instrumentos que dependen de esa base.** REP con metas, ecomodulación, depósito y retorno, tarifas y tasas, contenido reciclado y los instrumentos financieros dirigidos a proyectos y empresas. Pueden prepararse en paralelo, pero entran en vigor cuando el primer tiempo está operativo.
+
+Los instrumentos de promoción de inversiones, de financiamiento y de capacidades no dependen en el mismo grado del registro, y pueden iniciar en el primer tiempo.
+
+## Instrumentos habilitantes
+
+### Registro de productores e importadores y trazabilidad
+
+**Qué es.** Un registro obligatorio donde los productores e importadores de los productos priorizados declaran qué ponen en el mercado, en qué cantidades y con qué materiales, y reportan periódicamente. Es la base de cálculo de cualquier tarifa o meta de REP.
+
+**Cómo se aplicaría en Panamá.** La Ley 502 crea la plataforma de indicadores en el Sistema Nacional de Información Ambiental y obliga a las entidades públicas y privadas a proveer información conforme al reglamento [@panama2025Ley502, art. 11]. La propuesta es que el reglamento cree el registro dentro de esa plataforma, con identificación por partida arancelaria para los importadores, de modo que los datos de aduana alimenten el registro. La Ley 33 de 2018 ya prevé un inventario de segregadores organizados y no organizados en el sistema de información [@panama2018Ley33, art. 19], y la plataforma puede reunir ambos registros.
+
+**Ejemplos.** La Unión Europea exige que los regímenes de REP definan con claridad los productores obligados, tengan un sistema de información y publiquen las contribuciones por unidad o por tonelada [@ue2018Directiva851, art. 8 bis]. En Chile, los productores de los seis productos prioritarios deben inscribirse y los sistemas de gestión reportan metas [@chile2016Ley20920, arts. 10-24].
+
+**Sectores y datos.** Industrias, agricultura y alimentos, y residuos. El saldo comercial negativo de las dos primeras indica que el registro debe construirse sobre importaciones.
+
+**Condiciones y riesgos.** Requiere coordinación entre MiAMBIENTE, la aduana y el Ministerio de Comercio e Industrias, y capacidad de verificación. Sin auditoría, el registro puede subdeclarar volúmenes.
+
+### Formalización e inclusión de los recicladores de base
+
+**Qué es.** Un conjunto de medidas para reconocer a quienes recuperan materiales como prestadores de un servicio: registro, organización en cooperativas o asociaciones, acceso a contratos y pago por tonelada recuperada, y certificación de competencias.
+
+**Cómo se aplicaría en Panamá.** La Ley 33 reconoce la inclusión de la población recicladora de oficio, define al segregador y faculta a los municipios a incorporar a los segregadores organizados [@panama2018Ley33, arts. 3, 4 y 8], y la Ley 502 pide identificar oportunidades de empleo para los recicladores de base en el Plan Estratégico [@panama2025Ley502, art. 10]. La propuesta es pasar del reconocimiento al pago: que las tarifas de la REP y la tarifa de aseo remuneren la recuperación por tonelada, y que los segregadores registrados puedan contratar con los sistemas de REP y con los municipios.
+
+**Ejemplos.** En Colombia, el Decreto 596 de 2016 remunera la actividad de aprovechamiento con la tarifa de aseo cobrada a todos los usuarios [@minvivienda2016Decreto596]. En Chile, los recicladores registrados pueden cumplir metas de la REP y al menos la mitad de las instalaciones de recepción de envases deben incorporarlos, con un precio por kilo no inferior al que se paga a otros proveedores [@chile2016Ley20920, art. 32; @mmaChile2020DS12Envases, art. 41]. En Brasil, la ley permite contratar sin licitación a cooperativas de catadores [@brasil2010Lei12305, art. 36]. La experiencia de Ecuador muestra el riesgo contrario: con el impuesto redimible a las botellas, los intermediarios captaron la mayor parte del beneficio y los recicladores de base quedaron al margen [@pinos2018InstrumentosEcuador, p. 130].
+
+**Sectores y datos.** Residuos. Es el sector con mayor informalidad no medida: la encuesta de empleo no tiene una categoría para recicladores y la cadena de recuperación está atomizada en microempresas.
+
+**Condiciones y riesgos.** Un censo y un registro actualizados, definición de la remuneración y diseño que evite que los intermediarios capturen el pago.
+
+## Instrumentos normativos y regulatorios
+
+### Responsabilidad extendida del productor con metas por flujo
+
+**Qué es.** La REP obliga a los productores e importadores a asumir el costo financiero, y a veces también el organizativo, de la gestión de sus productos cuando se convierten en residuo. Se materializa en sistemas colectivos o individuales que recolectan, transportan y valorizan, financiados con contribuciones por unidad o por tonelada, y con metas anuales de recolección y valorización. Su efecto económico es trasladar el costo del final de vida del presupuesto municipal al precio del producto, de acuerdo con el principio de quien contamina paga que recoge la Ley 502 [@panama2025Ley502, art. 3].
+
+**Cómo se aplicaría en Panamá.** La Ley 502 declara la REP como mecanismo y pide lineamientos para guías técnicas de REP en el Plan Estratégico [@panama2025Ley502, arts. 2 y 10], pero no fija productos, metas ni tarifas. El Plan Nacional de Gestión Integral de Residuos ya identifica flujos candidatos [@aaud2017PNGIR, p. 287]. Con base en los datos, los flujos que se sugiere evaluar primero son:
+
+- **Envases y embalajes:** plástico (17,2 % de los residuos municipales), papel y cartón (13,7 %), vidrio (3 %) y metal (4,5 %) suman hasta el 38 % del peso, parte del cual no es envase, y los envases de bebidas conectan con el sector de alimentos y bebidas.
+- **Aparatos eléctricos y electrónicos:** 54 millones de kilogramos generados al año con reciclaje formal casi nulo [@res-gem2024, p. 132].
+- **Neumáticos, aceites lubricantes, pilas y baterías:** flujos de volumen menor pero de impacto ambiental alto, que son los que Chile eligió como productos prioritarios [@chile2016Ley20920, art. 10].
+- **Envases de agroquímicos y plásticos agrícolas**, para el sector de agricultura y alimentos, con precedente en Brasil y Ecuador [@brasil2010Lei12305, art. 33; @pinos2018InstrumentosEcuador, p. 126].
+
+**Ejemplos.** El decreto chileno de envases fija metas de recolección y valorización que suben gradualmente desde, por ejemplo, 3 % para el plástico y 11 % para el vidrio en el primer año hasta 45 % y 65 % desde el año 12 [@mmaChile2020DS12Envases, art. 21]. Colombia exige un aprovechamiento de envases de 10 % en 2021 hasta 30 % en 2030 [@minambienteCo2018Res1407, art. 9]. Perú fija metas mínimas de recolección de residuos electrónicos entre 2020 y 2024 [@minam2019DS009RAEE, art. 18]. La Unión Europea exige que las contribuciones cubran la recogida separada, el transporte, el tratamiento y la información, que se descuenten los ingresos por venta de material y que exista auditoría independiente [@ue2018Directiva851, art. 8 bis].
+
+**Sectores y datos.** Residuos e industrias (alta); agricultura y alimentos, y ciudades y construcción (media).
+
+**Condiciones y riesgos.** Registro de productores, metas graduales, autoridad que fiscalice, reglas para los sistemas colectivos y transparencia en el uso de las contribuciones. Los resultados oficiales de cumplimiento de metas en la región no pudieron verificarse, y la experiencia sugiere empezar por pocos flujos y metas moderadas. Un fondo alimentado por las contribuciones puede financiar infraestructura municipal de separación y apoyo a recicladores, a la manera del Fondo para el Reciclaje de Chile [@chile2016Ley20920, art. 31].
+
+### Ecomodulación de las contribuciones
+
+**Qué es.** El ajuste de la tarifa que paga cada productor según atributos de diseño del producto: durabilidad, reparabilidad, reciclabilidad, contenido reciclado y presencia de sustancias peligrosas. Sin ecomodulación, la REP financia la gestión pero no incentiva el rediseño, y la tarifa opera como un cargo uniforme.
+
+**Cómo se aplicaría en Panamá.** Debería incorporarse desde el diseño de la primera tarifa de la REP, con un conjunto pequeño de criterios verificables. Por ejemplo, un envase de plástico monomaterial fácil de reciclar pagaría menos que uno multicapa que no puede reciclarse, y un envase con material reciclado nacional obtendría una bonificación.
+
+**Ejemplos.** El decreto chileno de envases fija recargos y bonificaciones según la dificultad de recolección y de valorización y el uso de material reciclado nacional [@mmaChile2020DS12Envases, art. 20]. En Francia, el esquema de textiles ofrece un descuento de 50 % por incorporar 15 % de fibras recicladas y un bono de 75 % por durabilidad [@ocde2024EPRGarments, p. 31]. El Reglamento europeo de envases prevé un marco de modulación basado en la reciclabilidad [@ue2025Reglamento40, art. 7].
+
+**Sectores y datos.** Industrias (alta), por su incidencia en el diseño de envases; residuos (media). La OCDE advierte que, cuando la diferencia de tarifa es pequeña frente al precio del producto, el incentivo al rediseño es débil [@ocde2024EPRGarments, p. 31].
+
+**Condiciones y riesgos.** Criterios armonizados de reciclabilidad, datos por producto y una diferencia de tarifa suficiente.
+
+### Contenido mínimo de material reciclado y normas para el material secundario
+
+**Qué es.** Una obligación de que ciertos productos incorporen una proporción mínima de material reciclado. Crea demanda para el material que recuperan los sistemas de REP y los recicladores, y cierra el ciclo entre recolección y reindustrialización. Se complementa con normas técnicas que den confianza a quien compra material secundario.
+
+**Cómo se aplicaría en Panamá.** Hay dos puntos de entrada. El primero son las botellas de plástico PET, donde el país ya regula los plásticos de un solo uso [@panama2020Ley187]; una meta gradual de contenido reciclado daría salida al plástico recuperado. El segundo es la construcción: la Hoja de Ruta propone una "mina urbana" para trituración de concreto y tratamiento de metales de la construcción y la demolición, y bloques y adoquines con residuos de obra [@miambiente2024HojaRutaEC, p. 48 y 57]. Una norma técnica sobre áridos reciclados abriría el mercado a ese material.
+
+**Ejemplos.** La Unión Europea exige 25 % de plástico reciclado en las botellas PET desde 2025 y 30 % desde 2030 [@ue2019Directiva904, art. 6]. Colombia exige 50 % en las botellas de agua para 2025 y 90 % para 2030 [@colombia2022Ley2232, art. 17], y Perú, al menos 15 % [@peru2018Ley30884, art. 10].
+
+**Sectores y datos.** Industrias (plástico y minerales no metálicos), ciudades y construcción, y residuos. Las exportaciones de desechos de plástico y de papel son de pocas miles de toneladas al año, lo que muestra un mercado de demanda interna todavía incipiente.
+
+**Condiciones y riesgos.** Capacidad de reciclaje instalada que cumpla las especificaciones, y metas graduales. No se encontró una evaluación verificada del efecto de estas metas.
+
+## Instrumentos tributarios y tarifarios
+
+### Sistema de depósito y retorno de envases de bebidas
+
+**Qué es.** El consumidor paga un depósito al comprar una bebida envasada y lo recupera al devolver el envase en un punto de retorno. Es una forma de recolección dentro de un esquema de REP, y los depósitos no reclamados financian parte del sistema.
+
+**Cómo se aplicaría en Panamá.** La Hoja de Ruta propone un estudio de prefactibilidad de un sistema de depósito y devolución de envases en la ciudad de Panamá [@miambiente2024HojaRutaEC, p. 42 y 56-57]. La propuesta es empezar por botellas de plástico, latas y vidrio de bebidas, con puntos de retorno en comercios, y operar el sistema dentro de la REP de envases. El sector de elaboración de bebidas y el comercio al por menor son los actores centrales.
+
+**Ejemplos.** En los países europeos con sistemas plenamente operativos, la recogida supera el 85 % y la basura dispersa se reduce entre 40 % y 60 % [@sidorczuk2025DepositReturn, p. 1 y 7]. Ecuador creó en 2011 un impuesto redimible de USD 0,02 por botella plástica no retornable: la recolección llegó a 81 % el primer año y superó el 100 % después, lo que indica ingreso de botellas desde países vecinos, y en 2012-2014 se devolvieron USD 96,3 millones frente a USD 83,6 millones recaudados [@pinos2018InstrumentosEcuador, p. 129-130].
+
+**Sectores y datos.** Residuos y bebidas (alta), comercio y ciudades (media).
+
+**Condiciones y riesgos.** Un monto de depósito suficiente, red de retorno, control del ingreso de envases por las fronteras y tratamiento de los depósitos no reclamados. La experiencia ecuatoriana indica que sin control aduanero el sistema pierde recursos.
+
+### Tarifa de aseo a costo real con pago por generación, y tasa de disposición final
+
+**Qué es.** Dos instrumentos complementarios. La tarifa de aseo a costo real cobra el servicio por lo que cuesta prestarlo, y su variante de pago por generación cobra según la cantidad de residuo mezclado que produce cada usuario, con tarifa menor para quien separa reciclables. La tasa de disposición final grava el vertido de ciertos residuos para que reciclar o prevenir sea más competitivo.
+
+**Cómo se aplicaría en Panamá.** El servicio llega al `r formato_es(otros_res$valor[str_detect(otros_res$indicador, "Cobertura")], 0)` % del peso, el Censo de 2023 registra viviendas que queman su basura [@res-inec-censo2023-c18], y hay dos rellenos sanitarios y más de 57 vertederos [@res-pnud-residuos, p. 4]. Cobrar la tarifa a costo real es un requisito de sostenibilidad financiera de la recolección selectiva, con tarifa solidaria para hogares vulnerables, como recomienda la CEPAL [@cepal2021EconomiaCircularALC, p. 72-73]. El pago por generación exige contenedores identificados y un catastro de usuarios, por lo que corresponde al segundo tiempo y a ciudades piloto. La tasa de disposición final se propone primero para los residuos de construcción y demolición y los residuos no municipales, y solo cuando existan alternativas de valorización y rellenos controlados; antes de eso incentiva el vertido ilegal.
+
+**Ejemplos.** Veinte Estados de la Unión Europea aplican pago por generación y 22 aplican impuesto al vertido, con un promedio de entre 39 y 46 euros por tonelada [@eea2023EconomicInstruments]. Los cinco Estados europeos con mayor reciclaje combinan estos instrumentos con recogida de biorresiduos, y la Agencia Europea de Medio Ambiente advierte que ningún instrumento aislado logra tasas altas de reciclaje [@eea2023EconomicInstruments]. El Banco Mundial señala que la gestión básica cuesta al menos USD 35 por tonelada en países de ingreso bajo, que absorbe más del 10 % de los presupuestos municipales en ingreso medio, y que los esquemas por volumen requieren planificación coordinada y fuerte control [@bm2018WhatAWaste, p. 101]. La Ley 33 de 2018 ya manda crear incentivos económicos y fiscales a la recuperación de materiales [@panama2018Ley33, arts. 25-27].
+
+**Sectores y datos.** Residuos y ciudades y construcción (alta).
+
+**Condiciones y riesgos.** Catastro de usuarios, recolección selectiva disponible, rellenos controlados y fiscalización; protección de hogares vulnerables.
+
+### Incentivos fiscales a la inversión circular
+
+**Qué es.** Beneficios tributarios (exoneración de aranceles y del impuesto de transferencia de bienes muebles y servicios, depreciación acelerada, créditos fiscales) que reducen el costo de capital de inversiones en reciclaje, valorización, tratamiento de agua y eficiencia en el uso de recursos.
+
+**Cómo se aplicaría en Panamá.** La Hoja de Ruta propone revisar la Ley de Incentivos Ambientales para incluir medidas de economía circular [@miambiente2024HojaRutaEC, p. 35-37], y la Ley 33 de 2018 ya ordena crear incentivos fiscales a la recuperación de materiales [@panama2018Ley33, arts. 25-27]. Panamá tiene un precedente verificado: el régimen de energía solar combina exoneración de impuestos de importación y del impuesto de transferencia, crédito fiscal y depreciación acelerada [@panama2013Ley37Solar, art. 20]. No se encontraron incentivos tributarios vigentes específicos para el reciclaje. La propuesta es extender un régimen de ese tipo a maquinaria y equipos de recolección selectiva, clasificación, reciclaje y compostaje, y a plantas de tratamiento y reúso de agua, con lista de bienes elegibles certificada por la autoridad competente.
+
+**Ejemplos.** Colombia exime del impuesto al valor agregado la importación de maquinaria no producida en el país destinada a reciclar basuras o desperdicios y a depurar aguas residuales, y otorga un descuento de 25 % del impuesto de renta por inversiones en control y mejoramiento ambiental [@colombia1989EstatutoTributario, arts. 255 y 428]. El Programa de las Naciones Unidas para el Medio Ambiente recomienda igualar el trato tributario entre material virgen y reciclado [@unepfi2023CircularFinanceLAC, p. 71].
+
+**Sectores y datos.** Industrias, residuos y recursos hídricos (alta). La energía ya cuenta con su régimen.
+
+**Condiciones y riesgos.** Costo fiscal (gasto tributario) que debe estimarse y revisarse, lista de bienes elegibles bien definida, y plazo con evaluación. No se encontraron evaluaciones verificadas de efecto de estos incentivos en la región.
+
+## Instrumentos financieros
+
+### Criterios de economía circular en la taxonomía de finanzas sostenibles
+
+**Qué es.** La taxonomía clasifica qué actividades contribuyen a objetivos ambientales, con criterios técnicos. Sirve de lenguaje común para bancos, inversionistas y emisores de bonos, y reduce el riesgo de que se etiquete como verde lo que no lo es.
+
+**Cómo se aplicaría en Panamá.** La Taxonomía de Finanzas Sostenibles de Panamá incluye la transición hacia una economía circular entre sus siete objetivos, pero en esta primera fase solo el uso del suelo tiene criterios de contribución sustancial para todos los objetivos; en los demás sectores la economía circular opera como requisito de no causar daño significativo [@sbp2024TaxonomiaPanama, p. 43-44]. La propuesta es desarrollar criterios de contribución sustancial a la economía circular para gestión de residuos, construcción y manufactura. La propia taxonomía ya contiene puntos de partida: recolección segregada, compostaje y digestión anaeróbica en residuos [@sbp2024TaxonomiaPanama, p. 100], reutilización o reciclaje de al menos 20 % de los desechos de obra en construcción [@sbp2024TaxonomiaPanama, p. 90] y un plan de economía circular como requisito en manufactura [@sbp2024TaxonomiaPanama, p. 47-48].
+
+**Ejemplos.** El Reglamento de taxonomía de la Unión Europea define la transición hacia una economía circular como objetivo con criterios de contribución sustancial, entre ellos la prevención de residuos de construcción y demolición [@ue2020Taxonomia, arts. 9 y 13].
+
+**Sectores y datos.** Todos; en particular residuos, construcción e industrias. El Programa de las Naciones Unidas para el Medio Ambiente identifica la falta de una taxonomía común de finanzas circulares como barrera en la región [@unepfi2023CircularFinanceLAC, p. 44].
+
+**Condiciones y riesgos.** Coordinación entre las tres superintendencias y MiAMBIENTE, y consistencia con el registro de productores y los indicadores de la plataforma.
+
+### Bonos temáticos y marco soberano de financiamiento
+
+**Qué es.** Bonos cuyos fondos se destinan a proyectos verdes elegibles (bonos verdes) o cuyas condiciones financieras dependen del cumplimiento de metas de desempeño (bonos vinculados a la sostenibilidad), emitidos por el soberano, entes públicos o empresas.
+
+**Cómo se aplicaría en Panamá.** El Marco de Financiamiento Sostenible de la República, adoptado en 2024, tiene entre sus categorías verdes la prevención y el control de la contaminación con adopción de procesos de economía circular y el tratamiento sostenible de agua potable y aguas residuales, y enumera ejemplos elegibles de reciclaje, reutilización y reparación [@mef2024MarcoFinanciamientoSostenible, p. 22-24]. La propuesta es construir una cartera de proyectos elegibles que lo use: centros de acopio y plantas de clasificación municipales, compostaje y aprovechamiento de residuos orgánicos, la "mina urbana" de residuos de construcción que propone la Hoja de Ruta [@miambiente2024HojaRutaEC, p. 57], y reducción de pérdidas y tratamiento en el sector de agua. Para empresas grandes, sobre todo en energía, los bonos vinculados a metas ofrecen una vía de financiamiento.
+
+**Ejemplos.** En América Latina, varios emisores corporativos han usado la categoría de economía circular en bonos verdes, aunque en la mayoría la centralidad de la economía circular es parcial [@unepfi2023CircularFinanceLAC, p. 38 y 87].
+
+**Sectores y datos.** Residuos y recursos hídricos (alta), agricultura y alimentos (media). La cartera debe responder a la baja inversión extranjera y a la escala de los proyectos municipales.
+
+**Condiciones y riesgos.** El marco solo financia inversión pública presupuestada, con un máximo de 50 % de refinanciamiento [@mef2024MarcoFinanciamientoSostenible, p. 22], de modo que el cuello de botella es la preparación de proyectos, no la existencia del marco. Las emisiones realizadas bajo el marco no pudieron verificarse.
+
+### Crédito verde, garantías y financiamiento combinado para pequeñas empresas
+
+**Qué es.** Líneas de crédito de largo plazo y bajo costo, garantías parciales que reducen el riesgo percibido por los bancos y combinaciones de recursos concesionales y privados, dirigidas a negocios circulares que la banca clasifica como de alto riesgo.
+
+**Cómo se aplicaría en Panamá.** Las micro, pequeñas y medianas empresas son cerca del 96 % de las empresas, y la Hoja de Ruta propone capital semilla para el rediseño y la transformación de productos y subproductos [@miambiente2024HojaRutaEC, p. 46]. La propuesta es una línea dedicada, con banca pública o de desarrollo como administradora, plazos largos y un fondo de garantía parcial, para tres grupos: recuperadores y recicladores formalizados (que aportarían material al sistema de REP), pequeñas industrias que adopten ecodiseño, y productores agropecuarios que valoricen subproductos. La Ley 502 ya establece el acceso al financiamiento para emprendimientos circulares como finalidad [@panama2025Ley502, art. 2].
+
+**Ejemplos.** Bancóldex y la Corporación de Fomento de la Producción de Chile ofrecen préstamos de largo plazo, con plazos de hasta 15 años, y Chile cuenta con una línea de crédito verde [@unepfi2023CircularFinanceLAC, p. 32, 38 y 48]. Un fondo de inversión de impacto en Asia opera con una garantía de cartera de 50 % de la agencia de cooperación de Estados Unidos [@unepfi2023CircularFinanceLAC, p. 31]. El Programa de las Naciones Unidas para el Medio Ambiente considera las finanzas combinadas la vía más prometedora para reducir el riesgo y atraer capital privado [@unepfi2023CircularFinanceLAC, p. 76].
+
+**Sectores y datos.** Industrias, residuos y agricultura y alimentos. La recuperación de materiales es un campo de microempresas, y la informalidad estimada supera el 60 % en industrias y el 85 % en agricultura y alimentos.
+
+**Condiciones y riesgos.** Criterios de elegibilidad comunes con la taxonomía, capacitación de analistas de crédito, y formalización previa de los beneficiarios. No existe un fondo público de capital enfocado en economía circular en la región, y los mercados de capital de riesgo son incipientes [@unepfi2023CircularFinanceLAC, p. 38-44].
+
+## Instrumentos de promoción y facilitación de inversiones
+
+### Compras públicas circulares
+
+**Qué es.** El uso del poder de compra del Estado para demandar bienes, obras y servicios que reduzcan residuos y mantengan los materiales en uso, con criterios de costo del ciclo de vida.
+
+**Cómo se aplicaría en Panamá.** La Ley 502 modificó el artículo 40 de la ley de contrataciones públicas para que la Dirección General de Contrataciones Públicas establezca criterios de sostenibilidad, eficiencia energética, innovación y economía circular en las compras de todas las entidades [@panama2025Ley502, art. 12], y la Ley 33 ya ordenaba priorizar insumos reciclables y reciclados [@panama2018Ley33, art. 28]. Falta la reglamentación. Con los datos de este análisis, la construcción de obra pública es el punto más prometedor: especificar áridos, bases y bloques con contenido reciclado y exigir planes de gestión de residuos de obra, además de papel, mobiliario y equipos reacondicionados en las compras de la administración.
+
+**Ejemplos.** Chile incluye las compras públicas circulares en su hoja de ruta y Argentina, las compras de material reciclado [@cepal2022HojasRuta, p. 58 y 65]. La Comisión Europea publicó una guía de contratación pública circular [@ce2017PublicProcurementCE].
+
+**Sectores y datos.** Ciudades y construcción, e industrias (alta). El sector de construcción es el mayor por valor agregado, con una informalidad estimada de 70 %, y una regla de compras con exigencia de formalidad puede combinarse con los objetivos de calidad del empleo.
+
+**Condiciones y riesgos.** Criterios técnicos en los pliegos, capacitación de compradores, y oferta nacional de material reciclado que cumpla la norma. No se hallaron cifras verificadas del efecto de estas compras.
+
+### Alianzas público-privadas, apoyo a la innovación y mecanismos de promoción existentes
+
+**Qué es.** Esquemas en que el sector público aporta suelo, garantías o demanda y el privado construye y opera infraestructura de valorización, junto con subsidios y fondos para investigación, desarrollo e innovación circular.
+
+**Cómo se aplicaría en Panamá.** Para la infraestructura de separación, compostaje y valorización de escala municipal, una alianza con un operador privado puede reducir la carga de inversión de los municipios. La Ley 502 encarga al Ministerio de Comercio e Industrias, con otras entidades, estrategias para estimular la inversión pública y privada en investigación, desarrollo e innovación circular [@panama2025Ley502, art. 4]. La propuesta es amarrar los incentivos de circularidad a los mecanismos de promoción que esa institución ya opera, entre ellos el sello "Hecho en Panamá", en lugar de crear una institucionalidad nueva.
+
+**Ejemplos.** El centro de clasificación de residuos de París XVII fue construido por una entidad pública metropolitana y es operado por una empresa privada [@giz2026InstrumentosFinancieros, pág. PDF 25]. Brasil prevé incentivos fiscales, financieros y crediticios para la infraestructura de cooperativas de catadores [@brasil2010Lei12305, arts. 42 y 44].
+
+**Sectores y datos.** Residuos, agricultura y alimentos, e industrias.
+
+**Condiciones y riesgos.** Contratos con pagos por desempeño, claridad sobre el flujo de residuo asegurado al operador, y capacidad de los municipios para estructurar proyectos.
+
+## Instrumentos de capacidades y conciencia ambiental
+
+### Información, formación y certificación
+
+**Qué es.** Programas de formación técnica, asistencia a empresas, campañas de información y certificación de competencias que dan sustento a los demás instrumentos.
+
+**Cómo se aplicaría en Panamá.** La Ley 502 ya contiene el mandato: formación y asistencia técnica en ecodiseño, eficiencia en el uso de energía y agua, reciclaje y reparación [@panama2025Ley502, art. 5], campañas de sensibilización sobre REP y consumo responsable [@panama2025Ley502, art. 6], contenidos de economía circular en la educación superior [@panama2025Ley502, art. 7] y reporte público trienal [@panama2025Ley502, art. 11]. La propuesta es priorizar tres acciones: capacitar a analistas de crédito y a compradores públicos, certificar competencias de los recicladores de base, como hace Chile [@chile2016Ley20920, art. 32], y publicar un reporte de indicadores que cierre las brechas de información documentadas en este análisis.
+
+**Ejemplos.** El Programa de las Naciones Unidas para el Medio Ambiente recomienda capacitar al sector financiero para evaluar proyectos circulares [@unepfi2023CircularFinanceLAC, p. 74-76]. La Agencia Europea de Medio Ambiente observa que los instrumentos dirigidos a los ciudadanos requieren campañas de información para ser eficaces [@eea2023EconomicInstruments].
+
+**Sectores y datos.** Transversal, con prioridad en residuos y en las micro y pequeñas empresas de industrias y agricultura.
+
+**Condiciones y riesgos.** Financiamiento sostenido; por sí solos, estos instrumentos no cambian el comportamiento de productores y consumidores.
+
+## Síntesis de la propuesta
+
+El @tbl-instrumentos resume los instrumentos propuestos, los sectores donde son más pertinentes, el rasgo de los datos que los respalda y el tiempo en que conviene iniciarlos.
+
+```{r}
+#| label: tbl-instrumentos
+#| tbl-cap: "Instrumentos propuestos, sectores y respaldo en los datos"
+
+tribble(
+  ~Instrumento, ~Sectores, ~`Respaldo en los datos de Panamá`, ~Tiempo,
+  "Registro de productores e importadores y trazabilidad",
+  "Residuos, industrias, agricultura",
+  "Saldos comerciales negativos; reciclaje formal casi nulo de residuos electrónicos",
+  "Primero",
+  "Formalización e inclusión de recicladores de base",
+  "Residuos",
+  "Cadena atomizada en microempresas; sin registro actualizado de recicladores",
+  "Primero",
+  "REP con metas por flujo",
+  "Residuos, industrias",
+  "1,97 millones de t de residuos municipales; materiales de envase hasta el 38 % del peso",
+  "Segundo",
+  "Ecomodulación de contribuciones",
+  "Industrias, residuos",
+  "Importación de insumos más alta en industrias (17 % de la producción)",
+  "Segundo",
+  "Depósito y retorno de envases de bebidas",
+  "Residuos, bebidas, comercio",
+  "Plástico, vidrio y metal suman cerca de un cuarto de los residuos",
+  "Segundo",
+  "Contenido reciclado y normas para el material secundario",
+  "Industrias, construcción, residuos",
+  "Más de un millón de t de residuos de obra; cemento con 13 empresas",
+  "Segundo",
+  "Tarifa de aseo a costo real, pago por generación y tasa de disposición final",
+  "Residuos, ciudades y construcción",
+  "Cobertura de recolección de 64 % del peso; más de 57 vertederos",
+  "Segundo",
+  "Incentivos fiscales a la inversión circular",
+  "Industrias, residuos, recursos hídricos",
+  "Precedente de la Ley 37 de 2013; mandato de la Ley 33 de 2018",
+  "Primero",
+  "Compras públicas circulares",
+  "Construcción, industrias",
+  "Construcción es el mayor sector por valor agregado; mandato del artículo 12 de la Ley 502",
+  "Primero",
+  "Criterios de economía circular en la taxonomía",
+  "Todos",
+  "La contribución sustancial a la economía circular solo existe para uso del suelo",
+  "Primero",
+  "Bonos temáticos y marco soberano",
+  "Residuos, recursos hídricos, agricultura",
+  "Categorías de economía circular y agua en el marco; pérdidas de agua cercanas al 40 %",
+  "Primero",
+  "Crédito verde, garantías y financiamiento combinado",
+  "Industrias, residuos, agricultura",
+  "Pymes cerca del 96 % de las empresas; informalidad de 64 % a 89 %",
+  "Primero",
+  "Alianzas público-privadas y mecanismos de promoción existentes",
+  "Residuos, agricultura, industrias",
+  "Infraestructura municipal con baja inversión; incentivos del Ministerio de Comercio e Industrias",
+  "Primero",
+  "Información, formación y certificación",
+  "Transversal",
+  "Brechas de información documentadas en este análisis",
+  "Primero"
+) |>
+  tabla_ft_es(digitos = 0)
+```
+
+*Fuente: elaboración propia con base en los datos de este documento y en las fuentes citadas en cada instrumento.*
+
+El @tbl-paquetes ordena la misma propuesta desde la perspectiva de cada sector.
+
+```{r}
+#| label: tbl-paquetes
+#| tbl-cap: "Paquete de instrumentos propuesto por sector"
+
+tribble(
+  ~Sector, ~`Instrumentos prioritarios`, ~`Razón`,
+  "Residuos",
+  "Registro y trazabilidad; formalización de recicladores; REP de envases y de residuos electrónicos; depósito y retorno; tarifa de aseo a costo real; bonos temáticos",
+  "Es el gestor de los flujos de material, con la mayor intensidad de emisiones, un sector formal muy pequeño y una cadena de recuperación informal",
+  "Industrias",
+  "REP con ecomodulación; contenido reciclado; incentivos a maquinaria de reciclaje; crédito y garantías para pymes",
+  "Tiene los obligados naturales de la REP, depende de insumos importados y es el sector con más margen para el ecodiseño",
+  "Ciudades y construcción",
+  "Compras públicas circulares; normas de áridos reciclados; tasa de disposición final para residuos de obra; criterios de taxonomía",
+  "Es el mayor sector por valor agregado y genera más de un millón de toneladas al año de residuos de obra",
+  "Agricultura y alimentos",
+  "Aprovechamiento de residuos orgánicos con bonos y alianzas; REP de envases de agroquímicos; crédito para valorización de subproductos",
+  "Es el mayor empleador, con alta informalidad y los encadenamientos más fuertes; la fracción orgánica es el flujo de mayor volumen",
+  "Energía",
+  "Bonos vinculados a metas; revisión de los incentivos existentes para incluir eficiencia y biogás",
+  "Es pequeña en valor agregado, concentrada en pocas empresas grandes y con un régimen de incentivos ya vigente",
+  "Recursos hídricos",
+  "Bonos temáticos para tratamiento y reducción de pérdidas; incentivos a equipos de depuración y reúso",
+  "Es el sector más pequeño, con pérdidas cercanas al 40 % y acceso a una categoría propia del marco soberano"
+) |>
+  tabla_ft_es(digitos = 0)
+```
+
+*Fuente: elaboración propia.*
+
+## Alcance de la propuesta
+
+La propuesta es un punto de partida. Cada instrumento debe someterse a una evaluación de su factibilidad política, técnica, institucional y financiera, a una estimación de su efecto por sector y de su costo fiscal, y a un diseño detallado de montos, metas, responsables y plazos antes de recomendarse. Varias piezas dependen de decisiones que aún no se han tomado, como el contenido del reglamento de la Ley 502 y la integración del Consejo Nacional de Economía Circular. La evidencia internacional sobre el efecto de los instrumentos es más sólida para las bolsas plásticas, los sistemas de depósito y el impuesto al vertido que para la REP, la ecomodulación y el contenido reciclado, y se ha expuesto en cada caso con su grado de verificación.
+
+# Limitaciones y brechas de información
+
+El @tbl-brechas resume las limitaciones de los datos y su tratamiento.
+
+```{r}
+#| label: tbl-brechas
+#| tbl-cap: "Brechas de información y tratamiento"
+
+tribble(
+  ~Criterio, ~Brecha, ~Tratamiento,
+  "Empleo por género e informalidad",
+  "Las cuentas nacionales no distinguen sexo ni formalidad. La encuesta solo cruza ambos por sección de actividad.",
+  "Imputación proporcional por sección. Solicitar al INEC microdatos de la Encuesta de Mercado Laboral por división.",
+  "Empleo de energía, agua y residuos",
+  "Los puestos de las cuentas nacionales son una fracción de los ocupados de la encuesta en las secciones D y E.",
+  "Se reportan ambas cifras. Solicitar al INEC la conciliación.",
+  "Recicladores de base",
+  "No hay registro ni cuantificación reciente.",
+  "Cualitativo. Incluir en las consultas con actores y en la agenda de formalización.",
+  "Inversión",
+  "No hay formación bruta de capital por actividad. La inversión extranjera directa agrupa energía, agua y residuos.",
+  "Aproximación con inversión extranjera directa. Solicitar al MEF y a la Contraloría datos de inversión pública por sector.",
+  "Concentración y barreras",
+  "No hay cuotas de mercado ni índices de concentración. Los estudios sectoriales de competencia no son públicos.",
+  "Conteo de empresas y tamaño. Solicitar estudios a la autoridad de competencia. Entrevistas.",
+  "Agua y materiales",
+  "El agua solo existe por tipo de uso a nivel nacional y los materiales como un indicador agregado.",
+  "Caracterización nacional. Solicitar a MiAMBIENTE las concesiones de agua por uso.",
+  "Residuos",
+  "No hay serie anual de generación, composición ni tasas de reciclaje oficiales. Las fuentes difieren en la proporción de orgánicos.",
+  "Fuente única y registro de la diferencia. Plataforma de indicadores de la Ley 502.",
+  "Emisiones",
+  "EDGAR no incluye el uso de la tierra y difiere del inventario nacional.",
+  "Contraste con el inventario nacional. Solicitar las tablas del inventario por categoría.",
+  "Año base",
+  "Los eslabonamientos son de 2018 y las cuentas llegan a 2024.",
+  "Se supone que los coeficientes técnicos son estables. Solicitar la actualización de la matriz."
+) |>
+  tabla_ft_es(digitos = 0)
+```
+
+*Fuente: elaboración propia.*
+
+Además, las estadísticas por producto (comercio exterior) se asignaron a actividades con un supuesto de actividad principal, y el consumo de energía y agua por sector solo tiene cobertura parcial. La clasificación de los sectores en actividades es un trabajo propio de este análisis que debe validarse con MiAMBIENTE y el Ministerio de Comercio e Industrias, y la tabla de equivalencias se entrega editable para ese fin.
+
+# Conclusiones y pasos siguientes
+
+La evidencia disponible permite caracterizar los seis sectores con indicadores comparables en producto, empleo, comercio, emisiones y eslabonamientos, y con aproximaciones parciales en inversión, estructura de mercado, recursos y recuperación de materiales. Los hallazgos principales para el diseño de instrumentos son:
+
+1. Los sectores con más empleo (agricultura y alimentos, construcción, industrias) tienen alta informalidad, de modo que la formalización es una condición previa para los instrumentos de recaudación o de incentivo.
+2. El sector de residuos es pequeño en las cuentas nacionales, pero concentra la mayor intensidad de emisiones y el papel de gestor de los flujos de material. Su empleo informal y su cadena atomizada de recuperación no se miden bien con las estadísticas.
+3. Los saldos comerciales negativos de industrias y de agricultura y alimentos sugieren que los obligados de la REP serán en buena parte importadores, lo que subraya la necesidad de registros de importadores y productores.
+4. Los eslabonamientos más altos están en agricultura y alimentos e industrias, por lo que los instrumentos aplicados en esos sectores tendrán efectos de arrastre sobre proveedores nacionales.
+5. La información faltante es un hallazgo en sí misma: la plataforma de indicadores que ordena la Ley 502 debería cerrar las brechas de residuos, recicladores e inversión.
+6. Los instrumentos propuestos se ordenan en dos tiempos: primero las condiciones habilitantes (registro de productores e importadores, formalización de recicladores, información) y los instrumentos de financiamiento y compras públicas; después la responsabilidad extendida del productor con ecomodulación, el depósito y retorno, las tarifas y el contenido reciclado, que dependen de ese registro.
+
+Los instrumentos propuestos requieren ahora una evaluación de su factibilidad política, técnica, institucional y financiera, una estimación de su efecto por sector, y un diseño detallado. Las solicitudes de información del @tbl-brechas se canalizarán por las vías formales con MiAMBIENTE.
+
+# Glosario de siglas {.unnumbered}
+
+```{r}
+#| label: tbl-siglas
+#| tbl-cap: "Glosario de siglas"
+
+tribble(
+  ~Sigla, ~Significado,
+  "AAUD", "Autoridad de Aseo Urbano y Domiciliario",
+  "AMPYME", "Autoridad de la Micro, Pequeña y Mediana Empresa",
+  "CEPAL", "Comisión Económica para América Latina y el Caribe",
+  "CIIU", "Clasificación Industrial Internacional Uniforme",
+  "EDGAR", "Base de datos de emisiones para la investigación atmosférica global (Emissions Database for Global Atmospheric Research)",
+  "EML", "Encuesta de Mercado Laboral",
+  "GEI", "Gases de efecto invernadero",
+  "GIZ", "Agencia Alemana de Cooperación Internacional",
+  "IED", "Inversión extranjera directa",
+  "INEC", "Instituto Nacional de Estadística y Censo",
+  "IPCC", "Grupo Intergubernamental de Expertos sobre el Cambio Climático",
+  "MEF", "Ministerio de Economía y Finanzas",
+  "MiAMBIENTE", "Ministerio de Ambiente de Panamá",
+  "MIP", "Matriz insumo-producto",
+  "OIT", "Organización Internacional del Trabajo",
+  "PNUD", "Programa de las Naciones Unidas para el Desarrollo",
+  "REP", "Responsabilidad extendida del productor",
+  "SCN", "Sistema de Cuentas Nacionales",
+  "UTCUTS", "Uso de la tierra, cambio de uso de la tierra y silvicultura"
+) |>
+  tabla_ft_es(digitos = 0)
+```
+
+# Referencias {.unnumbered}
+
+::: {#refs}
+:::
+
+# Anexo. Mapeo detallado de actividades a sectores {.unnumbered}
+
+El @tbl-anexo-mapeo lista las 80 actividades del Sistema de Cuentas Nacionales con su código en la matriz insumo-producto, su sector principal y secundarios, el tipo de vínculo, el origen del vínculo (`Fuente` si el documento de política menciona la actividad; `Inferido` si se deduce del flujo de materiales) y la evidencia. HR: Hoja de Ruta [@miambiente2024HojaRutaEC]; RB: revisión bibliográfica [@pnud2024RevBiblioEC]; las páginas son las impresas.
+
+```{r}
+#| label: tbl-anexo-mapeo
+#| tbl-cap: "Mapeo detallado de las 80 actividades del SCN a los sectores de política"
+
+mapeo |>
+  transmute(
+    Código = cod_scn,
+    Actividad = str_trunc(actividad, 60),
+    MIP = cod_mip,
+    `Sector principal` = sector_principal,
+    `Sectores secundarios` = sectores_secundarios,
+    Vínculo = tipo_vinculo,
+    Origen = origen,
+    Evidencia = evidencia
+  ) |>
+  tabla_ft_es(digitos = 0)
+```
+
+*Fuente: elaboración propia; base `mapeo_sectores_scn`.*

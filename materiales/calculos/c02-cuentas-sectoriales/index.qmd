@@ -1,0 +1,303 @@
+---
+title: "Memoria de cálculo 2: cuentas económicas por actividad y sector de política"
+description: "Producción, valor agregado, comercio exterior y estructura de costos de las actividades del SCN de Panamá, 2018 a 2024, agregados en los sectores de la Hoja de Ruta"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - cuentas nacionales
+  - valor agregado
+  - comercio exterior
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Esta memoria calcula, para cada una de las 80 actividades de las cuentas nacionales de Panamá y para cada año de 2018 a 2024, la producción, el consumo intermedio, el valor agregado bruto, las exportaciones y las importaciones, y luego los agrega a los seis sectores de la Hoja de Ruta de Economía Circular. Responde a los criterios de producto interno bruto y de comercio exterior de los Términos de Referencia de la consultoría.
+
+La fuente es la base consolidada de los cuadros de oferta y utilización del Instituto Nacional de Estadística y Censo (INEC) [@inec2026cou]. Los valores están en millones de balboas (B/.) a precios corrientes. Los años 2018 a 2023 son definitivos y 2024 es provisional.
+
+Dos advertencias sobre la interpretación:
+
+- Las cuentas nacionales registran el comercio exterior por **producto**, no por actividad. Para asignar exportaciones e importaciones a actividades usamos la actividad que produce cada producto en el país (sección 4). Los productos que Panamá reexporta o importa sin producirlos se agrupan aparte.
+- Los valores son corrientes; las tasas de crecimiento mezclan precios y cantidades.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+```
+
+# Lectura de los datos
+
+Leemos la base consolidada y la tabla de equivalencias de la memoria 1. Renombramos las columnas que vamos a usar para que el código sea corto.
+
+```{r}
+#| label: lectura
+
+scn <- readRDS("data/inec/pan_scn_oficial.RDS") |>
+  rename(
+    anio = `Año`,
+    cuadro = Cuadro,
+    area = `Código área transaccional columnas`,
+    transaccion = Transacciones,
+    cod_scn = `Código Clasificación Actividades`,
+    cod_prod = `Código Nomenclatura Local de Productos`,
+    producto = `Nomenclatura Local de Productos`,
+    valor = Valor
+  )
+
+mapeo <- leer_salida("mapeo_sectores_scn")
+```
+
+# Producción, consumo intermedio y valor agregado por actividad
+
+La producción de cada actividad está en el cuadro de oferta, en el área transaccional `ATC01`. El consumo intermedio está en el cuadro de utilización, también en `ATC01`. El valor agregado bruto viene del cuadro 3 de la misma base. Sumamos cada uno por año y actividad.
+
+```{r}
+#| label: produccion-ci-vab
+
+produccion <- scn |>
+  filter(cuadro == "01 Oferta", area == "ATC01") |>
+  summarize(produccion = sum(valor), .by = c(anio, cod_scn))
+
+consumo_intermedio <- scn |>
+  filter(cuadro == "02 Utilización", area == "ATC01") |>
+  summarize(consumo_intermedio = sum(valor), .by = c(anio, cod_scn))
+
+valor_agregado <- scn |>
+  filter(cuadro == "03 Valor Agregado") |>
+  summarize(vab = sum(valor), .by = c(anio, cod_scn))
+```
+
+Antes de seguir comprobamos la identidad contable: el valor agregado debe ser igual a la producción menos el consumo intermedio en cada actividad y año.
+
+```{r}
+#| label: verifica-vab
+
+cuentas <- produccion |>
+  left_join(consumo_intermedio, by = c("anio", "cod_scn")) |>
+  left_join(valor_agregado, by = c("anio", "cod_scn")) |>
+  mutate(diferencia = produccion - consumo_intermedio - vab)
+
+# Diferencia máxima en valor absoluto (debe ser prácticamente cero)
+max(abs(cuentas$diferencia), na.rm = TRUE)
+
+# Filas con valor agregado ausente (actividades que no existían en ese año)
+cuentas |> filter(is.na(vab)) |> count(anio, cod_scn)
+```
+
+Las actividades `36.2` y `36.3` (obras de ingeniería civil y actividades especializadas de la construcción) existen como cuentas separadas solo desde la apertura de 2022. Antes de esa fecha, la construcción aparece completa en `36.1`. Para comparar entre años agregamos las tres actividades en la sección 6.
+
+# Clave de producto a actividad
+
+Para llevar exportaciones e importaciones a las actividades necesitamos saber qué actividad produce cada producto. Calculamos, para cada producto de la nomenclatura local, la actividad con mayor producción acumulada de 2018 a 2024, y la proporción de la oferta total del producto que es producción nacional.
+
+```{r}
+#| label: clave-producto
+
+# Producción nacional de cada producto por actividad
+prod_por_actividad <- scn |>
+  filter(cuadro == "01 Oferta", area == "ATC01", !is.na(cod_prod)) |>
+  summarize(valor = sum(valor), .by = c(cod_prod, cod_scn))
+
+# Actividad principal: la de mayor producción del producto
+actividad_principal <- prod_por_actividad |>
+  slice_max(valor, n = 1, by = cod_prod, with_ties = FALSE) |>
+  select(cod_prod, actividad_principal = cod_scn)
+
+# Producción nacional total e importaciones de cada producto
+oferta_producto <- scn |>
+  filter(cuadro == "01 Oferta", !is.na(cod_prod)) |>
+  mutate(
+    componente = case_when(
+      area == "ATC01" ~ "produccion",
+      area == "ATC02" ~ "importaciones",
+      TRUE ~ "otro"
+    )
+  ) |>
+  filter(componente != "otro") |>
+  summarize(valor = sum(valor), .by = c(cod_prod, componente)) |>
+  pivot_wider(names_from = componente, values_from = valor, values_fill = 0) |>
+  mutate(proporcion_nacional = produccion / (produccion + importaciones))
+
+clave_producto <- actividad_principal |>
+  left_join(oferta_producto, by = "cod_prod")
+```
+
+Los productos con menos de la mitad de oferta nacional son, sobre todo, bienes que Panamá importa y reexporta (combustibles de bunker, productos de la Zona Libre de Colón). Asignarlos a una actividad industrial exageraría la capacidad exportadora de esa actividad. Los asignamos a una categoría aparte, `REEXP`.
+
+```{r}
+#| label: clave-reexportacion
+
+clave_producto <- clave_producto |>
+  mutate(
+    cod_scn = if_else(proporcion_nacional < 0.5, "REEXP", actividad_principal)
+  )
+
+count(clave_producto, es_reexportacion = cod_scn == "REEXP")
+```
+
+# Exportaciones e importaciones por actividad
+
+Las exportaciones están en el cuadro de utilización (`ATC02`) y las importaciones en el cuadro de oferta (`ATC02`). Hay filas sin producto que corresponden a compras directas de no residentes en el territorio (turismo) y de residentes en el exterior; las agrupamos como `DIRECTAS`, porque no son atribuibles a una actividad productiva.
+
+```{r}
+#| label: comercio-exterior
+
+exportaciones <- scn |>
+  filter(cuadro == "02 Utilización", area == "ATC02") |>
+  left_join(select(clave_producto, cod_prod, cod_scn_prod = cod_scn), by = "cod_prod") |>
+  mutate(cod_scn = case_when(
+    is.na(cod_prod) ~ "DIRECTAS",
+    is.na(cod_scn_prod) ~ "REEXP",
+    TRUE ~ cod_scn_prod
+  )) |>
+  summarize(exportaciones = sum(valor), .by = c(anio, cod_scn))
+
+importaciones <- scn |>
+  filter(cuadro == "01 Oferta", area == "ATC02") |>
+  left_join(select(clave_producto, cod_prod, cod_scn_prod = cod_scn), by = "cod_prod") |>
+  mutate(cod_scn = case_when(
+    is.na(cod_prod) ~ "DIRECTAS",
+    is.na(cod_scn_prod) ~ "REEXP",
+    TRUE ~ cod_scn_prod
+  )) |>
+  summarize(importaciones = sum(valor), .by = c(anio, cod_scn))
+```
+
+Verificamos que los totales por año coinciden con los de la base antes de asignar.
+
+```{r}
+#| label: verifica-comercio
+
+total_exp_base <- scn |>
+  filter(cuadro == "02 Utilización", area == "ATC02") |>
+  summarize(total_base = sum(valor), .by = anio)
+
+exportaciones |>
+  summarize(total_asignado = sum(exportaciones), .by = anio) |>
+  left_join(total_exp_base, by = "anio") |>
+  mutate(diferencia = total_asignado - total_base) |>
+  arrange(anio)
+```
+
+# Tabla de cuentas por actividad
+
+Unimos todo en una tabla por año y actividad. Las categorías `REEXP` y `DIRECTAS` se agregan como filas con producción y valor agregado de cero, para que los totales de comercio exterior queden completos.
+
+```{r}
+#| label: cuentas-actividad
+
+nombres <- mapeo |> select(cod_scn, actividad, sector_principal, tipo_vinculo)
+
+cuentas_actividad <- cuentas |>
+  select(anio, cod_scn, produccion, consumo_intermedio, vab) |>
+  full_join(exportaciones, by = c("anio", "cod_scn")) |>
+  full_join(importaciones, by = c("anio", "cod_scn")) |>
+  left_join(nombres, by = "cod_scn") |>
+  mutate(
+    actividad = case_when(
+      cod_scn == "REEXP" ~ "Reexportaciones e importaciones sin producción nacional",
+      cod_scn == "DIRECTAS" ~ "Compras directas de residentes y no residentes",
+      TRUE ~ actividad
+    ),
+    sector_principal = if_else(
+      cod_scn %in% c("REEXP", "DIRECTAS"),
+      factor("Resto de la economía", levels = sectores_politica),
+      sector_principal
+    ),
+    across(c(produccion, consumo_intermedio, vab, exportaciones, importaciones), \(x) replace_na(x, 0))
+  ) |>
+  arrange(anio, cod_scn)
+
+# Control: valor agregado total por año (2024: 84,357 según el INEC)
+cuentas_actividad |> summarize(vab_total = sum(vab), .by = anio) |> arrange(anio)
+```
+
+# Agregación a los sectores de política
+
+Sumamos las actividades por sector principal. Para el valor agregado calculamos además la participación en el total de la economía y la tasa de crecimiento anual compuesta entre 2018 y 2024. Las tres actividades de construcción se suman, de modo que la serie del sector es comparable entre años.
+
+```{r}
+#| label: cuentas-sector
+
+cuentas_sector <- cuentas_actividad |>
+  summarize(
+    across(c(produccion, consumo_intermedio, vab, exportaciones, importaciones), sum),
+    .by = c(anio, sector_principal)
+  ) |>
+  mutate(
+    participacion_vab = 100 * vab / sum(vab),
+    .by = anio
+  ) |>
+  arrange(anio, sector_principal)
+```
+
+```{r}
+#| label: tbl-sector-2024
+#| tbl-cap: "Valor agregado y comercio exterior por sector de política, 2024 (millones de B/., precios corrientes)"
+
+cuentas_sector |>
+  filter(anio == 2024) |>
+  select(
+    Sector = sector_principal,
+    Producción = produccion,
+    `Valor agregado` = vab,
+    `Participación (%)` = participacion_vab,
+    Exportaciones = exportaciones,
+    Importaciones = importaciones
+  ) |>
+  tabla_ft(digitos = 1)
+```
+
+Calculamos el crecimiento anual compuesto del valor agregado entre 2018 y 2024 por sector.
+
+```{r}
+#| label: crecimiento
+
+crecimiento_sector <- cuentas_sector |>
+  filter(anio %in% c(2018, 2024)) |>
+  select(anio, sector_principal, vab) |>
+  pivot_wider(names_from = anio, values_from = vab, names_prefix = "vab_") |>
+  mutate(tcac_vab_2018_2024 = 100 * ((vab_2024 / vab_2018)^(1 / 6) - 1))
+
+crecimiento_sector
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(cuentas_actividad, "cuentas_actividad_2018_2024", hoja = "actividad")
+guardar_salida(cuentas_sector, "cuentas_sector_2018_2024", hoja = "sector")
+guardar_salida(crecimiento_sector, "crecimiento_vab_sector", hoja = "crecimiento")
+guardar_salida(clave_producto, "clave_producto_actividad", hoja = "clave")
+```
+
+Las cuatro tablas de `data/outputs/` son la fuente de verdad de las cifras económicas de los documentos: cuentas por actividad, cuentas por sector, crecimiento del valor agregado por sector y la clave de producto a actividad.
+
+# Referencias
+
+::: {#refs}
+:::

@@ -1,0 +1,157 @@
+/*-- scss:defaults --*/
+
+// Ajustar a la institución: fuentes, paleta y textos del footer.
+// Fuentes de Google Fonts (cambiar el @import y las variables juntos)
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+$presentation-font-family: "Roboto", sans-serif;
+$presentation-heading-font: "Oswald", sans-serif;
+$font-family-sans-serif: $presentation-font-family;
+$font-family-monospace: "Noto Sans Mono", "DejaVu Sans Mono", "Courier New", monospace;
+
+/*-- named colors --*/
+$theme-white: #ffffff;
+$theme-black: #000000;
+$theme-primary: #009EDB;
+$theme-secondary: #2E86C1;
+$theme-accent: #F39C12;
+$theme-highlight: #FFCE5E;
+$theme-grey: #7F7F7F;
+$theme-link: #2E6DA4;
+$theme-cream: #f5ece5;
+$theme-code-bg: #e3edf5;
+
+$body-bg: $theme-white;
+$body-color: $theme-black;
+$presentation-heading-color: $theme-primary;
+$link-color: $theme-link;
+$link-decoration: underline;
+$code-color: $theme-primary;
+$code-bg: $theme-code-bg;
+
+$presentation-font-size-root: 25px;
+$code-block-font-size: 0.5em;
+
+/*-- scss:rules --*/
+
+// Texto de énfasis: [texto]{.emphasis}
+.emphasis {
+  color: $theme-accent;
+}
+
+.reveal {
+  h2 {
+    padding: 12px 2px;
+    border-bottom: 6px solid $theme-primary;
+  }
+}
+
+// Diapositiva en blanco, para centrar un mensaje o una tabla de descargas
+.theme-blank {
+  h3, h4, h5, p, pre, li {
+    margin-left: 15%;
+    width: 75%;
+  }
+  h2 {
+    font-size: 2em;
+    border-bottom: none;
+  }
+  h3 {
+    font-size: 1.5em;
+  }
+}
+
+// Diapositiva de contenido: fondo de color, texto blanco y viñetas cuadradas
+.theme-content {
+  &:is(.slide-background) {
+    background-color: $theme-secondary;
+  }
+  color: white;
+  h2 {
+    color: white;
+    font-weight: 700;
+    border-bottom: none;
+    text-align: left;
+  }
+  ul {
+    list-style-type: square;
+  }
+  li::marker {
+    color: white;
+  }
+  strong, .emphasis {
+    color: $theme-highlight;
+  }
+  a {
+    color: $theme-highlight;
+  }
+}
+
+// Footer de tres columnas: texto izquierdo y derecho (vacíos por defecto) y
+// el texto del YAML (footer:) al centro.
+// Para agregar marca o autor: content: "Texto";
+.reveal .footer {
+  bottom: 0 !important;
+  padding: 0.35em 1.5em !important;
+  // Quarto fija width: 100%; sin border-box el padding lateral desborda la barra
+  box-sizing: border-box;
+
+  background-color: $theme-primary !important;
+  color: $theme-white;
+  font-size: 16px !important;
+  text-align: center !important;
+
+  a {
+    color: $theme-highlight !important;
+  }
+
+  display: grid !important;
+  grid-template-columns: 15% 70% 15%;
+  align-items: center;
+
+  &::before {
+    content: "";
+    grid-column: 1;
+    text-align: left;
+    font-size: 0.75em;
+    font-weight: 700;
+  }
+  > p {
+    grid-column: 2;
+    text-align: center;
+  }
+  &::after {
+    content: "";
+    grid-column: 3;
+    text-align: right;
+    font-size: 0.75em;
+    color: $theme-grey;
+  }
+}
+
+.reveal .slide-menu-button {
+  bottom: 2.5em !important;
+}
+
+// Botón de descarga: [archivo.xlsx](ruta){.button download="archivo.xlsx"}
+.reveal a.button {
+  display: inline-block;
+  padding: 0.5em 1.2em;
+  background-color: $theme-primary;
+  color: $theme-cream;
+  font-family: $presentation-heading-font;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $theme-accent;
+    color: $theme-cream;
+  }
+}
+
+// Permite cortar URL largas en la bibliografía
+.reveal #refs a,
+.reveal .csl-entry a {
+  overflow-wrap: anywhere;
+}
