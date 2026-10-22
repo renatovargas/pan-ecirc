@@ -1,0 +1,49 @@
+---
+title: "Materiales"
+subtitle: "Documentos, memorias de cálculo y presentaciones"
+toc: false
+---
+
+:::: {.grid}
+
+::: {.g-col-12 .g-col-md-4}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+### Documentos
+
+Informes del Producto 1: metodología, plan de trabajo y análisis de los sectores económicos priorizados.
+
+[Metodología](documentos/a1a-metodologia/index.qmd){.btn .btn-primary}
+[Plan de trabajo](documentos/a1b-plan-de-trabajo/index.qmd){.btn .btn-primary}
+[Sectores priorizados](documentos/a1c-sectores-economicos-priorizados/index.qmd){.btn .btn-primary}
+
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-md-4}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+### Memorias de cálculo
+
+Procesamiento paso a paso de las bases de datos que sustentan los documentos.
+
+[Ver memorias de cálculo](calculos/c01-mapeo-sectores/index.qmd){.btn .btn-primary}
+
+:::
+:::
+:::
+
+::: {.g-col-12 .g-col-md-4}
+::: {.card .h-100 .shadow-sm}
+::: {.card-body}
+### Presentaciones
+
+Diapositivas que se pueden ver en la página o en pantalla completa.
+
+[Ver presentaciones](presentaciones/01-ejemplo.qmd){.btn .btn-primary}
+:::
+:::
+:::
+
+::::

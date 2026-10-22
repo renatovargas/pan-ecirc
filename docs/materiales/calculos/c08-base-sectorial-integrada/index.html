@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Renato Vargas">
+<meta name="description" content="Integración de los indicadores de producto, empleo, comercio exterior, inversión, estructura empresarial, emisiones, recursos, recuperación de materiales y eslabonamientos por sector de la Hoja de Ruta de Economía Circular">
+
+<title>Memoria de cálculo 8: base sectorial integrada para el análisis de los sectores priorizados – PAN ECIRC</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-71fbcc4293f9c007eba8de2da594bbc4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../documentos/estilos.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">PAN ECIRC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../../materiales/index.html" aria-current="page"> 
+<span class="menu-text">Materiales</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">Acerca de</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../materiales/calculos/c01-mapeo-sectores/index.html">Memorias de cálculo</a></li><li class="breadcrumb-item"><a href="../../../materiales/calculos/c08-base-sectorial-integrada/index.html">C8. Base sectorial integrada</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Materiales</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1a-metodologia/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1a. Metodología</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1b-plan-de-trabajo/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1b. Plan de trabajo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1c-sectores-economicos-priorizados/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1c. Sectores económicos priorizados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Memorias de cálculo</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c01-mapeo-sectores/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C1. Mapeo de sectores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c02-cuentas-sectoriales/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C2. Cuentas por actividad y sector</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c03-empleo-sectorial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C3. Empleo, género e informalidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c04-eslabonamientos/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C4. Eslabonamientos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c05-emisiones-ghg/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C5. Emisiones de GEI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c06-recursos-y-residuos/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C6. Recursos y residuos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c07-inversion-y-estructura-empresarial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C7. Inversión y estructura empresarial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c08-base-sectorial-integrada/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">C8. Base sectorial integrada</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Presentaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/presentaciones/01-ejemplo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación de ejemplo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción"><span class="header-section-number">1</span> Introducción</a></li>
+  <li><a href="#preámbulo" id="toc-preámbulo" class="nav-link" data-scroll-target="#preámbulo"><span class="header-section-number">2</span> Preámbulo</a></li>
+  <li><a href="#lectura-de-las-salidas-anteriores" id="toc-lectura-de-las-salidas-anteriores" class="nav-link" data-scroll-target="#lectura-de-las-salidas-anteriores"><span class="header-section-number">3</span> Lectura de las salidas anteriores</a></li>
+  <li><a href="#indicadores-por-criterio" id="toc-indicadores-por-criterio" class="nav-link" data-scroll-target="#indicadores-por-criterio"><span class="header-section-number">4</span> Indicadores por criterio</a>
+  <ul class="collapse">
+  <li><a href="#producto-interno-bruto" id="toc-producto-interno-bruto" class="nav-link" data-scroll-target="#producto-interno-bruto"><span class="header-section-number">4.1</span> Producto interno bruto</a></li>
+  <li><a href="#empleo" id="toc-empleo" class="nav-link" data-scroll-target="#empleo"><span class="header-section-number">4.2</span> Empleo</a></li>
+  <li><a href="#comercio-exterior-y-competitividad" id="toc-comercio-exterior-y-competitividad" class="nav-link" data-scroll-target="#comercio-exterior-y-competitividad"><span class="header-section-number">4.3</span> Comercio exterior y competitividad</a></li>
+  <li><a href="#inversión" id="toc-inversión" class="nav-link" data-scroll-target="#inversión"><span class="header-section-number">4.4</span> Inversión</a></li>
+  <li><a href="#concentración-de-mercado" id="toc-concentración-de-mercado" class="nav-link" data-scroll-target="#concentración-de-mercado"><span class="header-section-number">4.5</span> Concentración de mercado</a></li>
+  <li><a href="#emisiones-de-gases-de-efecto-invernadero" id="toc-emisiones-de-gases-de-efecto-invernadero" class="nav-link" data-scroll-target="#emisiones-de-gases-de-efecto-invernadero"><span class="header-section-number">4.6</span> Emisiones de gases de efecto invernadero</a></li>
+  <li><a href="#uso-de-recursos" id="toc-uso-de-recursos" class="nav-link" data-scroll-target="#uso-de-recursos"><span class="header-section-number">4.7</span> Uso de recursos</a></li>
+  <li><a href="#potencial-de-recuperación-de-materiales" id="toc-potencial-de-recuperación-de-materiales" class="nav-link" data-scroll-target="#potencial-de-recuperación-de-materiales"><span class="header-section-number">4.8</span> Potencial de recuperación de materiales</a></li>
+  <li><a href="#eslabonamientos" id="toc-eslabonamientos" class="nav-link" data-scroll-target="#eslabonamientos"><span class="header-section-number">4.9</span> Eslabonamientos</a></li>
+  </ul></li>
+  <li><a href="#base-integrada" id="toc-base-integrada" class="nav-link" data-scroll-target="#base-integrada"><span class="header-section-number">5</span> Base integrada</a></li>
+  <li><a href="#matriz-de-relevancia-sectorial" id="toc-matriz-de-relevancia-sectorial" class="nav-link" data-scroll-target="#matriz-de-relevancia-sectorial"><span class="header-section-number">6</span> Matriz de relevancia sectorial</a></li>
+  <li><a href="#exportación" id="toc-exportación" class="nav-link" data-scroll-target="#exportación"><span class="header-section-number">7</span> Exportación</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">8</span> Referencias</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c08-base-sectorial-integrada/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../materiales/calculos/c01-mapeo-sectores/index.html">Memorias de cálculo</a></li><li class="breadcrumb-item"><a href="../../../materiales/calculos/c08-base-sectorial-integrada/index.html">C8. Base sectorial integrada</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Memoria de cálculo 8: base sectorial integrada para el análisis de los sectores priorizados</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">base integrada</div>
+    <div class="quarto-category">indicadores sectoriales</div>
+    <div class="quarto-category">economía circular</div>
+    <div class="quarto-category">Panamá</div>
+    <div class="quarto-category">rstats</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Integración de los indicadores de producto, empleo, comercio exterior, inversión, estructura empresarial, emisiones, recursos, recuperación de materiales y eslabonamientos por sector de la Hoja de Ruta de Economía Circular
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Renato Vargas </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">22 de octubre de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introducción" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introducción</h1>
+<p>Esta memoria junta en una sola base los indicadores de las memorias 2 a 7, de modo que cada sector de la Hoja de Ruta de Economía Circular <span class="citation" data-cites="miambiente2024HojaRutaEC">(<a href="#ref-miambiente2024HojaRutaEC" role="doc-biblioref">Ministerio de Ambiente de Panamá y Programa de las Naciones Unidas para el Desarrollo, 2024</a>)</span> tenga un valor para cada criterio de evaluación de los Términos de Referencia. La base resultante, <code>data/outputs/sectores_priorizados.rds</code>, es la fuente de verdad del documento de análisis sectorial.</p>
+<p>Cada indicador lleva su año, su unidad, la memoria que lo calcula y una <strong>bandera de calidad</strong>:</p>
+<ul>
+<li><strong>Alta:</strong> dato oficial desagregable a las actividades del sector, sin supuestos de asignación.</li>
+<li><strong>Media:</strong> dato oficial que requiere un supuesto de asignación (por ejemplo, de producto a actividad o de sección a sector).</li>
+<li><strong>Baja:</strong> dato disponible solo para un grupo de sectores, de una sección más amplia, o de una fuente externa con cobertura limitada.</li>
+<li><strong>Sin dato:</strong> el criterio no tiene una fuente cuantitativa disponible; se trata cualitativamente en el documento.</li>
+</ul>
+<p>Se evalúan los seis sectores de política. La categoría “Resto de la economía” se incluye como referencia para calcular participaciones, pero no entra en las comparaciones.</p>
+</section>
+<section id="preámbulo" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Preámbulo</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limpiar el área de trabajo</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Funciones y constantes compartidas</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"materiales/calculos/scripts/funciones_comunes.R"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>seis_sectores <span class="ot">&lt;-</span> sectores_politica[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="lectura-de-las-salidas-anteriores" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Lectura de las salidas anteriores</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>cuentas <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"cuentas_sector_2018_2024"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>crecimiento <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"crecimiento_vab_sector"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>empleo <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"empleo_sector_2018_2024"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>empleo_perfil <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"empleo_sector_perfil_2024"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>enlaces <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"eslabonamientos_sector_mip2018"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>emisiones <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"emisiones_sector_1970_2025"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>intensidad <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"intensidad_emisiones_sector"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>energia <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"energia_sector_2018_2024"</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>agua <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"agua_uso_sector_2022"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ied <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"ied_grupo_sector_2022_2024"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>estructura <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"estructura_empresarial_sector_2022"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>composicion <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"residuos_composicion_2021"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>otros_residuos <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"residuos_otros_indicadores"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="indicadores-por-criterio" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Indicadores por criterio</h1>
+<p>Construimos cada criterio como una tabla de tres columnas: sector, indicador y valor, con su metadato. Al final se unen.</p>
+<section id="producto-interno-bruto" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="producto-interno-bruto"><span class="header-section-number">4.1</span> Producto interno bruto</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>pib <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  cuentas <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2024</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Valor agregado bruto"</span>, <span class="at">valor =</span> vab,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  cuentas <span class="sc">|&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2024</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Participación en el valor agregado"</span>, <span class="at">valor =</span> participacion_vab,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"%"</span>, <span class="at">anio =</span> <span class="dv">2024</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  crecimiento <span class="sc">|&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Crecimiento anual compuesto del valor agregado"</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">valor =</span> tcac_vab_2018_2024, <span class="at">unidad =</span> <span class="st">"% anual (2018-2024)"</span>, <span class="at">anio =</span> <span class="dv">2024</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="st">"PIB"</span>, <span class="at">memoria =</span> <span class="st">"c02"</span>, <span class="at">calidad =</span> <span class="st">"Alta"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="empleo" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="empleo"><span class="header-section-number">4.2</span> Empleo</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>empleo_2024 <span class="ot">&lt;-</span> empleo <span class="sc">|&gt;</span> <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2024</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>empleo_crit <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  empleo_2024 <span class="sc">|&gt;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Puestos de trabajo"</span>, <span class="at">valor =</span> puestos,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"puestos"</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Alta"</span>),</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  empleo_2024 <span class="sc">|&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Participación en el empleo"</span>, <span class="at">valor =</span> participacion_empleo,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"%"</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Alta"</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  empleo_2024 <span class="sc">|&gt;</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Remuneración media por asalariado"</span>, <span class="at">valor =</span> remuneracion_media,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"miles de B/. al año"</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Alta"</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  empleo_perfil <span class="sc">|&gt;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Mujeres en el empleo (estimado)"</span>, <span class="at">valor =</span> pct_mujeres_est,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"%"</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  empleo_perfil <span class="sc">|&gt;</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Empleo informal (estimado)"</span>, <span class="at">valor =</span> pct_informal_est,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"%"</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="st">"Empleo"</span>, <span class="at">memoria =</span> <span class="st">"c03"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="comercio-exterior-y-competitividad" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="comercio-exterior-y-competitividad"><span class="header-section-number">4.3</span> Comercio exterior y competitividad</h2>
+<p>La competitividad se aproxima con tres indicadores: las exportaciones, el saldo comercial y la apertura (exportaciones sobre producción). El coeficiente de importación de insumos de la matriz insumo-producto mide la dependencia de insumos importados.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>comercio_2024 <span class="ot">&lt;-</span> cuentas <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2024</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">saldo =</span> exportaciones <span class="sc">-</span> importaciones,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">apertura =</span> <span class="dv">100</span> <span class="sc">*</span> exportaciones <span class="sc">/</span> produccion</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>comercio <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  comercio_2024 <span class="sc">|&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Exportaciones"</span>, <span class="at">valor =</span> exportaciones,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>),</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  comercio_2024 <span class="sc">|&gt;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Importaciones"</span>, <span class="at">valor =</span> importaciones,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>),</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  comercio_2024 <span class="sc">|&gt;</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Saldo comercial"</span>, <span class="at">valor =</span> saldo,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  comercio_2024 <span class="sc">|&gt;</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Exportaciones sobre producción"</span>, <span class="at">valor =</span> apertura,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"%"</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>),</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  enlaces <span class="sc">|&gt;</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Importaciones de insumos sobre producción"</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>              <span class="at">valor =</span> <span class="dv">100</span> <span class="sc">*</span> coef_importacion, <span class="at">unidad =</span> <span class="st">"% (2018)"</span>, <span class="at">anio =</span> <span class="dv">2018</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="st">"Comercio exterior"</span>, <span class="at">memoria =</span> <span class="st">"c02 y c04"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="inversión" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="inversión"><span class="header-section-number">4.4</span> Inversión</h2>
+<p>La inversión extranjera directa solo se publica para la sección de electricidad, gas y agua en conjunto. Repetimos el valor del grupo en los tres sectores que contiene y lo marcamos como calidad baja.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ied_flujo <span class="ot">&lt;-</span> ied <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(variable <span class="sc">==</span> <span class="st">"flujo"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">valor =</span> <span class="fu">sum</span>(miles_balboas) <span class="sc">/</span> <span class="dv">1000</span>, <span class="at">.by =</span> grupo_sector)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>ied_posicion <span class="ot">&lt;-</span> ied <span class="sc">|&gt;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(variable <span class="sc">==</span> <span class="st">"posicion"</span>, anio <span class="sc">==</span> <span class="dv">2024</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">valor =</span> <span class="fu">sum</span>(miles_balboas) <span class="sc">/</span> <span class="dv">1000</span>, <span class="at">.by =</span> grupo_sector)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Un sector por fila; los tres del grupo conjunto reciben el mismo valor</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>grupo_de_sector <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">sector_principal =</span> <span class="fu">factor</span>(sectores_politica, <span class="at">levels =</span> sectores_politica),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">grupo_sector =</span> <span class="fu">c</span>(</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Energía, recursos hídricos y residuos (conjunto)"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Energía, recursos hídricos y residuos (conjunto)"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Energía, recursos hídricos y residuos (conjunto)"</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Industrias"</span>, <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Ciudades y construcción"</span>,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Resto de la economía"</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>inversion <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  grupo_de_sector <span class="sc">|&gt;</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(ied_flujo, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"IED, flujo acumulado 2022-2024"</span>, valor,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>),</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  grupo_de_sector <span class="sc">|&gt;</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(ied_posicion, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"IED, posición al cierre"</span>, valor,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">criterio =</span> <span class="st">"Inversión"</span>, <span class="at">memoria =</span> <span class="st">"c07"</span>,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">calidad =</span> <span class="fu">if_else</span>(</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>      sector_principal <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Residuos"</span>, <span class="st">"Energía"</span>, <span class="st">"Recursos hídricos"</span>), <span class="st">"Baja"</span>, <span class="st">"Media"</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="concentración-de-mercado" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="concentración-de-mercado"><span class="header-section-number">4.5</span> Concentración de mercado</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>grupo_estructura <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">sector_principal =</span> <span class="fu">factor</span>(sectores_politica, <span class="at">levels =</span> sectores_politica),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">grupo_sector =</span> <span class="fu">c</span>(</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Recursos hídricos y residuos"</span>, <span class="st">"Energía"</span>, <span class="st">"Recursos hídricos y residuos"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Industrias"</span>, <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Ciudades y construcción"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="cn">NA</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>concentracion <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  grupo_estructura <span class="sc">|&gt;</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(estructura, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Empresas en la sección CIIU principal"</span>, <span class="at">valor =</span> empresas,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"empresas (2022)"</span>, <span class="at">anio =</span> <span class="dv">2022</span>),</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  grupo_estructura <span class="sc">|&gt;</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(estructura, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Empresas grandes en la sección"</span>, <span class="at">valor =</span> pct_grande,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"% de las empresas (2022)"</span>, <span class="at">anio =</span> <span class="dv">2022</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(valor)) <span class="sc">|&gt;</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="st">"Concentración de mercado"</span>, <span class="at">memoria =</span> <span class="st">"c07"</span>, <span class="at">calidad =</span> <span class="st">"Baja"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="emisiones-de-gases-de-efecto-invernadero" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="emisiones-de-gases-de-efecto-invernadero"><span class="header-section-number">4.6</span> Emisiones de gases de efecto invernadero</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>emisiones_2023 <span class="ot">&lt;-</span> emisiones <span class="sc">|&gt;</span> <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2023</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>intensidad_2023 <span class="ot">&lt;-</span> intensidad <span class="sc">|&gt;</span> <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2023</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>emisiones_crit <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  emisiones_2023 <span class="sc">|&gt;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Emisiones de GEI (sin UTCUTS)"</span>, <span class="at">valor =</span> emisiones_gg,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"Gg CO2e"</span>, <span class="at">anio =</span> <span class="dv">2023</span>),</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  emisiones_2023 <span class="sc">|&gt;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Participación en las emisiones"</span>, <span class="at">valor =</span> participacion,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"%"</span>, <span class="at">anio =</span> <span class="dv">2023</span>),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  intensidad_2023 <span class="sc">|&gt;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Intensidad de emisiones"</span>, <span class="at">valor =</span> intensidad_gg_por_millon,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"Gg CO2e por millón de B/."</span>, <span class="at">anio =</span> <span class="dv">2023</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(valor)) <span class="sc">|&gt;</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="st">"Emisiones de GEI"</span>, <span class="at">memoria =</span> <span class="st">"c05"</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="uso-de-recursos" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="uso-de-recursos"><span class="header-section-number">4.7</span> Uso de recursos</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>recursos <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  energia <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2023</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Consumo de energía"</span>, <span class="at">valor =</span> bep_miles,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"miles de bep"</span>, <span class="at">anio =</span> <span class="dv">2023</span>),</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  energia <span class="sc">|&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(anio <span class="sc">==</span> <span class="dv">2023</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Intensidad energética"</span>, <span class="at">valor =</span> intensidad_bep_miles_por_millon,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"miles de bep por millón de B/."</span>, <span class="at">anio =</span> <span class="dv">2023</span>),</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  agua <span class="sc">|&gt;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Extracción de agua"</span>, <span class="at">valor =</span> millones_m3,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de m3"</span>, <span class="at">anio =</span> <span class="dv">2022</span>)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="st">"Uso de recursos"</span>, <span class="at">memoria =</span> <span class="st">"c06"</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>El balance energético no tiene el consumo de recursos hídricos y construcción como líneas propias, y la extracción de agua solo existe para tres usos. Esos sectores quedan sin valor en esos indicadores.</p>
+</section>
+<section id="potencial-de-recuperación-de-materiales" class="level2" data-number="4.8">
+<h2 data-number="4.8" class="anchored" data-anchor-id="potencial-de-recuperación-de-materiales"><span class="header-section-number">4.8</span> Potencial de recuperación de materiales</h2>
+<p>El potencial se mide por las toneladas anuales de residuos con un material recuperable asociadas a cada sector: los residuos orgánicos al sector de agricultura y alimentos, los materiales manufacturados (plástico, papel y cartón, vidrio, metal, textiles, caucho y cuero) al sector de industrias, los residuos de construcción y demolición al sector de ciudades y construcción, y el total de residuos sólidos municipales al sector de residuos, que los gestiona.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>toneladas_material <span class="ot">&lt;-</span> composicion <span class="sc">|&gt;</span> <span class="fu">select</span>(material, toneladas_anio)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>t_organicos <span class="ot">&lt;-</span> toneladas_material <span class="sc">|&gt;</span> <span class="fu">filter</span>(material <span class="sc">==</span> <span class="st">"Orgánicos"</span>) <span class="sc">|&gt;</span> <span class="fu">pull</span>(toneladas_anio)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>t_manufacturados <span class="ot">&lt;-</span> toneladas_material <span class="sc">|&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(material <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Plástico"</span>, <span class="st">"Papel y cartón"</span>, <span class="st">"Vidrio"</span>, <span class="st">"Metal"</span>, <span class="st">"Textiles"</span>, <span class="st">"Caucho y cuero"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">t =</span> <span class="fu">sum</span>(toneladas_anio)) <span class="sc">|&gt;</span> <span class="fu">pull</span>(t)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>t_total_rsm <span class="ot">&lt;-</span> <span class="fu">sum</span>(toneladas_material<span class="sc">$</span>toneladas_anio)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>t_cyd <span class="ot">&lt;-</span> otros_residuos <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">str_starts</span>(indicador, <span class="st">"Construcción"</span>)) <span class="sc">|&gt;</span> <span class="fu">pull</span>(valor)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>recuperacion <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>sector_principal, <span class="sc">~</span>indicador, <span class="sc">~</span>valor, <span class="sc">~</span>unidad, <span class="sc">~</span>anio, <span class="sc">~</span>calidad,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Agricultura y alimentos"</span>, <span class="st">"Residuos orgánicos municipales"</span>, t_organicos, <span class="st">"t/año"</span>, <span class="dv">2021</span>, <span class="st">"Baja"</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Industrias"</span>, <span class="st">"Materiales manufacturados en residuos municipales"</span>, t_manufacturados, <span class="st">"t/año"</span>, <span class="dv">2021</span>, <span class="st">"Baja"</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Ciudades y construcción"</span>, <span class="st">"Residuos de construcción y demolición"</span>, t_cyd, <span class="st">"t/año"</span>, <span class="dv">2015</span>, <span class="st">"Baja"</span>,</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Residuos"</span>, <span class="st">"Residuos sólidos municipales gestionados"</span>, t_total_rsm, <span class="st">"t/año"</span>, <span class="dv">2021</span>, <span class="st">"Baja"</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">sector_principal =</span> <span class="fu">factor</span>(sector_principal, <span class="at">levels =</span> sectores_politica),</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">criterio =</span> <span class="st">"Potencial de recuperación"</span>, <span class="at">memoria =</span> <span class="st">"c06"</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="eslabonamientos" class="level2" data-number="4.9">
+<h2 data-number="4.9" class="anchored" data-anchor-id="eslabonamientos"><span class="header-section-number">4.9</span> Eslabonamientos</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>eslabonamientos <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  enlaces <span class="sc">|&gt;</span> <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Enlace hacia atrás (agregado)"</span>, <span class="at">valor =</span> enlace_atras,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">unidad =</span> <span class="st">"multiplicador"</span>, <span class="at">anio =</span> <span class="dv">2018</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  enlaces <span class="sc">|&gt;</span> <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Enlace hacia adelante (agregado)"</span>, <span class="at">valor =</span> enlace_adelante,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">unidad =</span> <span class="st">"multiplicador"</span>, <span class="at">anio =</span> <span class="dv">2018</span>),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  enlaces <span class="sc">|&gt;</span> <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Multiplicador de empleo"</span>, <span class="at">valor =</span> mult_empleo,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                       <span class="at">unidad =</span> <span class="st">"puestos por millón de B/."</span>, <span class="at">anio =</span> <span class="dv">2018</span>),</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  enlaces <span class="sc">|&gt;</span> <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Multiplicador de valor agregado"</span>, <span class="at">valor =</span> mult_vab,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">unidad =</span> <span class="st">"B/. por B/. de demanda final"</span>, <span class="at">anio =</span> <span class="dv">2018</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="st">"Eslabonamientos"</span>, <span class="at">memoria =</span> <span class="st">"c04"</span>, <span class="at">calidad =</span> <span class="st">"Media"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Los multiplicadores agregados incluyen las compras entre actividades del mismo sector, por lo que sirven para comparar entre sectores pero no con los de actividades individuales. La memoria 4 entrega los de las 76 actividades.</p>
+</section>
+</section>
+<section id="base-integrada" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Base integrada</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>sectores_priorizados <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  pib, empleo_crit, comercio, inversion, concentracion,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  emisiones_crit, recursos, recuperacion, eslabonamientos</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">sector_principal =</span> <span class="fu">factor</span>(sector_principal, <span class="at">levels =</span> sectores_politica),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">criterio =</span> <span class="fu">factor</span>(criterio, <span class="at">levels =</span> <span class="fu">c</span>(</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">"PIB"</span>, <span class="st">"Empleo"</span>, <span class="st">"Comercio exterior"</span>, <span class="st">"Inversión"</span>, <span class="st">"Concentración de mercado"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Emisiones de GEI"</span>, <span class="st">"Uso de recursos"</span>, <span class="st">"Potencial de recuperación"</span>, <span class="st">"Eslabonamientos"</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(criterio, indicador, sector_principal, valor, unidad, anio, calidad, memoria) <span class="sc">|&gt;</span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(criterio, indicador, sector_principal)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Número de indicadores por criterio y calidad</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">count</span>(sectores_priorizados, criterio, calidad)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 11 × 3
+   criterio                  calidad     n
+   &lt;fct&gt;                     &lt;chr&gt;   &lt;int&gt;
+ 1 PIB                       Alta       21
+ 2 Empleo                    Alta       21
+ 3 Empleo                    Media      14
+ 4 Comercio exterior         Media      35
+ 5 Inversión                 Baja        6
+ 6 Inversión                 Media       8
+ 7 Concentración de mercado  Baja       12
+ 8 Emisiones de GEI          Media      14
+ 9 Uso de recursos           Media      11
+10 Potencial de recuperación Baja        4
+11 Eslabonamientos           Media      28</code></pre>
+</div>
+</div>
+<p>Dos aspectos de los Términos de Referencia no tienen indicadores cuantitativos en la base: la formación bruta de capital por actividad, que ningún cuadro público de Panamá desagrega, y las barreras de entrada y salida de los mercados. Se tratan en el documento de análisis de forma cualitativa. La competitividad internacional se aproxima solo con el comercio exterior, porque no hay un índice de ventajas comparativas por sector con la información disponible.</p>
+</section>
+<section id="matriz-de-relevancia-sectorial" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Matriz de relevancia sectorial</h1>
+<p>Para ofrecer una lectura comparativa construimos una matriz de relevancia con una selección de indicadores, donde cada sector recibe un puntaje de 1 a 5 según el lugar que ocupa entre los seis sectores en cada indicador. El puntaje 5 corresponde al mayor valor. Es un ordenamiento relativo y no una medida de importancia absoluta.</p>
+<p>Dos advertencias sobre la matriz:</p>
+<ul>
+<li>Los pesos son iguales como punto de partida. Los sectores de recursos hídricos y de ciudades y construcción no tienen emisiones propias en la base (están en residuos e industrias), y su puntaje medio se calcula con cinco indicadores. Los pesos definitivos deben acordarse con la CEPAL y el Ministerio de Ambiente, para que la matriz no incorpore las preferencias del consultor.</li>
+<li>Un valor alto no siempre indica un mayor atractivo para una política de economía circular. Un sector con muchas emisiones tiene más presión climática pero no necesariamente más viabilidad. Por eso la matriz se presenta como insumo y no como un ranking de priorización.</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>indicadores_matriz <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Valor agregado bruto"</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Puestos de trabajo"</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Exportaciones"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Emisiones de GEI (sin UTCUTS)"</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Enlace hacia atrás (agregado)"</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Enlace hacia adelante (agregado)"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>matriz <span class="ot">&lt;-</span> sectores_priorizados <span class="sc">|&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(indicador <span class="sc">%in%</span> indicadores_matriz, sector_principal <span class="sc">%in%</span> seis_sectores) <span class="sc">|&gt;</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Rango de menor a mayor entre los sectores con dato en el indicador</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">rango =</span> <span class="fu">rank</span>(valor, <span class="at">ties.method =</span> <span class="st">"average"</span>),</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">puntaje =</span> <span class="dv">1</span> <span class="sc">+</span> <span class="dv">4</span> <span class="sc">*</span> (rango <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">/</span> (<span class="fu">sum</span>(<span class="sc">!</span><span class="fu">is.na</span>(valor)) <span class="sc">-</span> <span class="dv">1</span>),</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> indicador</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(indicador, sector_principal, valor, puntaje)</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>matriz_ancha <span class="ot">&lt;-</span> matriz <span class="sc">|&gt;</span></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sector_principal, indicador, puntaje) <span class="sc">|&gt;</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> indicador, <span class="at">values_from =</span> puntaje) <span class="sc">|&gt;</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_indicadores =</span> <span class="fu">rowSums</span>(<span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">pick</span>(<span class="fu">all_of</span>(indicadores_matriz)))),</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">puntaje_medio =</span> <span class="fu">rowMeans</span>(<span class="fu">pick</span>(<span class="fu">all_of</span>(indicadores_matriz)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(puntaje_medio))</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>matriz_ancha</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  sector_principal     `Valor agregado bruto` `Puestos de trabajo` Exportaciones
+  &lt;fct&gt;                                 &lt;dbl&gt;                &lt;dbl&gt;         &lt;dbl&gt;
+1 Agricultura y alime…                    4.2                  5             5  
+2 Industrias                              3.4                  3.4           4.2
+3 Ciudades y construc…                    5                    4.2           1.8
+4 Energía                                 2.6                  1             3.4
+5 Recursos hídricos                       1.8                  1.8           1.8
+6 Residuos                                1                    2.6           1.8
+# ℹ 5 more variables: `Emisiones de GEI (sin UTCUTS)` &lt;dbl&gt;,
+#   `Enlace hacia adelante (agregado)` &lt;dbl&gt;,
+#   `Enlace hacia atrás (agregado)` &lt;dbl&gt;, n_indicadores &lt;dbl&gt;,
+#   puntaje_medio &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="exportación" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Exportación</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(sectores_priorizados, <span class="st">"sectores_priorizados"</span>, <span class="at">hoja =</span> <span class="st">"indicadores"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(matriz, <span class="st">"matriz_relevancia_sectorial"</span>, <span class="at">hoja =</span> <span class="st">"matriz"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(matriz_ancha, <span class="st">"matriz_relevancia_sectorial_ancha"</span>, <span class="at">hoja =</span> <span class="st">"matriz_ancha"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="referencias" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Referencias</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-miambiente2024HojaRutaEC" class="csl-entry" role="listitem">
+Ministerio de Ambiente de Panamá y Programa de las Naciones Unidas para el Desarrollo. (2024). <em>Hoja de Ruta para el sector de Economía Circular con enfoque de Cambio Climático</em>. Ministerio de Ambiente de Panamá (MiAMBIENTE); PNUD Panamá. <a href="https://www.undp.org/sites/g/files/zskgke326/files/2024-09/undp-panama-hojar.pdf">https://www.undp.org/sites/g/files/zskgke326/files/2024-09/undp-panama-hojar.pdf</a>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c08-base-sectorial-integrada/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></div></div></footer></body></html>

@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Renato Vargas">
+<meta name="description" content="Encadenamientos hacia atrás y hacia adelante, multiplicadores de producción, valor agregado y empleo de las 76 actividades de la matriz insumo-producto de Panamá, y su agregación a los sectores de la Hoja de Ruta">
+
+<title>Memoria de cálculo 4: eslabonamientos productivos con la matriz insumo-producto de 2018 – PAN ECIRC</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<script src="../../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap-71fbcc4293f9c007eba8de2da594bbc4.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<link href="../../../site_libs/tabwid-1.1.3/tabwid.css" rel="stylesheet">
+<script src="../../../site_libs/tabwid-1.1.3/tabwid.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../../styles.css">
+<link rel="stylesheet" href="../../documentos/estilos.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../../index.html">
+    <span class="navbar-title">PAN ECIRC</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Buscar"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Navegación de palanca" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../index.html"> 
+<span class="menu-text">Inicio</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../../materiales/index.html" aria-current="page"> 
+<span class="menu-text">Materiales</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../about.html"> 
+<span class="menu-text">Acerca de</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../materiales/calculos/c01-mapeo-sectores/index.html">Memorias de cálculo</a></li><li class="breadcrumb-item"><a href="../../../materiales/calculos/c04-eslabonamientos/index.html">C4. Eslabonamientos</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Materiales</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Documentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1a-metodologia/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1a. Metodología</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1b-plan-de-trabajo/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1b. Plan de trabajo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/documentos/a1c-sectores-economicos-priorizados/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A1c. Sectores económicos priorizados</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Memorias de cálculo</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c01-mapeo-sectores/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C1. Mapeo de sectores</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c02-cuentas-sectoriales/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C2. Cuentas por actividad y sector</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c03-empleo-sectorial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C3. Empleo, género e informalidad</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c04-eslabonamientos/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">C4. Eslabonamientos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c05-emisiones-ghg/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C5. Emisiones de GEI</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c06-recursos-y-residuos/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C6. Recursos y residuos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c07-inversion-y-estructura-empresarial/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C7. Inversión y estructura empresarial</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/calculos/c08-base-sectorial-integrada/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">C8. Base sectorial integrada</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Presentaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../materiales/presentaciones/01-ejemplo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación de ejemplo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción"><span class="header-section-number">1</span> Introducción</a>
+  <ul class="collapse">
+  <li><a href="#notación" id="toc-notación" class="nav-link" data-scroll-target="#notación"><span class="header-section-number">1.1</span> Notación</a></li>
+  </ul></li>
+  <li><a href="#preámbulo" id="toc-preámbulo" class="nav-link" data-scroll-target="#preámbulo"><span class="header-section-number">2</span> Preámbulo</a></li>
+  <li><a href="#lectura-de-la-matriz" id="toc-lectura-de-la-matriz" class="nav-link" data-scroll-target="#lectura-de-la-matriz"><span class="header-section-number">3</span> Lectura de la matriz</a></li>
+  <li><a href="#coeficientes-técnicos-y-matriz-de-leontief" id="toc-coeficientes-técnicos-y-matriz-de-leontief" class="nav-link" data-scroll-target="#coeficientes-técnicos-y-matriz-de-leontief"><span class="header-section-number">4</span> Coeficientes técnicos y matriz de Leontief</a></li>
+  <li><a href="#indicadores-por-actividad" id="toc-indicadores-por-actividad" class="nav-link" data-scroll-target="#indicadores-por-actividad"><span class="header-section-number">5</span> Indicadores por actividad</a></li>
+  <li><a href="#asignación-a-sectores-de-política" id="toc-asignación-a-sectores-de-política" class="nav-link" data-scroll-target="#asignación-a-sectores-de-política"><span class="header-section-number">6</span> Asignación a sectores de política</a></li>
+  <li><a href="#flujos-y-enlaces-entre-sectores" id="toc-flujos-y-enlaces-entre-sectores" class="nav-link" data-scroll-target="#flujos-y-enlaces-entre-sectores"><span class="header-section-number">7</span> Flujos y enlaces entre sectores</a></li>
+  <li><a href="#proveedores-y-compradores-de-las-actividades-núcleo" id="toc-proveedores-y-compradores-de-las-actividades-núcleo" class="nav-link" data-scroll-target="#proveedores-y-compradores-de-las-actividades-núcleo"><span class="header-section-number">8</span> Proveedores y compradores de las actividades núcleo</a></li>
+  <li><a href="#exportación" id="toc-exportación" class="nav-link" data-scroll-target="#exportación"><span class="header-section-number">9</span> Exportación</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">10</span> Referencias</a></li>
+  </ul>
+<div class="toc-actions"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c04-eslabonamientos/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../../materiales/calculos/c01-mapeo-sectores/index.html">Memorias de cálculo</a></li><li class="breadcrumb-item"><a href="../../../materiales/calculos/c04-eslabonamientos/index.html">C4. Eslabonamientos</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Memoria de cálculo 4: eslabonamientos productivos con la matriz insumo-producto de 2018</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">insumo-producto</div>
+    <div class="quarto-category">eslabonamientos</div>
+    <div class="quarto-category">multiplicadores</div>
+    <div class="quarto-category">Panamá</div>
+    <div class="quarto-category">rstats</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    Encadenamientos hacia atrás y hacia adelante, multiplicadores de producción, valor agregado y empleo de las 76 actividades de la matriz insumo-producto de Panamá, y su agregación a los sectores de la Hoja de Ruta
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Renato Vargas </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Fecha de publicación</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">22 de octubre de 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introducción" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Introducción</h1>
+<p>Los Términos de Referencia piden analizar los sectores económicos “tomando en cuenta los relevantes eslabonamientos productivos”. Esta memoria cuantifica esos eslabonamientos con la matriz insumo-producto de Panamá de 2018 <span class="citation" data-cites="inec2024mip">(<a href="#ref-inec2024mip" role="doc-biblioref">Instituto Nacional de Estadística y Censo (INEC), Contraloría General de la República, 2024a</a>)</span>, que es la más reciente que publica el INEC, y con la metodología estándar de análisis insumo-producto <span class="citation" data-cites="millerblair2022">(<a href="#ref-millerblair2022" role="doc-biblioref">Miller y Blair, 2022</a>)</span>.</p>
+<p>La matriz tiene 76 actividades y está expresada en miles de balboas a precios básicos. Usamos la matriz de producción doméstica (cuadro 2), que registra las compras intermedias de insumos de origen nacional, y la de importaciones (cuadro 3) para medir las fugas hacia el exterior. La metodología del INEC está documentada en un informe técnico <span class="citation" data-cites="inec2024metodologiamip">(<a href="#ref-inec2024metodologiamip" role="doc-biblioref">Instituto Nacional de Estadística y Censo (INEC), Contraloría General de la República, 2024b</a>)</span>.</p>
+<p>Calculamos para cada actividad:</p>
+<ul>
+<li>El <strong>encadenamiento hacia atrás</strong>, que mide cuánta producción nacional adicional exige la actividad cuando aumenta su propia producción. Resume su capacidad de arrastrar a sus proveedores.</li>
+<li>El <strong>encadenamiento hacia adelante</strong>, que mide cuánta producción nacional adicional se genera cuando aumenta la demanda final de todas las actividades. Resume su importancia como proveedora de insumos para las demás.</li>
+<li>Los <strong>multiplicadores</strong> de valor agregado y de empleo.</li>
+<li>La <strong>fuga por importaciones</strong> de insumos.</li>
+</ul>
+<p>Aplicamos el cálculo en dos niveles: las 76 actividades y los siete grupos de sectores de la memoria 1. Una advertencia sobre el alcance: la matriz es de 2018 y las memorias de empleo y de cuentas llegan a 2024. Las proporciones estructurales (coeficientes técnicos) se suponen estables, y las cifras de valor agregado y empleo por unidad de producción de 2018 no deben leerse como las de 2024.</p>
+<section id="notación" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="notación"><span class="header-section-number">1.1</span> Notación</h2>
+<p>Seguimos la notación de Miller y Blair <span class="citation" data-cites="millerblair2022">(<a href="#ref-millerblair2022" role="doc-biblioref">Miller y Blair, 2022</a>)</span>. <span class="math inline">\(\mathbf{Z}\)</span> es la matriz de flujos intermedios domésticos, <span class="math inline">\(\mathbf{x}\)</span> el vector de producción total, <span class="math inline">\(\mathbf{A} = \mathbf{Z}\hat{\mathbf{x}}^{-1}\)</span> la matriz de coeficientes técnicos y <span class="math inline">\(\mathbf{L} = (\mathbf{I}-\mathbf{A})^{-1}\)</span> la matriz inversa de Leontief. Los indicadores son:</p>
+<p><span class="math display">\[
+\text{enlace atrás}_j = \sum_i l_{ij}, \qquad
+\text{enlace adelante}_i = \sum_j l_{ij}
+\]</span></p>
+<p>Los índices de Rasmussen-Hirschman dividen cada enlace entre el promedio de las 76 actividades; un valor mayor que 1 indica un enlace superior al promedio. El multiplicador de valor agregado es <span class="math inline">\(\mathbf{v}'\mathbf{L}\)</span>, con <span class="math inline">\(v_j\)</span> igual al valor agregado por unidad de producción de la actividad <span class="math inline">\(j\)</span>, y el de empleo es <span class="math inline">\(\mathbf{e}'\mathbf{L}\)</span>, con <span class="math inline">\(e_j\)</span> igual a los puestos de trabajo por unidad de producción.</p>
+</section>
+</section>
+<section id="preámbulo" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Preámbulo</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Limpiar el área de trabajo</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list =</span> <span class="fu">ls</span>())</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Funciones y constantes compartidas</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">"materiales/calculos/scripts/funciones_comunes.R"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mapeo <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"mapeo_sectores_scn"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="lectura-de-la-matriz" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Lectura de la matriz</h1>
+<p>El archivo tiene tres cuadros con la misma estructura: las 76 actividades (<code>AE01</code> a <code>AE76</code>) están en las filas 10 a 85 y en las columnas 3 a 78. Leemos la hoja completa como texto y extraemos rangos con una función corta.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>archivo_mip <span class="ot">&lt;-</span> <span class="st">"data/inec/P0705547520240930151649Matriz Insumo Producto 2018.xlsx"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>hojas <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">total =</span> <span class="fu">read_excel</span>(archivo_mip, <span class="at">sheet =</span> <span class="st">"Cuadro 1"</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>, <span class="at">col_types =</span> <span class="st">"text"</span>, <span class="at">.name_repair =</span> <span class="st">"minimal"</span>),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">domestica =</span> <span class="fu">read_excel</span>(archivo_mip, <span class="at">sheet =</span> <span class="st">"Cuadro 2"</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>, <span class="at">col_types =</span> <span class="st">"text"</span>, <span class="at">.name_repair =</span> <span class="st">"minimal"</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">importada =</span> <span class="fu">read_excel</span>(archivo_mip, <span class="at">sheet =</span> <span class="st">"Cuadro 3"</span>, <span class="at">col_names =</span> <span class="cn">FALSE</span>, <span class="at">col_types =</span> <span class="st">"text"</span>, <span class="at">.name_repair =</span> <span class="st">"minimal"</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Extrae un rango de una hoja como matriz numérica</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>rango <span class="ot">&lt;-</span> <span class="cf">function</span>(hoja, filas, columnas) {</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(<span class="fu">as.numeric</span>(<span class="fu">unlist</span>(hoja[filas, columnas])), <span class="at">nrow =</span> <span class="fu">length</span>(filas))</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Extraemos la matriz de flujos domésticos, la de importaciones, la demanda final doméstica (seis columnas: exportaciones, hogares, instituciones sin fines de lucro, gobierno, formación de capital y variación de existencias), y las filas de producción total, valor agregado y personal ocupado.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Z <span class="ot">&lt;-</span> <span class="fu">rango</span>(hojas<span class="sc">$</span>domestica, <span class="dv">10</span><span class="sc">:</span><span class="dv">85</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">78</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Mimp <span class="ot">&lt;-</span> <span class="fu">rango</span>(hojas<span class="sc">$</span>importada, <span class="dv">10</span><span class="sc">:</span><span class="dv">85</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">78</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>F_dom <span class="ot">&lt;-</span> <span class="fu">rango</span>(hojas<span class="sc">$</span>domestica, <span class="dv">10</span><span class="sc">:</span><span class="dv">85</span>, <span class="dv">79</span><span class="sc">:</span><span class="dv">84</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rango</span>(hojas<span class="sc">$</span>total, <span class="dv">103</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">78</span>)[<span class="dv">1</span>, ]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>va <span class="ot">&lt;-</span> <span class="fu">rango</span>(hojas<span class="sc">$</span>total, <span class="dv">92</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">78</span>)[<span class="dv">1</span>, ]</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>empleo <span class="ot">&lt;-</span> <span class="fu">rango</span>(hojas<span class="sc">$</span>total, <span class="dv">104</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">78</span>)[<span class="dv">1</span>, ]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>codigos <span class="ot">&lt;-</span> hojas<span class="sc">$</span>domestica[[<span class="dv">1</span>]][<span class="dv">10</span><span class="sc">:</span><span class="dv">85</span>]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>nombres <span class="ot">&lt;-</span> hojas<span class="sc">$</span>domestica[[<span class="dv">2</span>]][<span class="dv">10</span><span class="sc">:</span><span class="dv">85</span>]</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Comprobamos que la matriz está balanceada por filas: para cada actividad, las ventas intermedias más la demanda final doméstica son iguales a la producción total.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>balance <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(Z) <span class="sc">+</span> <span class="fu">rowSums</span>(F_dom) <span class="sc">-</span> x</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Desviación máxima (debe ser prácticamente cero)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">abs</span>(balance))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.189997e-06</code></pre>
+</div>
+</div>
+</section>
+<section id="coeficientes-técnicos-y-matriz-de-leontief" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Coeficientes técnicos y matriz de Leontief</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de coeficientes técnicos: cada columna de Z dividida entre su producción</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> Z <span class="sc">%*%</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> x)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Inversa de Leontief</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">diag</span>(<span class="dv">76</span>) <span class="sc">-</span> A)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Una matriz productiva debe tener sumas de columna de A menores que 1</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(<span class="fu">colSums</span>(A))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6788898</code></pre>
+</div>
+</div>
+</section>
+<section id="indicadores-por-actividad" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Indicadores por actividad</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>indicadores <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">cod_mip =</span> codigos,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">actividad_mip =</span> nombres,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">produccion_millones =</span> x <span class="sc">/</span> <span class="dv">1000</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Encadenamientos directos</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">enlace_atras_directo =</span> <span class="fu">colSums</span>(A),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">enlace_adelante_directo =</span> <span class="fu">rowSums</span>(Z) <span class="sc">/</span> x,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Encadenamientos totales (directos e indirectos)</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">enlace_atras =</span> <span class="fu">colSums</span>(L),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">enlace_adelante =</span> <span class="fu">rowSums</span>(L),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Valor agregado y empleo por unidad de producción</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">vab_por_produccion =</span> va <span class="sc">/</span> x,</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">puestos_por_millon =</span> <span class="dv">1000</span> <span class="sc">*</span> empleo <span class="sc">/</span> x,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Multiplicadores</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">mult_vab =</span> <span class="fu">as.vector</span>((va <span class="sc">/</span> x) <span class="sc">%*%</span> L),</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">mult_empleo =</span> <span class="fu">as.vector</span>(<span class="dv">1000</span> <span class="sc">*</span> (empleo <span class="sc">/</span> x) <span class="sc">%*%</span> L),</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Fuga por importaciones intermedias</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">coef_importacion =</span> <span class="fu">colSums</span>(Mimp) <span class="sc">/</span> x</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">indice_atras =</span> enlace_atras <span class="sc">/</span> <span class="fu">mean</span>(enlace_atras),</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">indice_adelante =</span> enlace_adelante <span class="sc">/</span> <span class="fu">mean</span>(enlace_adelante),</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">clasificacion =</span> <span class="fu">case_when</span>(</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>      indice_atras <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">&amp;</span> indice_adelante <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Clave"</span>,</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>      indice_atras <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Arrastre (hacia atrás)"</span>,</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>      indice_adelante <span class="sc">&gt;</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"Impulso (hacia adelante)"</span>,</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"Independiente"</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Los puestos por millón de balboas de producción son un cociente directo de la matriz. El multiplicador de empleo indica los puestos totales, directos e indirectos, por cada millón de balboas de demanda final de la actividad.</p>
+</section>
+<section id="asignación-a-sectores-de-política" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Asignación a sectores de política</h1>
+<p>Cada actividad de la matriz hereda el sector principal de la memoria 1. Verificamos que cada código de la matriz tenga un único sector.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sector_mip <span class="ot">&lt;-</span> mapeo <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(cod_mip, sector_principal)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Debe haber una fila por código de la matriz</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(sector_mip) <span class="sc">==</span> <span class="fu">n_distinct</span>(sector_mip<span class="sc">$</span>cod_mip)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>indicadores <span class="ot">&lt;-</span> indicadores <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(sector_mip, <span class="at">by =</span> <span class="st">"cod_mip"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>La siguiente tabla muestra las actividades núcleo y las más relevantes para los sectores prioritarios.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>actividades_seleccion <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AE38"</span>, <span class="st">"AE39"</span>, <span class="st">"AE40"</span>, <span class="st">"AE41"</span>, <span class="st">"AE42"</span>, <span class="st">"AE43"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AE16"</span>, <span class="st">"AE23"</span>, <span class="st">"AE27"</span>, <span class="st">"AE31"</span>, <span class="st">"AE32"</span>, <span class="st">"AE34"</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>indicadores <span class="sc">|&gt;</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cod_mip <span class="sc">%in%</span> actividades_seleccion) <span class="sc">|&gt;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    Código <span class="ot">=</span> cod_mip,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">Actividad =</span> actividad_mip,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Índice atrás</span><span class="st">`</span> <span class="ot">=</span> indice_atras,</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Índice adelante</span><span class="st">`</span> <span class="ot">=</span> indice_adelante,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Mult. VAB</span><span class="st">`</span> <span class="ot">=</span> mult_vab,</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Mult. empleo</span><span class="st">`</span> <span class="ot">=</span> mult_empleo,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    Clasificación <span class="ot">=</span> clasificacion</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabla_ft</span>(<span class="at">digitos =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-actividades-nucleo" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-actividades-nucleo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;1: Eslabonamientos de actividades seleccionadas, matriz insumo-producto de Panamá, 2018
+</figcaption>
+<div aria-describedby="tbl-actividades-nucleo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-d8bad469{}.cl-84f4c6e9{font-family:'Arial';font-size:9pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-12bdf8a2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-59bf8534{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-a978ab37{width:0.607in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-aa69ef0c{width:3.477in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9fd2bcba{width:0.857in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1dc6c549{width:1.059in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e6b501a8{width:0.767in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9b9e1e58{width:0.927in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-52cbff30{width:1.58in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a3b79b20{width:0.607in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6856e324{width:3.477in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-76c1e39e{width:0.857in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bb318ccb{width:1.059in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6c24c01d{width:0.767in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3a09448a{width:0.927in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-94aff4fa{width:1.58in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-173775fe{width:0.607in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-cf29d20b{width:3.477in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-3c43a5b8{width:0.857in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9fd8bd1d{width:1.059in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-06ae6606{width:0.767in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ed4560ea{width:0.927in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bed43648{width:1.58in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-d8bad469"><thead><tr style="overflow-wrap:break-word;"><th class="cl-a978ab37"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Código</span></p></th><th class="cl-aa69ef0c"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Actividad</span></p></th><th class="cl-9fd2bcba"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Índice atrás</span></p></th><th class="cl-1dc6c549"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Índice adelante</span></p></th><th class="cl-e6b501a8"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Mult. VAB</span></p></th><th class="cl-9b9e1e58"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Mult. empleo</span></p></th><th class="cl-52cbff30"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Clasificación</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE16</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Procesamiento y conservas de carnes</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.44</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.91</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.81</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">40.61</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Arrastre (hacia atrás)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE23</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Bebidas y tabaco</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.10</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.84</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.77</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">20.34</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Arrastre (hacia atrás)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE27</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Papel y subproductos</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.92</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.90</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.63</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">16.95</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Independiente</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE31</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Caucho y plástico</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.92</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.76</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.58</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">19.63</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Independiente</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE32</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Cemento, cal y yeso</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.10</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.98</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.82</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">10.03</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Arrastre (hacia atrás)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE34</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Metales comunes</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.19</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.90</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.57</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">21.95</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Arrastre (hacia atrás)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE38</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Suministro de electricidad, gas, vapor y aire acondicionado</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.95</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.86</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.89</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">6.52</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Impulso (hacia adelante)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE39</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Captación, tratamiento y distribución de agua</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.04</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.81</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.88</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">17.51</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Arrastre (hacia atrás)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE40</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Recogida, tratamiento y eliminación de desechos</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.97</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.74</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.88</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">40.97</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Independiente</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE41</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Construcción de edificios</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.02</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.71</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.82</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">15.55</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Arrastre (hacia atrás)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-a3b79b20"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE42</span></p></td><td class="cl-6856e324"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Construcción de obras de ingeniería civil</span></p></td><td class="cl-76c1e39e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.01</span></p></td><td class="cl-bb318ccb"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.71</span></p></td><td class="cl-6c24c01d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.81</span></p></td><td class="cl-3a09448a"><p class="cl-59bf8534"><span class="cl-84f4c6e9">10.60</span></p></td><td class="cl-94aff4fa"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Arrastre (hacia atrás)</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-173775fe"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">AE43</span></p></td><td class="cl-cf29d20b"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Actividades especializadas de la construcción</span></p></td><td class="cl-3c43a5b8"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.97</span></p></td><td class="cl-9fd8bd1d"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1.43</span></p></td><td class="cl-06ae6606"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0.81</span></p></td><td class="cl-ed4560ea"><p class="cl-59bf8534"><span class="cl-84f4c6e9">46.50</span></p></td><td class="cl-bed43648"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Impulso (hacia adelante)</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="flujos-y-enlaces-entre-sectores" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Flujos y enlaces entre sectores</h1>
+<p>Agregamos las 76 actividades a los siete grupos de sectores para ver cómo se relacionan entre sí. La matriz de flujos agregada es la suma de los bloques de <span class="math inline">\(\mathbf{Z}\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Matriz de pertenencia: 76 actividades por 7 sectores</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>sector_de_actividad <span class="ot">&lt;-</span> indicadores<span class="sc">$</span>sector_principal</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>G <span class="ot">&lt;-</span> <span class="fu">sapply</span>(sectores_politica, \(s) <span class="fu">as.numeric</span>(sector_de_actividad <span class="sc">==</span> s))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Flujos intersectoriales (millones de B/.), x agregada y coeficientes</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>Z_sector <span class="ot">&lt;-</span> <span class="fu">t</span>(G) <span class="sc">%*%</span> Z <span class="sc">%*%</span> G <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>x_sector <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">t</span>(G) <span class="sc">%*%</span> x) <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">dimnames</span>(Z_sector) <span class="ot">&lt;-</span> <span class="fu">list</span>(sectores_politica, sectores_politica)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>A_sector <span class="ot">&lt;-</span> Z_sector <span class="sc">%*%</span> <span class="fu">diag</span>(<span class="dv">1</span> <span class="sc">/</span> x_sector)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>L_sector <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">diag</span>(<span class="dv">7</span>) <span class="sc">-</span> A_sector)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>Z_sector <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="st">"Vende"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabla_ft</span>(<span class="at">digitos =</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-flujos-sectores" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-flujos-sectores-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;2: Compras intermedias domésticas entre sectores, 2018 (millones de B/.). Filas: sector que vende; columnas: sector que compra
+</figcaption>
+<div aria-describedby="tbl-flujos-sectores-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-d8bad469{}.cl-84f4c6e9{font-family:'Arial';font-size:9pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-12bdf8a2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-59bf8534{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-aa556e85{width:1.573in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-83f78a76{width:0.732in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-a58f9b70{width:0.649in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-65e0053e{width:1.211in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-586a480f{width:0.753in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-2eb6b7c3{width:1.476in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bda57c53{width:1.573in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7f266b3e{width:1.427in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6059cb62{width:1.573in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-35fdf517{width:0.732in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5fe225e3{width:0.649in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7c6a46a6{width:1.211in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-483d07db{width:0.753in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e29ae34e{width:1.476in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-01dcbf53{width:1.573in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-6780b69f{width:1.427in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-768daf28{width:1.573in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-df59b01e{width:0.732in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-80a56cf4{width:0.649in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-882c64f3{width:1.211in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d60069d1{width:0.753in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-bbdbb6d6{width:1.476in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e1b6253f{width:1.573in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-ea165731{width:1.427in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-d8bad469"><thead><tr style="overflow-wrap:break-word;"><th class="cl-aa556e85"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Vende</span></p></th><th class="cl-83f78a76"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Residuos</span></p></th><th class="cl-a58f9b70"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Energía</span></p></th><th class="cl-65e0053e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Recursos hídricos</span></p></th><th class="cl-586a480f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Industrias</span></p></th><th class="cl-2eb6b7c3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Agricultura y alimentos</span></p></th><th class="cl-bda57c53"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Ciudades y construcción</span></p></th><th class="cl-7f266b3e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Resto de la economía</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-6059cb62"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Residuos</span></p></td><td class="cl-35fdf517"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-5fe225e3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1</span></p></td><td class="cl-7c6a46a6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2</span></p></td><td class="cl-483d07db"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-e29ae34e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1</span></p></td><td class="cl-01dcbf53"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1</span></p></td><td class="cl-6780b69f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">25</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6059cb62"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Energía</span></p></td><td class="cl-35fdf517"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-5fe225e3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">143</span></p></td><td class="cl-7c6a46a6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">44</span></p></td><td class="cl-483d07db"><p class="cl-59bf8534"><span class="cl-84f4c6e9">106</span></p></td><td class="cl-e29ae34e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">67</span></p></td><td class="cl-01dcbf53"><p class="cl-59bf8534"><span class="cl-84f4c6e9">37</span></p></td><td class="cl-6780b69f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">882</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6059cb62"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Recursos hídricos</span></p></td><td class="cl-35fdf517"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-5fe225e3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1</span></p></td><td class="cl-7c6a46a6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-483d07db"><p class="cl-59bf8534"><span class="cl-84f4c6e9">13</span></p></td><td class="cl-e29ae34e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3</span></p></td><td class="cl-01dcbf53"><p class="cl-59bf8534"><span class="cl-84f4c6e9">26</span></p></td><td class="cl-6780b69f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">89</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6059cb62"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Industrias</span></p></td><td class="cl-35fdf517"><p class="cl-59bf8534"><span class="cl-84f4c6e9">4</span></p></td><td class="cl-5fe225e3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">16</span></p></td><td class="cl-7c6a46a6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1</span></p></td><td class="cl-483d07db"><p class="cl-59bf8534"><span class="cl-84f4c6e9">524</span></p></td><td class="cl-e29ae34e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">66</span></p></td><td class="cl-01dcbf53"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2,422</span></p></td><td class="cl-6780b69f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">726</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6059cb62"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Agricultura y alimentos</span></p></td><td class="cl-35fdf517"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-5fe225e3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-7c6a46a6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-483d07db"><p class="cl-59bf8534"><span class="cl-84f4c6e9">129</span></p></td><td class="cl-e29ae34e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2,026</span></p></td><td class="cl-01dcbf53"><p class="cl-59bf8534"><span class="cl-84f4c6e9">14</span></p></td><td class="cl-6780b69f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">745</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-6059cb62"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Ciudades y construcción</span></p></td><td class="cl-35fdf517"><p class="cl-59bf8534"><span class="cl-84f4c6e9">0</span></p></td><td class="cl-5fe225e3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">21</span></p></td><td class="cl-7c6a46a6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3</span></p></td><td class="cl-483d07db"><p class="cl-59bf8534"><span class="cl-84f4c6e9">36</span></p></td><td class="cl-e29ae34e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">38</span></p></td><td class="cl-01dcbf53"><p class="cl-59bf8534"><span class="cl-84f4c6e9">571</span></p></td><td class="cl-6780b69f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">642</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-768daf28"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Resto de la economía</span></p></td><td class="cl-df59b01e"><p class="cl-59bf8534"><span class="cl-84f4c6e9">25</span></p></td><td class="cl-80a56cf4"><p class="cl-59bf8534"><span class="cl-84f4c6e9">274</span></p></td><td class="cl-882c64f3"><p class="cl-59bf8534"><span class="cl-84f4c6e9">27</span></p></td><td class="cl-d60069d1"><p class="cl-59bf8534"><span class="cl-84f4c6e9">1,135</span></p></td><td class="cl-bbdbb6d6"><p class="cl-59bf8534"><span class="cl-84f4c6e9">748</span></p></td><td class="cl-e1b6253f"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3,534</span></p></td><td class="cl-ea165731"><p class="cl-59bf8534"><span class="cl-84f4c6e9">12,449</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Calculamos los enlaces de los sectores. Al agregar, los multiplicadores de cada sector reflejan también el comercio entre actividades del mismo grupo, de modo que no son comparables con los de las actividades individuales.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Valor agregado y empleo agregados por sector</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>va_sector <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">t</span>(G) <span class="sc">%*%</span> va) <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>empleo_sector <span class="ot">&lt;-</span> <span class="fu">as.vector</span>(<span class="fu">t</span>(G) <span class="sc">%*%</span> empleo)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>enlaces_sector <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sector_principal =</span> <span class="fu">factor</span>(sectores_politica, <span class="at">levels =</span> sectores_politica),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">produccion_millones =</span> x_sector,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">vab_millones =</span> va_sector,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">puestos =</span> empleo_sector,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">enlace_atras =</span> <span class="fu">colSums</span>(L_sector),</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">enlace_adelante =</span> <span class="fu">rowSums</span>(L_sector),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">mult_vab =</span> <span class="fu">as.vector</span>((va_sector <span class="sc">/</span> x_sector) <span class="sc">%*%</span> L_sector),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">mult_empleo =</span> <span class="fu">as.vector</span>((empleo_sector <span class="sc">/</span> x_sector) <span class="sc">%*%</span> L_sector),</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">coef_importacion =</span> <span class="fu">as.vector</span>(<span class="fu">t</span>(G) <span class="sc">%*%</span> <span class="fu">colSums</span>(Mimp)) <span class="sc">/</span> <span class="dv">1000</span> <span class="sc">/</span> x_sector</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">indice_atras =</span> enlace_atras <span class="sc">/</span> <span class="fu">mean</span>(enlace_atras),</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">indice_adelante =</span> enlace_adelante <span class="sc">/</span> <span class="fu">mean</span>(enlace_adelante)</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>enlaces_sector</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 11
+  sector_principal        produccion_millones vab_millones  puestos enlace_atras
+  &lt;fct&gt;                                 &lt;dbl&gt;        &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;
+1 Residuos                               111.         71.1    3836.         1.35
+2 Energía                               1844.       1223.     3376.         1.33
+3 Recursos hídricos                      231.        133.     2847          1.45
+4 Industrias                            5422.       2515.    93388.         1.50
+5 Agricultura y alimentos               6850.       3000.   358096.         1.68
+6 Ciudades y construcción              22731.      12924.   206051.         1.41
+7 Resto de la economía                 65478.      45151.  1246409.         1.32
+# ℹ 6 more variables: enlace_adelante &lt;dbl&gt;, mult_vab &lt;dbl&gt;, mult_empleo &lt;dbl&gt;,
+#   coef_importacion &lt;dbl&gt;, indice_atras &lt;dbl&gt;, indice_adelante &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="proveedores-y-compradores-de-las-actividades-núcleo" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Proveedores y compradores de las actividades núcleo</h1>
+<p>Para cada actividad núcleo identificamos las cinco actividades que más le venden y las cinco que más le compran, en millones de balboas. Este cuadro muestra con quién se articulan la gestión de residuos, el agua, la energía y la construcción.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>nucleo <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"AE38"</span>, <span class="st">"AE39"</span>, <span class="st">"AE40"</span>, <span class="st">"AE41"</span>, <span class="st">"AE42"</span>, <span class="st">"AE43"</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>proveedores <span class="ot">&lt;-</span> <span class="fu">map</span>(nucleo, \(a) {</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  j <span class="ot">&lt;-</span> <span class="fu">which</span>(codigos <span class="sc">==</span> a)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">nucleo =</span> a,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">rol =</span> <span class="st">"Proveedor"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cod_mip =</span> codigos,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">actividad =</span> nombres,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">flujo_millones =</span> Z[, j] <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_max</span>(flujo_millones, <span class="at">n =</span> <span class="dv">5</span>)</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">|&gt;</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list_rbind</span>()</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>compradores <span class="ot">&lt;-</span> <span class="fu">map</span>(nucleo, \(a) {</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  i <span class="ot">&lt;-</span> <span class="fu">which</span>(codigos <span class="sc">==</span> a)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">nucleo =</span> a,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">rol =</span> <span class="st">"Comprador"</span>,</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">cod_mip =</span> codigos,</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">actividad =</span> nombres,</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">flujo_millones =</span> Z[i, ] <span class="sc">/</span> <span class="dv">1000</span></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_max</span>(flujo_millones, <span class="at">n =</span> <span class="dv">5</span>)</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>}) <span class="sc">|&gt;</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list_rbind</span>()</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>vinculos_nucleo <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(proveedores, compradores) <span class="sc">|&gt;</span></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(indicadores, <span class="at">nucleo =</span> cod_mip, <span class="at">nombre_nucleo =</span> actividad_mip),</span>
+<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">"nucleo"</span></span>
+<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>vinculos_nucleo <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(nucleo <span class="sc">==</span> <span class="st">"AE40"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">Rol =</span> rol, <span class="at">Actividad =</span> actividad, <span class="st">`</span><span class="at">Flujo (millones B/.)</span><span class="st">`</span> <span class="ot">=</span> flujo_millones) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tabla_ft</span>(<span class="at">digitos =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-vinculos-residuos" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-vinculos-residuos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;3: Principales proveedores y compradores de la recogida, tratamiento y eliminación de desechos (AE40), 2018 (millones de B/.)
+</figcaption>
+<div aria-describedby="tbl-vinculos-residuos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<div class="tabwid"><style>.cl-d8bad469{}.cl-84f4c6e9{font-family:'Arial';font-size:9pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-12bdf8a2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-59bf8534{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:3pt;padding-top:3pt;padding-left:3pt;padding-right:3pt;line-height: 1;background-color:transparent;}.cl-ffc2d766{width:0.836in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-72ffd668{width:5.012in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-e9dfcec4{width:1.246in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-0c501f04{width:0.836in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-5c264e3d{width:5.012in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-f57b8630{width:1.246in;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1a3541dd{width:0.836in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-1323f0eb{width:5.012in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-81680815{width:1.246in;background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style><table data-quarto-disable-processing="true" class="cl-d8bad469"><thead><tr style="overflow-wrap:break-word;"><th class="cl-ffc2d766"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Rol</span></p></th><th class="cl-72ffd668"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Actividad</span></p></th><th class="cl-e9dfcec4"><p class="cl-59bf8534"><span class="cl-84f4c6e9">Flujo (millones B/.)</span></p></th></tr></thead><tbody><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Proveedor</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Servicios financieros, excepto seguros y fondos de pensiones</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">10.3</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Proveedor</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Reparación, mantenimiento e instalación de maquinaria y equipo comercial e industrial</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2.8</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Proveedor</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Comercio</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2.6</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Proveedor</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Servicios administrativos y de apoyo</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2.5</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Proveedor</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Mantenimiento y reparación de vehículos y bicicletas</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2.0</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Comprador</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Administración pública y defensa</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">6.0</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Comprador</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Atención de la salud humana y de asistencia social</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3.7</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Comprador</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Enseñanza pública y privada</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">3.4</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-0c501f04"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Comprador</span></p></td><td class="cl-5c264e3d"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Servicios financieros, excepto seguros y fondos de pensiones</span></p></td><td class="cl-f57b8630"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2.2</span></p></td></tr><tr style="overflow-wrap:break-word;"><td class="cl-1a3541dd"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Comprador</span></p></td><td class="cl-1323f0eb"><p class="cl-12bdf8a2"><span class="cl-84f4c6e9">Alquileres no residenciales y otras actividades inmobiliarias</span></p></td><td class="cl-81680815"><p class="cl-59bf8534"><span class="cl-84f4c6e9">2.2</span></p></td></tr></tbody></table></div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+</section>
+<section id="exportación" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Exportación</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(indicadores, <span class="st">"eslabonamientos_actividad_mip2018"</span>, <span class="at">hoja =</span> <span class="st">"actividad"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(enlaces_sector, <span class="st">"eslabonamientos_sector_mip2018"</span>, <span class="at">hoja =</span> <span class="st">"sector"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>(Z_sector) <span class="sc">|&gt;</span> <span class="fu">rownames_to_column</span>(<span class="st">"vende"</span>),</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"flujos_intersectoriales_mip2018"</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">hoja =</span> <span class="st">"flujos"</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(vinculos_nucleo, <span class="st">"vinculos_actividades_nucleo_mip2018"</span>, <span class="at">hoja =</span> <span class="st">"vinculos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="referencias" class="level1" data-number="10">
+<h1 data-number="10"><span class="header-section-number">10</span> Referencias</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-inec2024mip" class="csl-entry" role="listitem">
+Instituto Nacional de Estadística y Censo (INEC), Contraloría General de la República. (2024a). <em>Matriz insumo-producto por actividad económica, año de referencia 2018</em>. <a href="https://www.inec.gob.pa/">https://www.inec.gob.pa/</a>
+</div>
+<div id="ref-inec2024metodologiamip" class="csl-entry" role="listitem">
+Instituto Nacional de Estadística y Censo (INEC), Contraloría General de la República. (2024b). <em>Metodología de la matriz insumo-producto de Panamá</em>. INEC. <a href="https://www.inec.gob.pa/">https://www.inec.gob.pa/</a>
+</div>
+<div id="ref-millerblair2022" class="csl-entry" role="listitem">
+Miller, R. E. y Blair, P. D. (2022). <em>Input-Output Analysis: Foundations and Extensions</em> (3.ª ed.). Cambridge University Press. <a href="https://doi.org/10.1017/9781108676212">https://doi.org/10.1017/9781108676212</a>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c04-eslabonamientos/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></div></div></footer></body></html>

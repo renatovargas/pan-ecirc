@@ -1,0 +1,296 @@
+---
+title: "Memoria de cálculo 3: empleo, género e informalidad por actividad y sector de política"
+description: "Puestos de trabajo por actividad del SCN de Panamá, 2018 a 2024, con composición por condición en la ocupación, remuneración, y estimación de participación femenina e informalidad por sector"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - empleo
+  - género
+  - informalidad
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Los Términos de Referencia piden evaluar el empleo de cada sector con un desglose por género y por condición laboral formal e informal. Panamá publica el empleo en dos fuentes que no coinciden en su nivel de detalle:
+
+- La **matriz de empleo de las cuentas nacionales** del Instituto Nacional de Estadística y Censo (INEC) [@inec2026empleo] da los puestos de trabajo por actividad (80 actividades) y condición en la ocupación (asalariados, cuenta propia, empleadores y otros) para 2018 a 2024. No distingue sexo ni formalidad.
+- La **Encuesta de Mercado Laboral** (EML) del INEC da el empleo por sexo y su informalidad, pero solo en las 21 secciones de la Clasificación Industrial Internacional Uniforme (CIIU Rev. 4) y sin cruzar sexo con informalidad [@inec2026eml]. La Organización Internacional del Trabajo (OIT) publica ese cruce en ILOSTAT a partir de la misma encuesta [@ilo2026ilostat].
+
+La memoria combina las dos fuentes con un supuesto explícito: dentro de cada sección CIIU, todas las actividades tienen la misma proporción de mujeres y la misma tasa de informalidad que la sección. Es una imputación proporcional, útil para comparar sectores pero no para describir una actividad individual.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+library(readxl)
+
+mapeo <- leer_salida("mapeo_sectores_scn")
+```
+
+# Matriz de empleo de las cuentas nacionales
+
+## Lectura
+
+La hoja `Tabla` del archivo del INEC está en formato largo. La leemos como texto para evitar los avisos de conversión, porque el año de 2024 viene como "2024 (P)", y seleccionamos las siete columnas que importan.
+
+```{r}
+#| label: lectura-empleo
+
+archivo_empleo <- "data/inec/P00140176420260930102437Componentes del valor agregado y matriz de empleo años 2018-24.xlsx"
+
+empleo_crudo <- read_excel(
+  archivo_empleo,
+  sheet = "Tabla",
+  col_types = "text",
+  .name_repair = "minimal"
+) |>
+  select(anio_texto = `Año`, transaccion = Idf_Transaccion, actividad_cod = Idf_Actividad,
+         seccion = Idf_Categoria, concepto = Idf_Producto, valor = Valor) |>
+  mutate(
+    anio = as.numeric(str_extract(anio_texto, "^\\d{4}")),
+    valor = as.numeric(valor),
+    # "35.2 M" y "35.2 NM" son la misma actividad con distinta condición de mercado
+    cod_scn = str_extract(actividad_cod, "^\\d{2}\\.\\d")
+  )
+
+count(empleo_crudo, transaccion)
+```
+
+Las transacciones relevantes son `PO0101`, `PO0102` y `PO0103` (personal ocupado de mercado, para uso final propio y de no mercado) y `D00101` a `D00103` (remuneración de los asalariados por las mismas condiciones). El concepto identifica la condición en la ocupación.
+
+```{r}
+#| label: conceptos
+
+conceptos <- tribble(
+  ~concepto, ~condicion,
+  "PO",  "Total",
+  "PO1", "Asalariados",
+  "PO2", "Cuenta propia",
+  "PO3", "Empleadores y patronos",
+  "PO4", "Familiares no remunerados",
+  "PO5", "Otros no remunerados",
+  "PO6", "Personal de otros establecimientos"
+)
+```
+
+## Puestos de trabajo por actividad
+
+Sumamos las tres condiciones de mercado y las actividades con sufijo, y verificamos que el total coincida con la suma de las condiciones en la ocupación.
+
+```{r}
+#| label: puestos
+
+puestos <- empleo_crudo |>
+  filter(str_starts(transaccion, "PO0")) |>
+  inner_join(conceptos, by = "concepto") |>
+  summarize(puestos = sum(valor), .by = c(anio, cod_scn, condicion)) |>
+  pivot_wider(names_from = condicion, values_from = puestos, values_fill = 0) |>
+  mutate(
+    suma_condiciones = rowSums(pick(Asalariados:`Personal de otros establecimientos`)),
+    diferencia = Total - suma_condiciones
+  )
+
+# Diferencia máxima entre el total y la suma de condiciones
+max(abs(puestos$diferencia))
+```
+
+```{r}
+#| label: puestos-total-anio
+
+puestos |> summarize(puestos_totales = sum(Total), .by = anio) |> arrange(anio)
+```
+
+## Remuneración de los asalariados
+
+La remuneración está en millones de balboas. Las transacciones `D00101` a `D00103` traen, además de la remuneración total de los asalariados (concepto `D1`), sus componentes (sueldos, contribuciones sociales), los impuestos sobre la producción y los componentes del excedente de explotación. Para no sumar varias veces lo mismo conservamos solo el concepto `D1`. Dividida entre los asalariados da la remuneración media por puesto asalariado, en miles de balboas al año.
+
+```{r}
+#| label: remuneracion
+
+remuneracion <- empleo_crudo |>
+  filter(str_starts(transaccion, "D001"), concepto == "D1") |>
+  summarize(remuneracion = sum(valor), .by = c(anio, cod_scn))
+
+empleo_actividad <- puestos |>
+  select(anio, cod_scn, puestos = Total, asalariados = Asalariados,
+         cuenta_propia = `Cuenta propia`, empleadores = `Empleadores y patronos`,
+         no_remunerados = `Familiares no remunerados`) |>
+  left_join(remuneracion, by = c("anio", "cod_scn")) |>
+  left_join(select(mapeo, cod_scn, actividad, ciiu_seccion, sector_principal), by = "cod_scn") |>
+  mutate(
+    # Miles de balboas por asalariado y por año
+    remuneracion_media = 1000 * remuneracion / asalariados
+  )
+```
+
+# Características por sección CIIU de la EML
+
+## Lectura de ILOSTAT
+
+ILOSTAT trae, en miles de personas, el empleo total y el empleo informal por sexo y sección CIIU. Tomamos 2025, el último año con ambas series. Su total de ocupados (1.968,6 miles) coincide con la EML de septiembre de 2025 del INEC. La definición de informalidad que usa ILOSTAT incluye la agricultura, por lo que el total de informales es mayor que el que publica el INEC para el empleo no agrícola.
+
+```{r}
+#| label: ilostat
+
+leer_ilostat <- function(archivo, nombre_valor) {
+  read_csv(archivo, show_col_types = FALSE) |>
+    filter(time == 2025, str_detect(classif1.label, "ISIC-Rev.4\\): [A-U]\\.")) |>
+    transmute(
+      sexo = sex.label,
+      seccion = str_extract(classif1.label, "(?<=\\): )[A-U]"),
+      !!nombre_valor := obs_value * 1000
+    )
+}
+
+ocupados_sexo <- leer_ilostat("data/inec-eml/ilostat_PAN_EMP_TEMP_SEX_ECO_NB_A.csv", "ocupados")
+informales_sexo <- leer_ilostat("data/inec-eml/ilostat_PAN_EMP_NIFL_SEX_ECO_NB_A.csv", "informales")
+```
+
+## Proporción de mujeres y tasa de informalidad
+
+```{r}
+#| label: perfil-seccion
+
+perfil_seccion <- ocupados_sexo |>
+  left_join(informales_sexo, by = c("sexo", "seccion")) |>
+  pivot_wider(names_from = sexo, values_from = c(ocupados, informales)) |>
+  transmute(
+    seccion,
+    ocupados_total = ocupados_Total,
+    pct_mujeres = 100 * ocupados_Female / ocupados_Total,
+    tasa_informal_total = 100 * informales_Total / ocupados_Total,
+    tasa_informal_mujeres = 100 * informales_Female / ocupados_Female,
+    tasa_informal_hombres = 100 * informales_Male / ocupados_Male
+  )
+
+perfil_seccion |> filter(seccion %in% c("A", "C", "D", "E", "F"))
+```
+
+# Imputación a actividades y agregación a sectores
+
+Aplicamos a cada actividad el perfil de su sección y calculamos las mujeres y los informales estimados con los puestos de 2024. Es una estimación: el perfil de 2025 de una sección se aplica a los puestos de 2024.
+
+```{r}
+#| label: imputacion
+
+empleo_2024 <- empleo_actividad |>
+  filter(anio == 2024) |>
+  left_join(perfil_seccion, by = c("ciiu_seccion" = "seccion")) |>
+  mutate(
+    mujeres_est = puestos * pct_mujeres / 100,
+    informales_est = puestos * tasa_informal_total / 100
+  )
+
+# Actividades cuya sección no tiene perfil en ILOSTAT
+empleo_2024 |> filter(is.na(pct_mujeres)) |> count(cod_scn, ciiu_seccion)
+```
+
+Antes de agregar, comparamos los puestos de las cuentas nacionales de 2024 con los ocupados de la encuesta de 2025 por sección. Las dos fuentes miden cosas distintas: las cuentas nacionales cuentan puestos de trabajo e incluyen la ocupación que la encuesta puede no captar, y la encuesta cuenta personas ocupadas en un mes de referencia.
+
+```{r}
+#| label: comparacion-fuentes
+
+comparacion_fuentes <- empleo_2024 |>
+  summarize(puestos_scn = sum(puestos), .by = ciiu_seccion) |>
+  left_join(
+    select(perfil_seccion, seccion, ocupados_eml = ocupados_total),
+    by = c("ciiu_seccion" = "seccion")
+  ) |>
+  mutate(razon_scn_eml = puestos_scn / ocupados_eml) |>
+  arrange(ciiu_seccion)
+
+comparacion_fuentes |> mutate(across(where(is.numeric), \(x) round(x, 2)))
+```
+
+La razón es cercana a uno en la industria (C), el comercio (G), el transporte (H), la educación (P) y los hogares (T), pero se aleja de uno en varias secciones relevantes para este estudio:
+
+- **Agricultura (A):** las cuentas nacionales registran 1,6 veces los ocupados de la encuesta.
+- **Electricidad (D) y agua y desechos (E):** las cuentas nacionales registran 0,3 y 0,5 veces los ocupados de la encuesta, es decir, menos de la mitad.
+- **Construcción (F):** las cuentas nacionales registran 1,1 veces.
+
+Los puestos de las cuentas nacionales y los ocupados de la encuesta no son comparables uno a uno, y esta memoria no establece cuál es más cercano a la realidad. Las diferencias de la sección D y E son especialmente importantes porque contienen los sectores de energía, recursos hídricos y residuos: con los ocupados de la encuesta el empleo de esos sectores sería de dos a tres veces mayor. Por eso las tablas de los documentos citan los puestos de las cuentas nacionales como cifra principal y mencionan la cifra de la encuesta por sección como referencia. Las estimaciones de mujeres e informales se aplican a la base de las cuentas nacionales y deben leerse con esta salvedad.
+
+```{r}
+#| label: empleo-sector
+
+empleo_sector <- empleo_actividad |>
+  summarize(
+    across(c(puestos, asalariados, cuenta_propia, empleadores, no_remunerados, remuneracion), sum),
+    .by = c(anio, sector_principal)
+  ) |>
+  mutate(
+    participacion_empleo = 100 * puestos / sum(puestos),
+    remuneracion_media = 1000 * remuneracion / asalariados,
+    .by = anio
+  )
+
+empleo_sector_2024 <- empleo_2024 |>
+  summarize(
+    puestos = sum(puestos),
+    mujeres_est = sum(mujeres_est, na.rm = TRUE),
+    informales_est = sum(informales_est, na.rm = TRUE),
+    .by = sector_principal
+  ) |>
+  mutate(
+    pct_mujeres_est = 100 * mujeres_est / puestos,
+    pct_informal_est = 100 * informales_est / puestos
+  )
+```
+
+```{r}
+#| label: tbl-empleo-2024
+#| tbl-cap: "Empleo por sector de política, 2024: puestos, participación, mujeres e informalidad estimadas"
+
+empleo_sector |>
+  filter(anio == 2024) |>
+  select(sector_principal, participacion_empleo, remuneracion_media) |>
+  left_join(empleo_sector_2024, by = "sector_principal") |>
+  select(
+    Sector = sector_principal,
+    Puestos = puestos,
+    `Participación (%)` = participacion_empleo,
+    `Mujeres (%)` = pct_mujeres_est,
+    `Informales (%)` = pct_informal_est,
+    `Remuneración media (miles B/.)` = remuneracion_media
+  ) |>
+  tabla_ft(digitos = 1)
+```
+
+La proporción de informales del sector "Residuos" es la de la sección E completa (suministro de agua y gestión de desechos). Esa cifra puede subestimar la informalidad de la cadena del reciclaje, porque la encuesta clasifica a cada persona en una sola actividad y no hay una categoría que identifique a los recicladores de base. El Plan Nacional de Gestión Integral de Residuos y la Ley 33 de 2018 reconocen a esa población, pero ninguna fuente consultada la cuantifica con datos recientes.
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(empleo_actividad, "empleo_actividad_2018_2024", hoja = "actividad")
+guardar_salida(empleo_sector, "empleo_sector_2018_2024", hoja = "sector")
+guardar_salida(empleo_sector_2024, "empleo_sector_perfil_2024", hoja = "perfil")
+guardar_salida(perfil_seccion, "perfil_empleo_seccion_ciiu_2025", hoja = "seccion")
+```
+
+# Referencias
+
+::: {#refs}
+:::

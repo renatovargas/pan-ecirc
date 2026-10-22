@@ -1,0 +1,18 @@
+/* Presentaciones embebidas */
+.slide-embed {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  margin-bottom: 0.5rem;
+}
+
+.slide-embed .slide-deck {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.slide-links {
+  text-align: right;
+  margin-bottom: 1.5rem;
+}

@@ -1,0 +1,344 @@
+---
+title: "Memoria de cálculo 4: eslabonamientos productivos con la matriz insumo-producto de 2018"
+description: "Encadenamientos hacia atrás y hacia adelante, multiplicadores de producción, valor agregado y empleo de las 76 actividades de la matriz insumo-producto de Panamá, y su agregación a los sectores de la Hoja de Ruta"
+author: "Renato Vargas"
+date: "2026-10-22"
+lang: es
+categories:
+  - insumo-producto
+  - eslabonamientos
+  - multiplicadores
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Los Términos de Referencia piden analizar los sectores económicos "tomando en cuenta los relevantes eslabonamientos productivos". Esta memoria cuantifica esos eslabonamientos con la matriz insumo-producto de Panamá de 2018 [@inec2024mip], que es la más reciente que publica el INEC, y con la metodología estándar de análisis insumo-producto [@millerblair2022].
+
+La matriz tiene 76 actividades y está expresada en miles de balboas a precios básicos. Usamos la matriz de producción doméstica (cuadro 2), que registra las compras intermedias de insumos de origen nacional, y la de importaciones (cuadro 3) para medir las fugas hacia el exterior. La metodología del INEC está documentada en un informe técnico [@inec2024metodologiamip].
+
+Calculamos para cada actividad:
+
+- El **encadenamiento hacia atrás**, que mide cuánta producción nacional adicional exige la actividad cuando aumenta su propia producción. Resume su capacidad de arrastrar a sus proveedores.
+- El **encadenamiento hacia adelante**, que mide cuánta producción nacional adicional se genera cuando aumenta la demanda final de todas las actividades. Resume su importancia como proveedora de insumos para las demás.
+- Los **multiplicadores** de valor agregado y de empleo.
+- La **fuga por importaciones** de insumos.
+
+Aplicamos el cálculo en dos niveles: las 76 actividades y los siete grupos de sectores de la memoria 1. Una advertencia sobre el alcance: la matriz es de 2018 y las memorias de empleo y de cuentas llegan a 2024. Las proporciones estructurales (coeficientes técnicos) se suponen estables, y las cifras de valor agregado y empleo por unidad de producción de 2018 no deben leerse como las de 2024.
+
+## Notación
+
+Seguimos la notación de Miller y Blair [@millerblair2022]. $\mathbf{Z}$ es la matriz de flujos intermedios domésticos, $\mathbf{x}$ el vector de producción total, $\mathbf{A} = \mathbf{Z}\hat{\mathbf{x}}^{-1}$ la matriz de coeficientes técnicos y $\mathbf{L} = (\mathbf{I}-\mathbf{A})^{-1}$ la matriz inversa de Leontief. Los indicadores son:
+
+$$
+\text{enlace atrás}_j = \sum_i l_{ij}, \qquad
+\text{enlace adelante}_i = \sum_j l_{ij}
+$$
+
+Los índices de Rasmussen-Hirschman dividen cada enlace entre el promedio de las 76 actividades; un valor mayor que 1 indica un enlace superior al promedio. El multiplicador de valor agregado es $\mathbf{v}'\mathbf{L}$, con $v_j$ igual al valor agregado por unidad de producción de la actividad $j$, y el de empleo es $\mathbf{e}'\mathbf{L}$, con $e_j$ igual a los puestos de trabajo por unidad de producción.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+library(readxl)
+
+mapeo <- leer_salida("mapeo_sectores_scn")
+```
+
+# Lectura de la matriz
+
+El archivo tiene tres cuadros con la misma estructura: las 76 actividades (`AE01` a `AE76`) están en las filas 10 a 85 y en las columnas 3 a 78. Leemos la hoja completa como texto y extraemos rangos con una función corta.
+
+```{r}
+#| label: lectura
+
+archivo_mip <- "data/inec/P0705547520240930151649Matriz Insumo Producto 2018.xlsx"
+
+hojas <- list(
+  total = read_excel(archivo_mip, sheet = "Cuadro 1", col_names = FALSE, col_types = "text", .name_repair = "minimal"),
+  domestica = read_excel(archivo_mip, sheet = "Cuadro 2", col_names = FALSE, col_types = "text", .name_repair = "minimal"),
+  importada = read_excel(archivo_mip, sheet = "Cuadro 3", col_names = FALSE, col_types = "text", .name_repair = "minimal")
+)
+
+# Extrae un rango de una hoja como matriz numérica
+rango <- function(hoja, filas, columnas) {
+  matrix(as.numeric(unlist(hoja[filas, columnas])), nrow = length(filas))
+}
+```
+
+Extraemos la matriz de flujos domésticos, la de importaciones, la demanda final doméstica (seis columnas: exportaciones, hogares, instituciones sin fines de lucro, gobierno, formación de capital y variación de existencias), y las filas de producción total, valor agregado y personal ocupado.
+
+```{r}
+#| label: extraccion
+
+Z <- rango(hojas$domestica, 10:85, 3:78)
+Mimp <- rango(hojas$importada, 10:85, 3:78)
+F_dom <- rango(hojas$domestica, 10:85, 79:84)
+
+x <- rango(hojas$total, 103, 3:78)[1, ]
+va <- rango(hojas$total, 92, 3:78)[1, ]
+empleo <- rango(hojas$total, 104, 3:78)[1, ]
+
+codigos <- hojas$domestica[[1]][10:85]
+nombres <- hojas$domestica[[2]][10:85]
+```
+
+Comprobamos que la matriz está balanceada por filas: para cada actividad, las ventas intermedias más la demanda final doméstica son iguales a la producción total.
+
+```{r}
+#| label: balance
+
+balance <- rowSums(Z) + rowSums(F_dom) - x
+
+# Desviación máxima (debe ser prácticamente cero)
+max(abs(balance))
+```
+
+# Coeficientes técnicos y matriz de Leontief
+
+```{r}
+#| label: leontief
+
+# Matriz de coeficientes técnicos: cada columna de Z dividida entre su producción
+A <- Z %*% diag(1 / x)
+
+# Inversa de Leontief
+L <- solve(diag(76) - A)
+
+# Una matriz productiva debe tener sumas de columna de A menores que 1
+max(colSums(A))
+```
+
+# Indicadores por actividad
+
+```{r}
+#| label: indicadores
+
+indicadores <- tibble(
+  cod_mip = codigos,
+  actividad_mip = nombres,
+  produccion_millones = x / 1000,
+  # Encadenamientos directos
+  enlace_atras_directo = colSums(A),
+  enlace_adelante_directo = rowSums(Z) / x,
+  # Encadenamientos totales (directos e indirectos)
+  enlace_atras = colSums(L),
+  enlace_adelante = rowSums(L),
+  # Valor agregado y empleo por unidad de producción
+  vab_por_produccion = va / x,
+  puestos_por_millon = 1000 * empleo / x,
+  # Multiplicadores
+  mult_vab = as.vector((va / x) %*% L),
+  mult_empleo = as.vector(1000 * (empleo / x) %*% L),
+  # Fuga por importaciones intermedias
+  coef_importacion = colSums(Mimp) / x
+) |>
+  mutate(
+    indice_atras = enlace_atras / mean(enlace_atras),
+    indice_adelante = enlace_adelante / mean(enlace_adelante),
+    clasificacion = case_when(
+      indice_atras > 1 & indice_adelante > 1 ~ "Clave",
+      indice_atras > 1 ~ "Arrastre (hacia atrás)",
+      indice_adelante > 1 ~ "Impulso (hacia adelante)",
+      TRUE ~ "Independiente"
+    )
+  )
+```
+
+Los puestos por millón de balboas de producción son un cociente directo de la matriz. El multiplicador de empleo indica los puestos totales, directos e indirectos, por cada millón de balboas de demanda final de la actividad.
+
+# Asignación a sectores de política
+
+Cada actividad de la matriz hereda el sector principal de la memoria 1. Verificamos que cada código de la matriz tenga un único sector.
+
+```{r}
+#| label: sector-mip
+
+sector_mip <- mapeo |>
+  distinct(cod_mip, sector_principal)
+
+# Debe haber una fila por código de la matriz
+nrow(sector_mip) == n_distinct(sector_mip$cod_mip)
+```
+
+```{r}
+#| label: indicadores-sector
+
+indicadores <- indicadores |>
+  left_join(sector_mip, by = "cod_mip")
+```
+
+La siguiente tabla muestra las actividades núcleo y las más relevantes para los sectores prioritarios.
+
+```{r}
+#| label: tbl-actividades-nucleo
+#| tbl-cap: "Eslabonamientos de actividades seleccionadas, matriz insumo-producto de Panamá, 2018"
+
+actividades_seleccion <- c(
+  "AE38", "AE39", "AE40", "AE41", "AE42", "AE43",
+  "AE16", "AE23", "AE27", "AE31", "AE32", "AE34"
+)
+
+indicadores |>
+  filter(cod_mip %in% actividades_seleccion) |>
+  select(
+    Código = cod_mip,
+    Actividad = actividad_mip,
+    `Índice atrás` = indice_atras,
+    `Índice adelante` = indice_adelante,
+    `Mult. VAB` = mult_vab,
+    `Mult. empleo` = mult_empleo,
+    Clasificación = clasificacion
+  ) |>
+  tabla_ft(digitos = 2)
+```
+
+# Flujos y enlaces entre sectores
+
+Agregamos las 76 actividades a los siete grupos de sectores para ver cómo se relacionan entre sí. La matriz de flujos agregada es la suma de los bloques de $\mathbf{Z}$.
+
+```{r}
+#| label: flujos-sectores
+
+# Matriz de pertenencia: 76 actividades por 7 sectores
+sector_de_actividad <- indicadores$sector_principal
+G <- sapply(sectores_politica, \(s) as.numeric(sector_de_actividad == s))
+
+# Flujos intersectoriales (millones de B/.), x agregada y coeficientes
+Z_sector <- t(G) %*% Z %*% G / 1000
+x_sector <- as.vector(t(G) %*% x) / 1000
+dimnames(Z_sector) <- list(sectores_politica, sectores_politica)
+
+A_sector <- Z_sector %*% diag(1 / x_sector)
+L_sector <- solve(diag(7) - A_sector)
+```
+
+```{r}
+#| label: tbl-flujos-sectores
+#| tbl-cap: "Compras intermedias domésticas entre sectores, 2018 (millones de B/.). Filas: sector que vende; columnas: sector que compra"
+
+Z_sector |>
+  as.data.frame() |>
+  rownames_to_column("Vende") |>
+  tabla_ft(digitos = 0)
+```
+
+Calculamos los enlaces de los sectores. Al agregar, los multiplicadores de cada sector reflejan también el comercio entre actividades del mismo grupo, de modo que no son comparables con los de las actividades individuales.
+
+```{r}
+#| label: enlaces-sector
+
+# Valor agregado y empleo agregados por sector
+va_sector <- as.vector(t(G) %*% va) / 1000
+empleo_sector <- as.vector(t(G) %*% empleo)
+
+enlaces_sector <- tibble(
+  sector_principal = factor(sectores_politica, levels = sectores_politica),
+  produccion_millones = x_sector,
+  vab_millones = va_sector,
+  puestos = empleo_sector,
+  enlace_atras = colSums(L_sector),
+  enlace_adelante = rowSums(L_sector),
+  mult_vab = as.vector((va_sector / x_sector) %*% L_sector),
+  mult_empleo = as.vector((empleo_sector / x_sector) %*% L_sector),
+  coef_importacion = as.vector(t(G) %*% colSums(Mimp)) / 1000 / x_sector
+) |>
+  mutate(
+    indice_atras = enlace_atras / mean(enlace_atras),
+    indice_adelante = enlace_adelante / mean(enlace_adelante)
+  )
+
+enlaces_sector
+```
+
+# Proveedores y compradores de las actividades núcleo
+
+Para cada actividad núcleo identificamos las cinco actividades que más le venden y las cinco que más le compran, en millones de balboas. Este cuadro muestra con quién se articulan la gestión de residuos, el agua, la energía y la construcción.
+
+```{r}
+#| label: proveedores-compradores
+
+nucleo <- c("AE38", "AE39", "AE40", "AE41", "AE42", "AE43")
+
+proveedores <- map(nucleo, \(a) {
+  j <- which(codigos == a)
+  tibble(
+    nucleo = a,
+    rol = "Proveedor",
+    cod_mip = codigos,
+    actividad = nombres,
+    flujo_millones = Z[, j] / 1000
+  ) |>
+    slice_max(flujo_millones, n = 5)
+}) |>
+  list_rbind()
+
+compradores <- map(nucleo, \(a) {
+  i <- which(codigos == a)
+  tibble(
+    nucleo = a,
+    rol = "Comprador",
+    cod_mip = codigos,
+    actividad = nombres,
+    flujo_millones = Z[i, ] / 1000
+  ) |>
+    slice_max(flujo_millones, n = 5)
+}) |>
+  list_rbind()
+
+vinculos_nucleo <- bind_rows(proveedores, compradores) |>
+  left_join(
+    select(indicadores, nucleo = cod_mip, nombre_nucleo = actividad_mip),
+    by = "nucleo"
+  )
+```
+
+```{r}
+#| label: tbl-vinculos-residuos
+#| tbl-cap: "Principales proveedores y compradores de la recogida, tratamiento y eliminación de desechos (AE40), 2018 (millones de B/.)"
+
+vinculos_nucleo |>
+  filter(nucleo == "AE40") |>
+  select(Rol = rol, Actividad = actividad, `Flujo (millones B/.)` = flujo_millones) |>
+  tabla_ft(digitos = 1)
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(indicadores, "eslabonamientos_actividad_mip2018", hoja = "actividad")
+guardar_salida(enlaces_sector, "eslabonamientos_sector_mip2018", hoja = "sector")
+guardar_salida(
+  as.data.frame(Z_sector) |> rownames_to_column("vende"),
+  "flujos_intersectoriales_mip2018",
+  hoja = "flujos"
+)
+guardar_salida(vinculos_nucleo, "vinculos_actividades_nucleo_mip2018", hoja = "vinculos")
+```
+
+# Referencias
+
+::: {#refs}
+:::
