@@ -1,0 +1,11 @@
+---
+title: "Documentos"
+subtitle: "Informes de la consultoría"
+toc: false
+---
+
+## Actividad 1
+
+- [Metodología](a1a-metodologia/index.qmd): marco conceptual, criterios de evaluación de los instrumentos y procedimiento de trabajo de la consultoría.
+- [Plan de trabajo](a1b-plan-de-trabajo/index.qmd): actividades, calendario, necesidades de información y riesgos.
+- [Sectores económicos priorizados](a1c-sectores-economicos-priorizados/index.qmd): caracterización de los seis sectores de política con datos oficiales, eslabonamientos productivos y catorce instrumentos propuestos.

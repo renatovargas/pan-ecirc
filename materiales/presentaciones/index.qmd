@@ -1,0 +1,9 @@
+---
+title: "Presentaciones"
+subtitle: "Diapositivas"
+toc: false
+---
+
+Presentaciones de la consultoría.
+
+- [Presentación de ejemplo](01-ejemplo.qmd): estructura mínima de una presentación en revealjs.

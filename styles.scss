@@ -5,3 +5,13 @@ $theme-primary: #009EDB;
 
 $primary: $theme-primary;
 $link-color: $theme-primary;
+
+// Texto blanco en el menú superior (el azul es claro y Bootstrap elegiría negro)
+// Variables propias de Quarto para el menú
+$navbar-fg: #fff;
+$navbar-hl: #fff;
+$navbar-dark-color: #fff;
+$navbar-dark-hover-color: rgba(#fff, 0.8);
+$navbar-dark-active-color: #fff;
+$navbar-dark-brand-color: #fff;
+$navbar-dark-brand-hover-color: #fff;

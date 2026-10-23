@@ -1,0 +1,16 @@
+---
+title: "Memorias de cálculo"
+subtitle: "Procesamiento paso a paso de las bases de datos"
+toc: false
+---
+
+Las memorias de cálculo documentan, con código en R y texto breve, cómo se construyó cada base de datos que sustenta los documentos. Cada una indica sus fuentes, explica los supuestos y exporta su resultado para que el cálculo pueda reproducirse y revisarse.
+
+- [C1. Mapeo de sectores](c01-mapeo-sectores/index.qmd): equivalencia entre los seis sectores de política de la Hoja de Ruta y las actividades de las cuentas nacionales.
+- [C2. Cuentas por actividad y sector](c02-cuentas-sectoriales/index.qmd): producción, valor agregado y comercio exterior de 2018 a 2024.
+- [C3. Empleo, género e informalidad](c03-empleo-sectorial/index.qmd): puestos de trabajo, remuneración y estimación de participación femenina e informalidad.
+- [C4. Eslabonamientos](c04-eslabonamientos/index.qmd): encadenamientos y multiplicadores con la matriz insumo-producto de 2018.
+- [C5. Emisiones de GEI](c05-emisiones-ghg/index.qmd): emisiones de gases de efecto invernadero por sector de política, de 1970 a 2025.
+- [C6. Recursos y residuos](c06-recursos-y-residuos/index.qmd): energía, agua, materiales, residuos y señales de recuperación.
+- [C7. Inversión y estructura empresarial](c07-inversion-y-estructura-empresarial/index.qmd): inversión extranjera directa y tamaño de las empresas por sector.
+- [C8. Base sectorial integrada](c08-base-sectorial-integrada/index.qmd): integración de todos los indicadores y matriz de relevancia sectorial.
