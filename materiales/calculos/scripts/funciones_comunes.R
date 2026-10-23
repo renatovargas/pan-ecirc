@@ -68,7 +68,12 @@ tema_grafico <- function() {
 }
 
 # Tabla de flextable con formato español, ajustada al ancho de la página
-tabla_ft_es <- function(x, digitos = 1, enteros = NULL) {
+#
+# anchos_cm: anchos de columna en cm (layout fijo; Word los respeta).
+# lineas_tenues: separa los renglones con líneas finas gris claro.
+# tamano: tamaño de letra.
+tabla_ft_es <- function(x, digitos = 1, enteros = NULL, anchos_cm = NULL,
+                        lineas_tenues = FALSE, tamano = 8) {
   tabla <- x |>
     # Los enteros pasan a numéricos para usar el mismo formato que los decimales
     mutate(across(where(is.integer), as.numeric)) |>
@@ -82,8 +87,25 @@ tabla_ft_es <- function(x, digitos = 1, enteros = NULL) {
     )
   }
 
-  tabla |>
+  tabla <- tabla |>
     theme_booktabs() |>
-    fontsize(size = 8, part = "all") |>
-    set_table_properties(layout = "autofit", width = 1)
+    fontsize(size = tamano, part = "all")
+
+  if (lineas_tenues) {
+    tabla <- border_inner_h(
+      tabla,
+      border = officer::fp_border(color = "gray80", width = 0.25),
+      part = "body"
+    )
+  }
+
+  if (is.null(anchos_cm)) {
+    set_table_properties(tabla, layout = "autofit", width = 1)
+  } else {
+    stopifnot(length(anchos_cm) == ncol(x))
+    tabla |>
+      set_table_properties(layout = "fixed") |>
+      width(width = anchos_cm / 2.54)
+  }
 }
+

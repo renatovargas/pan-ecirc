@@ -2,6 +2,7 @@ project:
   type: website
   output-dir: docs
   execute-dir: project
+  post-render: materiales/calculos/scripts/reparar_docx.R
   render:
     - "*.qmd"
     - "materiales/**/*.qmd"
@@ -13,6 +14,7 @@ project:
 
 website:
   title: "PAN ECIRC"
+  site-url: https://renatovargas.github.io/pan-ecirc/
   repo-url: https://github.com/renatovargas/pan-ecirc
   repo-branch: main
   repo-actions: [source]
@@ -26,13 +28,15 @@ website:
       - href: about.qmd
         text: Acerca de
   sidebar:
-    - title: Materiales
+    - id: materiales
+      title: Materiales
       style: docked
       search: false
       contents:
         - text: "Materiales"
           href: materiales/index.qmd
         - section: Documentos
+          href: materiales/documentos/index.qmd
           contents:
             - text: "A1a. Metodología"
               href: materiales/documentos/a1a-metodologia/index.qmd
@@ -40,27 +44,10 @@ website:
               href: materiales/documentos/a1b-plan-de-trabajo/index.qmd
             - text: "A1c. Sectores económicos priorizados"
               href: materiales/documentos/a1c-sectores-economicos-priorizados/index.qmd
-        - section: Memorias de cálculo
-          contents:
-            - text: "C1. Mapeo de sectores"
-              href: materiales/calculos/c01-mapeo-sectores/index.qmd
-            - text: "C2. Cuentas por actividad y sector"
-              href: materiales/calculos/c02-cuentas-sectoriales/index.qmd
-            - text: "C3. Empleo, género e informalidad"
-              href: materiales/calculos/c03-empleo-sectorial/index.qmd
-            - text: "C4. Eslabonamientos"
-              href: materiales/calculos/c04-eslabonamientos/index.qmd
-            - text: "C5. Emisiones de GEI"
-              href: materiales/calculos/c05-emisiones-ghg/index.qmd
-            - text: "C6. Recursos y residuos"
-              href: materiales/calculos/c06-recursos-y-residuos/index.qmd
-            - text: "C7. Inversión y estructura empresarial"
-              href: materiales/calculos/c07-inversion-y-estructura-empresarial/index.qmd
-            - text: "C8. Base sectorial integrada"
-              href: materiales/calculos/c08-base-sectorial-integrada/index.qmd
-        - section: Presentaciones
-          contents:
-            - materiales/presentaciones/01-ejemplo.qmd
+        - text: "Memorias de cálculo"
+          href: materiales/calculos/index.qmd
+        - text: "Presentaciones"
+          href: materiales/presentaciones/index.qmd
 
 format:
   html:

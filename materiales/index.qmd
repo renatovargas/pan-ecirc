@@ -11,11 +11,9 @@ toc: false
 ::: {.card-body}
 ### Documentos
 
-Informes del Producto 1: metodología, plan de trabajo y análisis de los sectores económicos priorizados.
+Informes de la Actividad 1: metodología, plan de trabajo y análisis de los sectores económicos priorizados.
 
-[Metodología](documentos/a1a-metodologia/index.qmd){.btn .btn-primary}
-[Plan de trabajo](documentos/a1b-plan-de-trabajo/index.qmd){.btn .btn-primary}
-[Sectores priorizados](documentos/a1c-sectores-economicos-priorizados/index.qmd){.btn .btn-primary}
+[Ver documentos](documentos/index.qmd){.btn .btn-primary}
 
 :::
 :::
@@ -28,7 +26,7 @@ Informes del Producto 1: metodología, plan de trabajo y análisis de los sector
 
 Procesamiento paso a paso de las bases de datos que sustentan los documentos.
 
-[Ver memorias de cálculo](calculos/c01-mapeo-sectores/index.qmd){.btn .btn-primary}
+[Ver memorias de cálculo](calculos/index.qmd){.btn .btn-primary}
 
 :::
 :::
@@ -41,7 +39,7 @@ Procesamiento paso a paso de las bases de datos que sustentan los documentos.
 
 Diapositivas que se pueden ver en la página o en pantalla completa.
 
-[Ver presentaciones](presentaciones/01-ejemplo.qmd){.btn .btn-primary}
+[Ver presentaciones](presentaciones/index.qmd){.btn .btn-primary}
 :::
 :::
 :::
