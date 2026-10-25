@@ -1,52 +1,424 @@
 [
   {
-    "objectID": "slides/01-ejemplo/index.html#temas-a-tratar",
-    "href": "slides/01-ejemplo/index.html#temas-a-tratar",
-    "title": "Presentación de ejemplo",
-    "section": "Temas a tratar",
-    "text": "Temas a tratar\n\nUna diapositiva con texto y fórmulas.\nUna diapositiva con código de R.\nDescarga de archivos de ejemplo.\nBibliografía."
+    "objectID": "slides/01-actividad-01/index.html#contenido",
+    "href": "slides/01-actividad-01/index.html#contenido",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Contenido",
+    "text": "Contenido\n\nSectores priorizados e instrumentos. Qué muestran los datos de los seis sectores de política y por qué proponemos los instrumentos que proponemos.\nMetodología. Cómo se evalúan los sectores y los instrumentos.\nPlan de trabajo. Qué sigue, con quién y cuándo."
   },
   {
-    "objectID": "slides/01-ejemplo/index.html#texto",
-    "href": "slides/01-ejemplo/index.html#texto",
-    "title": "Presentación de ejemplo",
-    "section": "Texto y fórmulas",
-    "text": "Texto y fórmulas\nLa producción total se obtiene con la inversa de Leontief (Miller y Blair, 2022):\n\\[\n\\mathbf{x} = (\\mathbf{I} - \\mathbf{A})^{-1} \\mathbf{f}\n\\]\nEl texto de énfasis usa el color de acento del tema."
+    "objectID": "slides/01-actividad-01/index.html#punto-de-partida",
+    "href": "slides/01-actividad-01/index.html#punto-de-partida",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Punto de partida",
+    "text": "Punto de partida\n\nLa Ley 502 de 2025 fija el marco de la transición hacia la economía circular (Asamblea Nacional de Panamá, 2025).\nLa ley declara la responsabilidad extendida del productor (REP), crea una plataforma de indicadores y abre las compras públicas a criterios circulares.\nLas tarifas de la REP, los incentivos fiscales y las metas quedan para el reglamento.\nLa Hoja de Ruta de Economía Circular priorizó seis sectores de política (Ministerio de Ambiente de Panamá y Programa de las Naciones Unidas para el Desarrollo, 2024).\nEn las hojas de ruta de la región, el financiamiento es solo el 7 % de las iniciativas (Samaniego et al., 2022, pp. 26-27).\nLa pregunta central: qué instrumentos pueden llevar recursos hacia la circularidad en esos sectores."
   },
   {
-    "objectID": "slides/01-ejemplo/index.html#código-de-r",
-    "href": "slides/01-ejemplo/index.html#código-de-r",
-    "title": "Presentación de ejemplo",
-    "section": "Código de R",
-    "text": "Código de R\nLas rutas en R son relativas a la raíz del proyecto, no a esta carpeta.\n\ndatos &lt;- read.csv(\"data/examples/ejemplo.csv\")\ndatos\n\n       sector produccion empleo\n1 Agricultura        120     45\n2   Industria        300     80\n3   Servicios        450    160"
+    "objectID": "slides/01-actividad-01/index.html#de-sectores-de-política-a-estadísticas",
+    "href": "slides/01-actividad-01/index.html#de-sectores-de-política-a-estadísticas",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "De sectores de política a estadísticas",
+    "text": "De sectores de política a estadísticas\n\nLa Ley 502 y la Hoja de Ruta no listan actividades económicas.\nCada una de las 80 actividades de las cuentas nacionales se asignó a un único sector de política principal.\nAsí las cifras suman sin doble conteo; lo que no tiene vínculo queda en “Resto de la economía”.\n\n\n\nSector de políticaActividadesActividades principalesAgricultura y alimentos22Cultivo de cereales, legumbres y semillas oleaginosas; Cultivo de maiz; Cultivo de arrozIndustrias15Elaboración de bebidas y tabaco; Fabricación de productos textiles y prendas de vestir; Fabricación de cuero, productos conexos y calzadoEnergía1Suministro de electricidad, gas, vapor y aire acondicionadoRecursos hídricos1Captación, tratamiento y distribuciòn de aguaResiduos1Recogida, tratamiento y eliminación de desechos, recuperación de materiales y actividades de descontaminación y otros servicios de eliminación de desechosCiudades y construcción3Construcción de edificios; Construcción de obras de ingeniería civil; Actividades especializadas de la construcción\n\n\n\n\nElaboración propia con base en la Hoja de Ruta y las cuentas nacionales del INEC. Detalle en la memoria C1."
   },
   {
-    "objectID": "slides/01-ejemplo/index.html#section",
-    "href": "slides/01-ejemplo/index.html#section",
-    "title": "Presentación de ejemplo",
-    "section": "",
-    "text": "Descargar los archivos de ejemplo:\n\n\n\nCSV:\nejemplo.csv"
+    "objectID": "slides/01-actividad-01/index.html#pesan-poco-en-valor-agregado-y-mucho-en-empleo",
+    "href": "slides/01-actividad-01/index.html#pesan-poco-en-valor-agregado-y-mucho-en-empleo",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Pesan poco en valor agregado y mucho en empleo",
+    "text": "Pesan poco en valor agregado y mucho en empleo\n\n\n\n\n\n\n\n\n\n\n\n\n\nLos seis sectores generan 27,8 % del valor agregado y 36,8 % de los puestos de trabajo.\nCiudades y construcción es el mayor por valor agregado: 17,5 %.\nAgricultura y alimentos es el mayor empleador: 23,2 % de los puestos.\nResiduos, recursos hídricos y energía son pequeños en las cuentas nacionales.\nEnergía y agricultura crecen más de 6 % anual desde 2018, a precios corrientes.\n\n\n\n\nElaboración propia con datos del INEC. Memorias C2 y C3."
   },
   {
-    "objectID": "slides/01-ejemplo/index.html#bibliografía",
-    "href": "slides/01-ejemplo/index.html#bibliografía",
-    "title": "Presentación de ejemplo",
+    "objectID": "slides/01-actividad-01/index.html#donde-hay-más-empleo-hay-más-informalidad",
+    "href": "slides/01-actividad-01/index.html#donde-hay-más-empleo-hay-más-informalidad",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Donde hay más empleo hay más informalidad",
+    "text": "Donde hay más empleo hay más informalidad\n\n\n\n\n\n\n\n\n\n\n\n\n\nLa informalidad estimada supera el 60 % en agricultura (89 %), construcción (70 %) e industrias (64 %).\nLas mujeres son 5 % del empleo en construcción y 26 % en agricultura.\nUn cargo nuevo recae sobre unidades pequeñas que no pueden trasladarlo.\nLos instrumentos de costo deben ir acompañados de apoyo financiero y técnico.\n\n\n\n\nEstimación con el perfil de la Encuesta de Mercado Laboral por grupo de actividades económicas. Memoria C3."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#los-obligados-de-una-rep-serán-sobre-todo-importadores",
+    "href": "slides/01-actividad-01/index.html#los-obligados-de-una-rep-serán-sobre-todo-importadores",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Los obligados de una REP serán sobre todo importadores",
+    "text": "Los obligados de una REP serán sobre todo importadores\n\nIndustrias tuvo un saldo comercial de -555 millones de balboas en 2024.\nAgricultura y alimentos tuvo un saldo de -487 millones.\nIndustrias importa insumos equivalentes al 17 % de su producción, el coeficiente más alto de los seis sectores.\nUna REP recae sobre quien pone el producto en el mercado, y en Panamá ese actor suele importar.\nPor eso hace falta un registro de importadores por partida arancelaria, con la aduana como aliada.\n\n\n\nElaboración propia con datos del INEC (cuadros de oferta y utilización y matriz insumo-producto de 2018)."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#mercados-concentrados-arriba-y-atomizados-abajo",
+    "href": "slides/01-actividad-01/index.html#mercados-concentrados-arriba-y-atomizados-abajo",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Mercados concentrados arriba y atomizados abajo",
+    "text": "Mercados concentrados arriba y atomizados abajo\n\nLa inversión extranjera directa de 2022 a 2024 se concentró en electricidad, gas y agua: 592 millones de balboas.\n39 % de las empresas de electricidad, gas y vapor son grandes; en industria, agricultura y construcción son menos de 9 %.\n13 empresas fabrican cemento, cal y yeso, y 49 fabrican productos de plástico.\nLa recuperación de materiales reúne 77 empresas con menos de cuatro empleados en promedio.\nPocos interlocutores en el cemento facilitan una norma de contenido reciclado.\nLa recuperación atomizada requiere formalización antes que tarifas.\n\n\n\nElaboración propia con datos del INEC (inversión extranjera directa y Directorio de Empresas 2022). Memoria C7."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#residuos-pequeño-en-valor-agregado-grande-en-emisiones",
+    "href": "slides/01-actividad-01/index.html#residuos-pequeño-en-valor-agregado-grande-en-emisiones",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Residuos: pequeño en valor agregado, grande en emisiones",
+    "text": "Residuos: pequeño en valor agregado, grande en emisiones\n\n\n\n\n\n\n\n\n\n\n\n\n\nPanamá emitió 19,8 millones de toneladas de CO₂ equivalente en 2023, sin uso de la tierra.\nEnergía y agricultura concentran 40 % de esas emisiones.\nResiduos emite 22,5 Gg por millón de balboas de valor agregado; energía, 2,5.\nGestionar los orgánicos y capturar metano tiene un potencial de mitigación proporcionalmente grande.\n\n\n\n\nElaboración propia con datos de EDGAR (European Commission, Joint Research Centre (JRC), 2026), que difiere del inventario nacional. Memoria C5."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#qué-hay-en-la-basura",
+    "href": "slides/01-actividad-01/index.html#qué-hay-en-la-basura",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Qué hay en la basura",
+    "text": "Qué hay en la basura\n\n\n\n\n\n\n\n\n\n\n\n\n\nPanamá genera 1,97 millones de toneladas de residuos municipales al año.\nEl servicio recolecta 64 % del peso.\nOrgánicos, plástico y papel y cartón suman casi dos tercios.\nLa construcción y la demolición agregan 1,07 millones de toneladas al año.\nDe 54 millones de kilogramos de residuos electrónicos, 0,1 millones se reciclan formalmente (UNITAR y Unión Internacional de Telecomunicaciones (UIT), 2024, p. 132).\n\n\n\n\nElaboración propia con datos del Banco Mundial (Banco Mundial, 2024). Memoria C6."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#solo-el-metal-tiene-un-mercado-de-recuperación-visible",
+    "href": "slides/01-actividad-01/index.html#solo-el-metal-tiene-un-mercado-de-recuperación-visible",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Solo el metal tiene un mercado de recuperación visible",
+    "text": "Solo el metal tiene un mercado de recuperación visible\n\nLas exportaciones de plástico, papel y vidrio no llegan al 10 % de lo que se genera.\nLas de metal superan tres veces lo que hay en los residuos municipales, porque vienen también de la industria y la construcción.\nLa demanda de material secundario existe para el metal y es débil para el resto.\nEl reciclaje dentro del país no se mide con las estadísticas disponibles.\n\n\n\nMaterialExportado (t)Generado en residuos municipales (t)Exportado sobre generado (%)Plástico7.041338.9962,1Papel y cartón21.235270.0147,9Vidrio5.08559.1278,6Metal281.57988.691317,5\n\n\n\n\nElaboración propia con datos de UN Comtrade (United Nations Statistics Division, 2026) y del Banco Mundial (Banco Mundial, 2024), 2021."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#eslabonamientos-quién-arrastra-a-quién",
+    "href": "slides/01-actividad-01/index.html#eslabonamientos-quién-arrastra-a-quién",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Eslabonamientos: quién arrastra a quién",
+    "text": "Eslabonamientos: quién arrastra a quién\n\n\n\n\n\n\n\n\n\n\n\n\n\nLa matriz insumo-producto de 2018 sigue la cadena de compras entre 76 actividades; un índice mayor que 1 indica un vínculo superior al promedio.\nAgricultura y alimentos tiene los encadenamientos más fuertes y 79 puestos por millón de balboas de demanda final.\nLa electricidad (AE38) impulsa hacia adelante: es insumo de casi todas las actividades.\nResiduos genera 41 puestos por millón, el segundo valor más alto.\n\n\n\n\nLa matriz tiene 76 actividades y las cuentas nacionales 80, porque reúne pesca y acuicultura, el comercio y el apoyo al transporte por agua. Memoria C4."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#la-matriz-de-relevancia-mide-tamaño",
+    "href": "slides/01-actividad-01/index.html#la-matriz-de-relevancia-mide-tamaño",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "La matriz de relevancia mide tamaño",
+    "text": "La matriz de relevancia mide tamaño\n\nCada sector de política recibe de 1 a 5 puntos según su lugar en seis indicadores; los pesos son iguales hasta acordarlos con las instituciones.\nAgricultura, industrias y construcción encabezan la matriz por su peso económico.\nResiduos queda al final y, sin embargo, gestiona los flujos de material de toda la economía.\n\n\n\nSector de políticaValor agregadoEmpleoExportacionesEmisionesEnlace atrásEnlace adelantePuntaje medioAgricultura y alimentos4,25,05,03,75,05,04,6Industrias3,43,44,22,34,23,43,5Ciudades y construcción5,04,21,82,62,63,2Energía2,61,03,45,01,04,22,9Recursos hídricos1,81,81,83,41,82,1Residuos1,02,61,81,01,81,01,5\n\n\n\n\nElaboración propia. Una celda vacía indica que el sector no tiene el indicador. Memoria C8."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#síntesis-por-sector-de-política",
+    "href": "slides/01-actividad-01/index.html#síntesis-por-sector-de-política",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Síntesis por sector de política",
+    "text": "Síntesis por sector de política\n\nAgricultura y alimentos. Es el mayor empleador, con los encadenamientos más fuertes y la informalidad más alta; su flujo de material clave son los orgánicos.\nIndustrias. Reúne a los obligados naturales de la REP, depende de insumos importados y su valor agregado cae desde 2018.\nCiudades y construcción. Es el mayor sector por valor agregado y genera más de un millón de toneladas de residuos de obra al año.\nEnergía. Crece rápido, paga los salarios más altos, tiene pocas empresas grandes y es el principal emisor.\nRecursos hídricos. Es pequeño y pierde cerca del 40 % del agua producida (Programa de las Naciones Unidas para el Desarrollo y Ministerio de Ambiente de Panamá, 2024, pp. 56-57).\nResiduos. Es pequeño, intensivo en empleo y en emisiones, y su cadena de recuperación está atomizada."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#seis-rasgos-que-condicionan-el-diseño",
+    "href": "slides/01-actividad-01/index.html#seis-rasgos-que-condicionan-el-diseño",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Seis rasgos que condicionan el diseño",
+    "text": "Seis rasgos que condicionan el diseño\n\nResiduos es el nudo de la transición, y su sector formal es muy pequeño.\nLos obligados de una REP serán sobre todo importadores.\nLa informalidad es alta justo donde hay más empleo.\nLos flujos de mayor volumen son los orgánicos, los envases y los residuos de obra.\nConstrucción y cemento concentran una oportunidad de demanda con pocos interlocutores.\nEnergía y agua atraen inversión y ya tienen marcos de financiamiento."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#una-secuencia-en-dos-momentos",
+    "href": "slides/01-actividad-01/index.html#una-secuencia-en-dos-momentos",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Una secuencia en dos momentos",
+    "text": "Una secuencia en dos momentos\nSin registro y control, los nuevos gravámenes y tarifas no se sostienen (Agencia Europea de Medio Ambiente, 2023; Pinos et al., 2018, p. 130).\n\n\nPrimer momento\n\nRegistro de productores e importadores y trazabilidad.\nFormalización de recicladores de base.\nReglamento de la Ley 502 y plataforma de indicadores.\nFinanciamiento, compras públicas e incentivos que no dependen del registro.\n\n\nSegundo momento\n\nREP con metas por flujo y ecomodulación.\nDepósito y retorno de envases.\nTarifa de aseo a costo real y tasa de disposición final.\nContenido mínimo de material reciclado."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#seis-familias-de-instrumentos",
+    "href": "slides/01-actividad-01/index.html#seis-familias-de-instrumentos",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Seis familias de instrumentos",
+    "text": "Seis familias de instrumentos\n\nHabilitantes: registro, trazabilidad y formalización.\nNormativos y regulatorios: REP, ecomodulación y contenido reciclado.\nTributarios y tarifarios: depósito y retorno, tarifa de aseo e incentivos fiscales.\nFinancieros: taxonomía, bonos temáticos, crédito y garantías.\nPromoción de inversiones: compras públicas y alianzas público-privadas.\nCapacidades: información, formación y certificación.\n\n\n\nClasificación basada en la Directiva marco de residuos de la Unión Europea (Parlamento Europeo y Consejo de la Unión Europea, 2018) y en la tipología de la GIZ (Barkhau, 2026)."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#registro-de-productores-e-importadores",
+    "href": "slides/01-actividad-01/index.html#registro-de-productores-e-importadores",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Registro de productores e importadores",
+    "text": "Registro de productores e importadores\n\nQué es. Un registro obligatorio donde productores e importadores declaran qué ponen en el mercado y con qué materiales.\nPara qué. Es la base de cálculo de cualquier tarifa o meta de REP.\nPor qué en Panamá. Los saldos comerciales negativos obligan a construirlo sobre las importaciones.\nCómo. Dentro de la plataforma de indicadores de la Ley 502, alimentado por la aduana por partida arancelaria (Asamblea Nacional de Panamá, 2025, art. 11).\nEjemplo. Chile exige inscripción y reporte a los productores de seis productos prioritarios (Ministerio del Medio Ambiente de Chile, 2016, arts. 10-24).\nRiesgo. Sin auditoría, los volúmenes se subdeclaran."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#formalización-de-recicladores-de-base",
+    "href": "slides/01-actividad-01/index.html#formalización-de-recicladores-de-base",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Formalización de recicladores de base",
+    "text": "Formalización de recicladores de base\n\nQué es. Registrar, organizar y pagar a quienes recuperan materiales como prestadores de un servicio.\nPor qué en Panamá. La recuperación está atomizada, y el último conteo de segregadores urbanos (6.085 personas) es de 2010 (Banco Interamericano de Desarrollo, Organización Panamericana de la Salud y Asociación Interamericana de Ingeniería Sanitaria y Ambiental, 2010, p. 143).\nCómo. Pasar del reconocimiento de las Leyes 33 y 502 al pago por tonelada recuperada (Asamblea Nacional de Panamá, 2018; Asamblea Nacional de Panamá, 2025, art. 10).\nEjemplo. Colombia remunera el aprovechamiento con la tarifa de aseo (Ministerio de Vivienda, Ciudad y Territorio de Colombia, 2016).\nEjemplo. En Chile, los recicladores registrados pueden cumplir metas de la REP (Ministerio del Medio Ambiente de Chile, 2016, art. 32).\nRiesgo. En Ecuador, los intermediarios captaron la mayor parte del beneficio (Pinos et al., 2018, p. 130)."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#responsabilidad-extendida-del-productor-con-metas",
+    "href": "slides/01-actividad-01/index.html#responsabilidad-extendida-del-productor-con-metas",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Responsabilidad extendida del productor con metas",
+    "text": "Responsabilidad extendida del productor con metas\n\nQué es. Productores e importadores pagan la gestión de sus productos cuando se vuelven residuo.\nEfecto. El costo del final de vida pasa del presupuesto municipal al precio del producto.\nFlujos sugeridos. Envases (hasta 38 % del peso de los residuos municipales), aparatos electrónicos, neumáticos, aceites, baterías y envases de agroquímicos.\nEjemplo. Chile sube la meta de envases plásticos de 3 % a 45 % en doce años (Ministerio del Medio Ambiente de Chile, 2020, art. 21).\nDiseño. Conviene empezar con pocos flujos y metas moderadas.\nRecursos. Las contribuciones pueden alimentar un fondo para infraestructura municipal y recicladores (Ministerio del Medio Ambiente de Chile, 2016, art. 31)."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#ecomodulación-de-las-contribuciones",
+    "href": "slides/01-actividad-01/index.html#ecomodulación-de-las-contribuciones",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Ecomodulación de las contribuciones",
+    "text": "Ecomodulación de las contribuciones\n\nQué es. La tarifa de la REP sube o baja según el diseño del producto: reciclabilidad, durabilidad y contenido reciclado.\nPor qué. Sin ecomodulación, la REP financia la gestión pero no incentiva el rediseño.\nEn Panamá. Un envase monomaterial pagaría menos que uno multicapa que no puede reciclarse.\nEjemplo. Chile aplica recargos y bonificaciones según reciclabilidad y uso de material reciclado nacional (Ministerio del Medio Ambiente de Chile, 2020, art. 20).\nEjemplo. Francia descuenta 50 % en textiles con 15 % de fibras recicladas (Brown y Börkey, 2024, p. 31).\nCondición. La diferencia de tarifa debe pesar frente al precio del producto."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#contenido-mínimo-de-material-reciclado",
+    "href": "slides/01-actividad-01/index.html#contenido-mínimo-de-material-reciclado",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Contenido mínimo de material reciclado",
+    "text": "Contenido mínimo de material reciclado\n\nQué es. Una proporción mínima obligatoria de material reciclado en ciertos productos.\nPor qué. Crea demanda para lo que recuperan la REP y los recicladores.\nBotellas. Panamá ya regula los plásticos de un solo uso (Asamblea Nacional de Panamá, 2020), y una meta gradual daría salida al plástico recuperado.\nConstrucción. Una norma de áridos reciclados abriría la “mina urbana” que propone la Hoja de Ruta (Ministerio de Ambiente de Panamá y Programa de las Naciones Unidas para el Desarrollo, 2024, p. 57).\nEjemplo. La Unión Europea exige 25 % de plástico reciclado en botellas desde 2025 y 30 % desde 2030 (Parlamento Europeo y Consejo de la Unión Europea, 2019, art. 6).\nCondición. Capacidad de reciclaje que cumpla las especificaciones."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#depósito-y-retorno-de-envases-de-bebidas",
+    "href": "slides/01-actividad-01/index.html#depósito-y-retorno-de-envases-de-bebidas",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Depósito y retorno de envases de bebidas",
+    "text": "Depósito y retorno de envases de bebidas\n\nQué es. El consumidor paga un depósito y lo recupera al devolver el envase.\nPor qué en Panamá. Plástico, vidrio y metal suman cerca de un cuarto de los residuos municipales.\nAntecedente. La Hoja de Ruta propone un estudio de prefactibilidad en la ciudad de Panamá (Ministerio de Ambiente de Panamá y Programa de las Naciones Unidas para el Desarrollo, 2024, p. 42).\nEjemplo. En Europa, la recogida supera el 85 % y la basura dispersa cae entre 40 % y 60 % (Sidorczuk-Pietraszko et al., 2025, p. 1 y 7).\nEjemplo. Ecuador recolectó más del 100 % porque entraron botellas de países vecinos (Pinos et al., 2018, pp. 129-130).\nCondición. Control aduanero y una red de retorno en los comercios."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#tarifa-de-aseo-y-tasa-de-disposición-final",
+    "href": "slides/01-actividad-01/index.html#tarifa-de-aseo-y-tasa-de-disposición-final",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Tarifa de aseo y tasa de disposición final",
+    "text": "Tarifa de aseo y tasa de disposición final\n\nQué es. La tarifa a costo real financia la recolección, y el pago por generación premia a quien separa.\nComplemento. La tasa de disposición final encarece el vertido frente al reciclaje.\nPor qué en Panamá. La recolección cubre 64 % del peso y hay más de 57 vertederos (Programa de las Naciones Unidas para el Desarrollo (PNUD) Panamá, 2023, p. 4).\nEquidad. Una tarifa solidaria protege a los hogares vulnerables (Miguel et al., 2021, pp. 72-73).\nEvidencia. En Europa, ningún instrumento aislado logra tasas altas de reciclaje (Agencia Europea de Medio Ambiente, 2023).\nRiesgo. Una tasa sin alternativas de valorización incentiva el vertido ilegal."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#incentivos-fiscales-a-la-inversión-circular",
+    "href": "slides/01-actividad-01/index.html#incentivos-fiscales-a-la-inversión-circular",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Incentivos fiscales a la inversión circular",
+    "text": "Incentivos fiscales a la inversión circular\n\nQué es. Exoneraciones, depreciación acelerada y créditos fiscales para invertir en reciclaje, valorización y tratamiento de agua.\nPrecedente. El régimen de energía solar de Panamá ya combina esos tres beneficios (Asamblea Nacional de la República de Panamá, 2013, art. 20).\nMandato. La Ley 33 de 2018 ordena incentivos a la recuperación de materiales (Asamblea Nacional de Panamá, 2018, arts. 25-27).\nEjemplo. Colombia exime del impuesto al valor agregado la maquinaria para reciclar y depurar aguas (Gobierno de Colombia, 1989, art. 428).\nCondición. Estimar el gasto tributario, definir los bienes elegibles y fijar plazos con evaluación."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#taxonomía-y-bonos-temáticos",
+    "href": "slides/01-actividad-01/index.html#taxonomía-y-bonos-temáticos",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Taxonomía y bonos temáticos",
+    "text": "Taxonomía y bonos temáticos\n\nTaxonomía. La economía circular es un objetivo, pero fuera del uso del suelo solo opera como requisito de no causar daño (Superintendencia de Bancos de Panamá et al., 2024, pp. 43-44).\nPropuesta. Criterios de contribución sustancial para residuos, construcción y manufactura.\nBonos. El Marco de Financiamiento Sostenible ya tiene categorías de economía circular y de agua (Ministerio de Economía y Finanzas de Panamá, 2024, pp. 22-24).\nPropuesta. Una cartera de proyectos elegibles: acopio, compostaje, residuos de obra y reducción de pérdidas de agua.\nCuello de botella. La preparación de proyectos limita más que el marco."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#crédito-verde-garantías-y-financiamiento-combinado",
+    "href": "slides/01-actividad-01/index.html#crédito-verde-garantías-y-financiamiento-combinado",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Crédito verde, garantías y financiamiento combinado",
+    "text": "Crédito verde, garantías y financiamiento combinado\n\nQué es. Crédito de largo plazo, garantías parciales y recursos concesionales para negocios que la banca considera riesgosos.\nPor qué en Panamá. Las micro, pequeñas y medianas empresas son cerca del 96 % de las empresas.\nA quién. Recicladores formalizados, pequeñas industrias con ecodiseño y productores que valoricen subproductos.\nEjemplo. Bancóldex en Colombia y CORFO en Chile ofrecen plazos de hasta 15 años (United Nations Environment Programme, 2023, pp. 32, 38 y 48).\nCondición. Formalización previa de los beneficiarios y analistas de crédito capacitados."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#compras-públicas-circulares",
+    "href": "slides/01-actividad-01/index.html#compras-públicas-circulares",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Compras públicas circulares",
+    "text": "Compras públicas circulares\n\nQué es. El Estado usa su poder de compra para demandar bienes y obras circulares.\nMandato. La Ley 502 ordena criterios de economía circular en las contrataciones públicas (Asamblea Nacional de Panamá, 2025, art. 12); falta reglamentarlos.\nPunto de entrada. La obra pública, con áridos, bases y bloques con contenido reciclado.\nPor qué. Construcción es el mayor sector por valor agregado y tiene 70 % de informalidad estimada.\nBeneficio adicional. Una exigencia de formalidad en los pliegos mejora la calidad del empleo."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#alianzas-innovación-y-capacidades",
+    "href": "slides/01-actividad-01/index.html#alianzas-innovación-y-capacidades",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Alianzas, innovación y capacidades",
+    "text": "Alianzas, innovación y capacidades\n\nAlianzas público-privadas. Infraestructura municipal de separación, compostaje y valorización con operador privado.\nEjemplo. El centro de clasificación de París XVII es público y lo opera una empresa privada (Barkhau, 2026).\nPromoción existente. Amarrar los incentivos a los mecanismos del Ministerio de Comercio e Industrias, como el sello “Hecho en Panamá”.\nCapacidades. Capacitar a analistas de crédito y a compradores públicos.\nInformación. Certificar a los recicladores y publicar un reporte de indicadores (Asamblea Nacional de Panamá, 2025, arts. 5-7 y 11)."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#primer-momento-nueve-instrumentos-que-pueden-empezar-ya",
+    "href": "slides/01-actividad-01/index.html#primer-momento-nueve-instrumentos-que-pueden-empezar-ya",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Primer momento: nueve instrumentos que pueden empezar ya",
+    "text": "Primer momento: nueve instrumentos que pueden empezar ya\n\n\nInstrumentoSectores de políticaRespaldo en los datosRegistro de productores e importadoresResiduos, industrias, agriculturaSaldos comerciales negativosFormalización de recicladoresResiduosCadena atomizada; sin registro actualizadoIncentivos fiscalesIndustrias, residuos, aguaPrecedente de la Ley 37 de 2013Compras públicas circularesConstrucción, industriasMayor sector por valor agregadoCriterios en la taxonomíaTodosContribución circular solo en uso del sueloBonos temáticosResiduos, agua, agriculturaPérdidas de agua cercanas al 40 %Crédito verde y garantíasIndustrias, residuos, agriculturaPymes, 96 % de las empresasAlianzas y promoción existenteResiduos, agricultura, industriasInfraestructura municipal escasaInformación y formaciónTransversalBrechas de información"
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#segundo-momento-cinco-instrumentos-que-dependen-del-registro",
+    "href": "slides/01-actividad-01/index.html#segundo-momento-cinco-instrumentos-que-dependen-del-registro",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Segundo momento: cinco instrumentos que dependen del registro",
+    "text": "Segundo momento: cinco instrumentos que dependen del registro\n\n\nInstrumentoSectores de políticaRespaldo en los datosREP con metas por flujoResiduos, industriasEnvases hasta 38 % del peso de los residuosEcomodulaciónIndustrias, residuosIndustrias importa 17 % de su producción en insumosDepósito y retornoResiduos, bebidas, comercioPlástico, vidrio y metal, cerca de un cuarto de los residuosContenido recicladoIndustrias, construcción, residuosMás de un millón de t de residuos de obra; 13 cementerasTarifa de aseo y tasa de disposiciónResiduos, ciudades y construcciónRecolección de 64 % del peso; más de 57 vertederos\n\n\n\n\nPueden prepararse en paralelo y entran en vigor cuando el registro esté operativo."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#un-paquete-por-sector-de-política",
+    "href": "slides/01-actividad-01/index.html#un-paquete-por-sector-de-política",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Un paquete por sector de política",
+    "text": "Un paquete por sector de política\n\nResiduos: registro, recicladores, REP de envases y electrónicos, depósito y retorno, tarifa de aseo y bonos.\nIndustrias: REP con ecomodulación, contenido reciclado, incentivos a maquinaria de reciclaje y crédito para pymes.\nCiudades y construcción: compras públicas, normas de áridos reciclados, tasa a residuos de obra y taxonomía.\nAgricultura y alimentos: aprovechamiento de orgánicos, REP de envases de agroquímicos y crédito para subproductos.\nEnergía: bonos vinculados a metas y revisión de los incentivos vigentes para incluir eficiencia y biogás.\nRecursos hídricos: bonos para tratamiento y reducción de pérdidas, e incentivos a equipos de reúso."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#brechas-de-información",
+    "href": "slides/01-actividad-01/index.html#brechas-de-información",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Brechas de información",
+    "text": "Brechas de información\n\nNo hay formación bruta de capital por actividad económica.\nNo hay cuotas de mercado ni estudios de competencia públicos.\nNo hay un registro reciente de recicladores de base.\nNo hay series anuales oficiales de generación y reciclaje de residuos.\nLa matriz insumo-producto es de 2018.\nCada brecha se convierte en una solicitud formal de información."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#cuatro-decisiones-de-método",
+    "href": "slides/01-actividad-01/index.html#cuatro-decisiones-de-método",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Cuatro decisiones de método",
+    "text": "Cuatro decisiones de método\n\nDatos oficiales primero. Cada cifra sale de estadísticas oficiales procesadas en memorias de cálculo públicas.\nEvidencia con grado de confianza. Cada indicador lleva una bandera de calidad, y lo que falta se registra como hallazgo.\nJuicio técnico explícito. Los criterios son transparentes y los pesos se acuerdan con CEPAL y MiAMBIENTE.\nSecuencia en dos momentos. Las condiciones habilitantes van antes que los instrumentos que dependen de ellas."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#tres-actividades-encadenadas",
+    "href": "slides/01-actividad-01/index.html#tres-actividades-encadenadas",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Tres actividades encadenadas",
+    "text": "Tres actividades encadenadas\n\n\nCada actividad responde preguntas propias y se apoya en la anterior."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#marco-conceptual",
+    "href": "slides/01-actividad-01/index.html#marco-conceptual",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Marco conceptual",
+    "text": "Marco conceptual\n\nLa Ley 502 define la economía circular por sus principios: diseño circular, residuo mínimo, jerarquía de residuos e internalización de costos (Asamblea Nacional de Panamá, 2025, art. 3).\nLa jerarquía pone la prevención, la reutilización y el reciclaje antes de la disposición final.\nUn instrumento se evalúa por su capacidad de cambiar los incentivos de quien diseña, produce, importa, consume y gestiona.\nLa eficacia de la REP depende de la ecomodulación y de la capacidad operativa (Parlamento Europeo y Consejo de la Unión Europea, 2018, art. 8 bis).\nSin registro y control, los instrumentos pierden eficacia."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#familias-de-instrumentos",
+    "href": "slides/01-actividad-01/index.html#familias-de-instrumentos",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Familias de instrumentos",
+    "text": "Familias de instrumentos\n\n\nFamiliaQué incluyeNormativos y regulatoriosLeyes marco, metas obligatorias, REP, contenido reciclado, ecomodulaciónTributarios y tarifariosImpuestos y tasas, depósito y reembolso, pago por generación, incentivos fiscalesFinancierosCrédito, garantías, financiamiento combinado, bonos temáticos, taxonomíasPromoción y facilitación de inversionesCompras públicas circulares, alianzas público-privadas, subsidiosCapacidades y conciencia ambientalFormación, asistencia técnica, campañas, información y trazabilidad\n\n\n\n\nElaboración propia con base en la Unión Europea (Parlamento Europeo y Consejo de la Unión Europea, 2018), la GIZ (Barkhau, 2026) y la Ley 502 (Asamblea Nacional de Panamá, 2025)."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#nueve-criterios-para-evaluar-los-sectores",
+    "href": "slides/01-actividad-01/index.html#nueve-criterios-para-evaluar-los-sectores",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Nueve criterios para evaluar los sectores",
+    "text": "Nueve criterios para evaluar los sectores\n\n\nCriterioFuente principalProducto interno brutoCuadros de oferta y utilización del INEC, 2018-2024Empleo, género y condición laboralMatriz de empleo del INEC; Encuesta de Mercado LaboralComercio exterior y competitividadCuadros de oferta y utilización; matriz insumo-productoInversiónInversión extranjera directa del INECConcentración y barrerasDirectorio de Empresas y Locales; entrevistasEmisiones de gases de efecto invernaderoEDGAR; inventario nacionalUso de recursosBalance Energético Nacional; Banco MundialRecuperación de materialesBanco Mundial; UN Comtrade; diagnóstico nacional de residuosEslabonamientos productivosMatriz insumo-producto del INEC, 2018"
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#cada-cifra-lleva-su-bandera-de-calidad",
+    "href": "slides/01-actividad-01/index.html#cada-cifra-lleva-su-bandera-de-calidad",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Cada cifra lleva su bandera de calidad",
+    "text": "Cada cifra lleva su bandera de calidad\n\nLa bandera dice al lector cuánto confiar en cada indicador.\nLo que no pudo verificarse en la fuente original no sostiene ninguna recomendación.\n\n\n\nBanderaSignificadoAltaDato oficial desagregable a las actividades del sector, sin supuestosMediaDato oficial que requiere un supuesto de asignaciónBajaDato disponible solo para un grupo más amplio o con cobertura limitadaSin datoSin fuente cuantitativa; se trata de forma cualitativa y se registra como brecha"
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#herramientas-del-análisis-sectorial",
+    "href": "slides/01-actividad-01/index.html#herramientas-del-análisis-sectorial",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Herramientas del análisis sectorial",
+    "text": "Herramientas del análisis sectorial\n\nTabla de equivalencias. Asigna las 80 actividades a los seis sectores y se entrega editable para que MiAMBIENTE y el Ministerio de Comercio e Industrias la validen.\nEslabonamientos. El modelo de Leontief sobre la matriz insumo-producto de 2018 mide arrastre e impulso entre actividades (Miller y Blair, 2022).\nMatriz de relevancia. Ordena los sectores de 1 a 5 en cada indicador para comparar unidades distintas.\nMemorias de cálculo. Cada paso está documentado en código en el sitio del proyecto."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#una-ficha-normalizada-por-instrumento",
+    "href": "slides/01-actividad-01/index.html#una-ficha-normalizada-por-instrumento",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Una ficha normalizada por instrumento",
+    "text": "Una ficha normalizada por instrumento\n\n\nCampoContenidoProblema o barreraPrecio, riesgo, financiamiento, coordinación, información o cumplimientoSector y flujo objetivoProducto o flujo de material, y actor cuya conducta se busca cambiarMecanismoIncentivo, obligación, reducción de riesgo, señal de precio o acceso a capitalRequisitosBase legal, entidades responsables y capacidad de fiscalizaciónFuente de recursosCosto fiscal o financiero y potencial de apalancamientoExperiencia internacionalPaíses, base legal y evidencia, con su grado de verificaciónDatos e indicadoresDatos necesarios para implementarlo y monitorearloRiesgosElusión, efectos no deseados y efectos distributivos"
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#siete-criterios-de-factibilidad",
+    "href": "slides/01-actividad-01/index.html#siete-criterios-de-factibilidad",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Siete criterios de factibilidad",
+    "text": "Siete criterios de factibilidad\n\n\nCriterioPregunta de evaluaciónImpacto potencial¿Puede movilizar recursos y cambiar prácticas?Técnica¿Hay tecnología, mercado de materiales secundarios y datos?Institucional¿Hay mandato, coordinación y capacidad de supervisión?Política y regulatoria¿Es compatible con el marco legal y aceptable para los actores?Financiera¿Cuál es la fuente de fondeo, el costo y el apalancamiento?Tiempo¿Es inmediato, de mediano plazo o una reforma estructural?Equidad y competitividad¿Cómo afecta a las pymes, el empleo y la competencia?\n\n\n\nCada criterio se puntúa en escala ordinal con justificación escrita; la puntuación ordena la discusión con los actores."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#efectos-por-sector",
+    "href": "slides/01-actividad-01/index.html#efectos-por-sector",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Efectos por sector",
+    "text": "Efectos por sector\n\nLos cargos sobre productos (REP, depósito, impuestos) se analizan con el modelo de precios de insumo-producto (Miller y Blair, 2022).\nEl modelo estima cuánto suben los precios de cada sector cuando una actividad paga un cargo.\nSupone traslado completo del cargo y no incluye cambios de comportamiento.\nLos instrumentos financieros se analizan de forma cualitativa estructurada, con criterios explícitos.\nToda estimación lleva una nota sobre la confianza de los datos."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#capacidades-institucionales-y-sistema-financiero",
+    "href": "slides/01-actividad-01/index.html#capacidades-institucionales-y-sistema-financiero",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Capacidades institucionales y sistema financiero",
+    "text": "Capacidades institucionales y sistema financiero\n\nSe evalúan seis funciones: regular, registrar, recaudar, fiscalizar, monitorear y financiar.\nLas fuentes son los mandatos legales, las entrevistas y los informes institucionales.\nEl mapa del sistema financiero cubre banca, fondos, aseguradoras y mercado de valores.\nLa taxonomía (Superintendencia de Bancos de Panamá et al., 2024) y el marco soberano (Ministerio de Economía y Finanzas de Panamá, 2024) son los puntos de articulación.\nEl aporte es acercar lo que la taxonomía declara elegible a proyectos circulares financiables."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#hoja-de-ruta-contenido-y-reglas",
+    "href": "slides/01-actividad-01/index.html#hoja-de-ruta-contenido-y-reglas",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Hoja de Ruta: contenido y reglas",
+    "text": "Hoja de Ruta: contenido y reglas\n\nContenido. Instrumentos, actores y roles, fuentes de financiamiento, reformas, indicadores y articulación con la Ley 502.\nRegla 1. Secuencia en dos momentos.\nRegla 2. Usar la institucionalidad existente antes de crear instrumentos nuevos.\nRegla 3. Cada recomendación se rastrea hasta su fuente y su criterio.\nIndicadores. Se alinean con la plataforma de indicadores de la Ley 502 (Asamblea Nacional de Panamá, 2025, art. 11)."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#participación-de-actores",
+    "href": "slides/01-actividad-01/index.html#participación-de-actores",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Participación de actores",
+    "text": "Participación de actores\n\nGobierno: MiAMBIENTE, MEF y su Dirección de Crédito Público, Ministerio de Comercio e Industrias, AAUD y municipios.\nSistema financiero: banca pública y privada, fondos de inversión y superintendencias.\nSector privado: gremios, productores e importadores, y gestores de residuos.\nAcademia y sociedad civil: centros técnicos, universidades y organizaciones de economía circular.\nLas entrevistas acompañan todo el proceso, y la mesa técnica valida al final.\nLos aportes se sistematizan: qué se recibió, qué se incorporó y por qué se descartó lo demás."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#limitaciones-del-enfoque",
+    "href": "slides/01-actividad-01/index.html#limitaciones-del-enfoque",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Limitaciones del enfoque",
+    "text": "Limitaciones del enfoque\n\nVarios criterios solo se evalúan por grupo de actividades o con supuestos de asignación.\nLos eslabonamientos son de 2018 y suponen coeficientes estables.\nLa equivalencia entre sectores y actividades requiere validación institucional.\nLa evidencia internacional es más sólida para bolsas, depósito y vertido que para la REP y la ecomodulación.\nEl modelo de precios es una aproximación sin cambios de comportamiento."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#lo-que-informó-miambiente",
+    "href": "slides/01-actividad-01/index.html#lo-que-informó-miambiente",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Lo que informó MiAMBIENTE",
+    "text": "Lo que informó MiAMBIENTE\n\nEl reglamento de la Ley 502 está en borrador, con la meta de tenerlo antes de fin de año.\nEl Consejo Nacional de Economía Circular aún no está integrado (Asamblea Nacional de Panamá, 2025, art. 8).\nLos sectores de la Hoja de Ruta se mantienen.\nLos datos se facilitan con solicitudes formales, y conviene sumar al MEF y su Dirección de Crédito Público.\nEl Ministerio de Comercio e Industrias opera incentivos aprovechables, como el sello “Hecho en Panamá”."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#cinco-principios-del-plan",
+    "href": "slides/01-actividad-01/index.html#cinco-principios-del-plan",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Cinco principios del plan",
+    "text": "Cinco principios del plan\n\nConcentración en noviembre. El trabajo analítico y con actores ocurre entre el 26 de octubre y el 27 de noviembre.\nInsumos tempranos para el reglamento. Se adelantan a mediados de noviembre.\nSolicitudes de datos en la primera semana. Se envían entre el 26 y el 30 de octubre.\nParticipación continua. Las entrevistas comienzan el 2 de noviembre.\nHolgura antes del cierre. Las versiones finales se entregan el 18 de diciembre."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#cronograma",
+    "href": "slides/01-actividad-01/index.html#cronograma",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Cronograma",
+    "text": "Cronograma\n\n\n\n\n\n\n\n\n\n\n\nLas líneas verticales marcan los hitos: 23 de octubre, 27 de noviembre, 4 y 18 de diciembre."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#hitos",
+    "href": "slides/01-actividad-01/index.html#hitos",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Hitos",
+    "text": "Hitos\n\n\nFechaHito22 y 23 de octubreEntrega del plan de trabajo, la metodología y el análisis sectorial26 al 30 de octubreSolicitudes formales de informaciónMediados de noviembreInsumos para el reglamento de la Ley 50223 al 27 de noviembreMesa técnica de validación3 y 4 de diciembreBorradores de factibilidad y de la Hoja de Ruta7 al 14 de diciembreRevisión de CEPAL y MiAMBIENTE18 de diciembreVersiones finales y presentaciones21 al 31 de diciembreReserva de contingencia, solo para ajustes"
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#insumos-adelantados-para-el-reglamento",
+    "href": "slides/01-actividad-01/index.html#insumos-adelantados-para-el-reglamento",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Insumos adelantados para el reglamento",
+    "text": "Insumos adelantados para el reglamento\n\nEl reglamento de la Ley 502 se elabora mientras avanza este trabajo.\nA mediados de noviembre se entrega a MiAMBIENTE un documento breve con contenidos de traducción normativa directa.\nIncluye los flujos prioritarios sugeridos para la REP.\nIncluye la estructura de tarifas y los criterios de ecomodulación.\nIncluye las obligaciones de registro y reporte, y las condiciones de trazabilidad."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#misión-a-panamá-y-mesa-técnica",
+    "href": "slides/01-actividad-01/index.html#misión-a-panamá-y-mesa-técnica",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Misión a Panamá y mesa técnica",
+    "text": "Misión a Panamá y mesa técnica\n\nLa misión ocurriría del 23 al 27 de noviembre en Ciudad de Panamá.\nLa misma semana combina la mesa técnica con reuniones con MiAMBIENTE, el MEF y las superintendencias.\nLa decisión sobre el viaje se toma a más tardar el 6 de noviembre.\nSi el viaje no procede, la mesa se realiza de forma híbrida.\nMiAMBIENTE valida la lista de invitados.\nLa agenda presenta la lista corta de instrumentos, las condiciones habilitantes y la secuencia propuesta."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#solicitudes-de-información",
+    "href": "slides/01-actividad-01/index.html#solicitudes-de-información",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Solicitudes de información",
+    "text": "Solicitudes de información\n\n\nInstituciónInformación solicitadaMEF, Dirección de Crédito PúblicoEmisiones temáticas y espacio fiscalSuperintendencias del sector financieroPiloto de la taxonomía, cartera verde y productos vigentesMinisterio de Comercio e IndustriasIncentivos vigentes y registros de industriasAAUD y MiAMBIENTEResiduos, sitios de disposición, gestores y recicladoresINECMicrodatos de empleo, conciliación de empleo y matriz actualizadaAutoridad de competenciaEstudios de mercado en cemento, plásticos, residuos y electricidad"
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#riesgos-y-mitigación",
+    "href": "slides/01-actividad-01/index.html#riesgos-y-mitigación",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Riesgos y mitigación",
+    "text": "Riesgos y mitigación\n\n\nRiesgoMitigaciónEl reglamento avanza antes que los productosInsumos adelantados a mediados de noviembreBaja disponibilidad de actores a fin de añoEntrevistas desde el 2 de noviembre; respuestas escritasDemora en la entrega de datosSolicitudes en la primera semana; tratamiento alternativo documentadoPocos datos de recicladores y concentraciónAnálisis cualitativo y entrevistas dirigidasConsejo de Economía Circular no integradoHoja de Ruta como insumo para su primera agendaFeriados y cierre institucionalHolgura en diciembre; entrega final el 18Viaje no aprobadoMesa híbrida y reuniones virtuales"
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#próximos-pasos",
+    "href": "slides/01-actividad-01/index.html#próximos-pasos",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
+    "section": "Próximos pasos",
+    "text": "Próximos pasos\n\nConvertir los catorce instrumentos en fichas y una lista corta.\nEnviar las solicitudes formales de información.\nIniciar las entrevistas con gobierno y sistema financiero.\nEvaluar factibilidad, efectos por sector y capacidades.\nValidar la Hoja de Ruta en la mesa técnica de fines de noviembre.\nConsultar los documentos y las memorias de cálculo en línea."
+  },
+  {
+    "objectID": "slides/01-actividad-01/index.html#bibliografía",
+    "href": "slides/01-actividad-01/index.html#bibliografía",
+    "title": "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo",
     "section": "Bibliografía",
-    "text": "Bibliografía\n\n\nMiller, R. E. y Blair, P. D. (2022). Input-Output Analysis: Foundations and Extensions (3.ª ed.). Cambridge University Press. https://doi.org/10.1017/9781108676212"
+    "text": "Bibliografía\n\n\nAgencia Europea de Medio Ambiente. (2023). Economic instruments and separate collection systems: key strategies to increase recycling (EEA Briefing 29/2022). Agencia Europea de Medio Ambiente. https://doi.org/10.2800/444518\n\n\nAsamblea Nacional de la República de Panamá. (2013). Ley 37 de 10 de junio de 2013, que establece el régimen de incentivos para el fomento de la construcción, operación y mantenimiento de centrales y/o instalaciones solares. Gaceta Oficial Digital No. 27308, 13 de junio de 2013. https://www.energia.gob.pa/wp-content/uploads/2024/03/Ley-37-de-10-de-junio-de-2013-11-3.pdf\n\n\nAsamblea Nacional de Panamá. (2018). Ley 33 de 30 de mayo de 2018, que establece la Política Basura Cero y su marco de acción para la gestión integral de residuos, y dicta otras disposiciones. Gaceta Oficial Digital No. 28537-C, 31 de mayo de 2018. https://s3-legispan.asamblea.gob.pa/legispan/NORMAS/2010/2018/LEY/Administrador%20Legispan_28537-C_2018_5_31_ASAMBLEA%20NACIONAL_33.pdf\n\n\nAsamblea Nacional de Panamá. (2020). Ley 187 de 2 de diciembre de 2020, que regula la reducción y el reemplazo progresivo de los plásticos de un solo uso. Gaceta Oficial Digital No. 29167-B, 2 de diciembre de 2020. https://www.gacetaoficial.gob.pa/storage/gacetas/2020/12/29167_B/GacetaNo_29167b_20201202.pdf\n\n\nAsamblea Nacional de Panamá. (2025). Ley 502 de 25 de noviembre de 2025, que dicta normas para la implementación de la economía circular como estrategia ambiental. Gaceta Oficial Digital No. 30413, 26 de noviembre de 2025. https://www.gacetaoficial.gob.pa/storage/gacetas/2025/11/30413/GacetaNo_30413_20251126.pdf\n\n\nBanco Interamericano de Desarrollo, Organización Panamericana de la Salud y Asociación Interamericana de Ingeniería Sanitaria y Ambiental. (2010). Informe de la evaluación regional del manejo de residuos sólidos urbanos en América Latina y el Caribe 2010. https://publications.iadb.org/es/informe-de-la-evaluacion-regional-del-manejo-de-residuos-solidos-urbanos-en-america-latina-y-el\n\n\nBanco Mundial. (2024). What a Waste 3.0: Global Database, Country Dataset and Codebook [Data set]. https://datacatalog.worldbank.org/search/dataset/0039597/what-a-waste-global-database\n\n\nBarkhau, J. (2026). Instrumentos financieros para el manejo de plásticos de un solo uso. Presentación, Deutsche Gesellschaft für Internationale Zusammenarbeit (GIZ), Proyecto Global Go Circular; evento técnico CEPAL, 21 de agosto de 2026.\n\n\nBrown, A. y Börkey, P. (2024). Extended producer responsibility in the garments sector (OECD Environment Working Papers N.º 253). OECD Publishing. https://doi.org/10.1787/8ee5adb2-en\n\n\nEuropean Commission, Joint Research Centre (JRC). (2026). EDGAR (Emissions Database for Global Atmospheric Research), EDGAR_2026_GHG: emisiones de gases de efecto invernadero por país y categoría, 1970-2025, potenciales de calentamiento AR5. https://edgar.jrc.ec.europa.eu/dataset_ghg2026\n\n\nGobierno de Colombia. (1989). Estatuto Tributario (Decreto 624 de 1989), arts. 255, 424 y 428. http://www.secretariasenado.gov.co/senado/basedoc/estatuto_tributario.html\n\n\nMiguel, C. de, Martínez, K., Pereira, M. y Kohout, M. (2021). Economía circular en América Latina y el Caribe: oportunidad para una recuperación transformadora (Documentos de Proyectos LC/TS.2021/120). Comisión Económica para América Latina y el Caribe (CEPAL). https://hdl.handle.net/11362/47309\n\n\nMiller, R. E. y Blair, P. D. (2022). Input-Output Analysis: Foundations and Extensions (3.ª ed.). Cambridge University Press. https://doi.org/10.1017/9781108676212\n\n\nMinisterio de Ambiente de Panamá y Programa de las Naciones Unidas para el Desarrollo. (2024). Hoja de Ruta para el sector de Economía Circular con enfoque de Cambio Climático. Ministerio de Ambiente de Panamá (MiAMBIENTE); PNUD Panamá. https://www.undp.org/sites/g/files/zskgke326/files/2024-09/undp-panama-hojar.pdf\n\n\nMinisterio de Economía y Finanzas de Panamá. (2024). Resolución Ministerial N.º MEF-RES-2024-1529 de 20 de junio de 2024, por la cual se adopta el “Marco de Financiamiento Sostenible de la República de Panamá”. Gaceta Oficial Digital No. 30061-C, 26 de junio de 2024. https://www.gacetaoficial.gob.pa/pdfTemp/30061_C/105794.pdf\n\n\nMinisterio de Vivienda, Ciudad y Territorio de Colombia. (2016). Decreto 596 de 2016: Por el cual se modifica y adiciona el Decreto número 1077 de 2015 en lo relativo con el esquema de la actividad de aprovechamiento del servicio público de aseo y el régimen transitorio para la formalización de los recicladores de oficio, y se dictan otras disposiciones. Diario Oficial N.° 49.841, 11 de abril de 2016. https://normas.cra.gov.co/gestor/docs/decreto_0596_2016.htm\n\n\nMinisterio del Medio Ambiente de Chile. (2016). Ley 20.920: Establece el marco para la gestión de residuos, la responsabilidad extendida del productor y fomento al reciclaje. Diario Oficial de la República de Chile, 1 de junio de 2016. https://www.bcn.cl/leychile/navegar?idNorma=1090894\n\n\nMinisterio del Medio Ambiente de Chile. (2020). Decreto 12: Establece metas de recolección y valorización y otras obligaciones asociadas de envases y embalajes. Diario Oficial de la República de Chile, N.° 42.906, 16 de marzo de 2021. https://www.bcn.cl/leychile/navegar?idNorma=1157019\n\n\nParlamento Europeo y Consejo de la Unión Europea. (2018). Directiva (UE) 2018/851 del Parlamento Europeo y del Consejo, de 30 de mayo de 2018, por la que se modifica la Directiva 2008/98/CE sobre los residuos. Diario Oficial de la Unión Europea, L 150, 14.6.2018, pp. 109 y ss. https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:32018L0851\n\n\nParlamento Europeo y Consejo de la Unión Europea. (2019). Directiva (UE) 2019/904 del Parlamento Europeo y del Consejo, de 5 de junio de 2019, relativa a la reducción del impacto de determinados productos de plástico en el medio ambiente. Diario Oficial de la Unión Europea, L 155, 12.6.2019, pp. 1-19. https://eur-lex.europa.eu/legal-content/ES/TXT/?uri=CELEX:32019L0904\n\n\nPinos, J., Puig Ventosa, I., Banegas, F., Quezada, F., Delgado, G., Orellana, N., Saquisilí, S., Quindi, T. y Chacón, G. (2018). Instrumentos económicos para la gestión de residuos de envases en Ecuador. Ciencia Digital, 2(2), 123-144. https://doi.org/10.33262/cienciadigital.v2i2.77\n\n\nPrograma de las Naciones Unidas para el Desarrollo (PNUD) Panamá. (2023). Un país pequeño y un reto enorme: la gestión integral de residuos sólidos en Panamá. https://www.undp.org/sites/g/files/zskgke326/files/2023-10/undp-pa-desechos_lab.pdf\n\n\nPrograma de las Naciones Unidas para el Desarrollo y Ministerio de Ambiente de Panamá. (2024). Revisión Bibliográfica para la Hoja de Ruta para el sector de Economía Circular con enfoque de Cambio Climático. PNUD Panamá; Ministerio de Ambiente de Panamá (MiAMBIENTE). https://www.undp.org/sites/g/files/zskgke326/files/2024-09/undp-panama-revbiblio.pdf\n\n\nSamaniego, J., Rondón Toro, E., Herrera Jiménez, J. y Santori, S. (2022). Panorama de las hojas de ruta de economía circular en América Latina y el Caribe (Documentos de Proyectos LC/TS.2022/235). Comisión Económica para América Latina y el Caribe (CEPAL). https://hdl.handle.net/11362/48632\n\n\nSidorczuk-Pietraszko, E., Piontek, W. y Larsson, A. (2025). Are Deposit–Return Schemes an Optimal Solution for Beverage Container Collection in the European Union? An Evidence Review. Sustainability, 17(19), 8791. https://doi.org/10.3390/su17198791\n\n\nSuperintendencia de Bancos de Panamá, Superintendencia del Mercado de Valores de Panamá, Superintendencia de Seguros y Reaseguros de Panamá y Grupo de Trabajo de Finanzas Sostenibles. (2024). Taxonomía de Finanzas Sostenibles de Panamá [Primera edición]. Superintendencia de Bancos de Panamá. https://supervalores.gob.pa/files/taxonomia/Taxonomia-Finanzas-Sostenibles-Panama.pdf\n\n\nUNITAR y Unión Internacional de Telecomunicaciones (UIT). (2024). The Global E-waste Monitor 2024. https://ewastemonitor.info/wp-content/uploads/2024/12/GEM_2024_EN_11_NOV-web.pdf\n\n\nUnited Nations Environment Programme. (2023). Unlocking Circular Economy Finance in Latin America and the Caribbean: The Catalyst for a Positive Change. Findings and recommendations for Policymakers and the Financial Sector. https://www.unepfi.org/publications/unlocking-circular-economy-finance-in-latin-america-and-the-caribbean/\n\n\nUnited Nations Statistics Division. (2026). UN Comtrade: comercio internacional de mercancías de Panamá (SA), datos anuales 2021-2025. https://comtradeapi.un.org/public/v1/preview/C/A/HS"
   },
   {
-    "objectID": "materiales/presentaciones/01-ejemplo.html#objetivos",
-    "href": "materiales/presentaciones/01-ejemplo.html#objetivos",
-    "title": "Presentación de ejemplo",
-    "section": "Objetivos",
-    "text": "Objetivos\n\nMostrar la estructura mínima de una presentación\nMostrar cómo se cita y se descargan archivos de ejemplo"
+    "objectID": "materiales/presentaciones/index.html",
+    "href": "materiales/presentaciones/index.html",
+    "title": "Presentaciones",
+    "section": "",
+    "text": "Presentaciones de la consultoría.\n\nSectores priorizados, metodología y plan de trabajo: qué muestran los datos de los seis sectores de política, por qué se proponen los instrumentos, cómo se evalúan y qué sigue.",
+    "crumbs": [
+      "Inicio",
+      "Presentaciones"
+    ]
   },
   {
     "objectID": "materiales/documentos/index.html",
     "href": "materiales/documentos/index.html",
     "title": "Documentos",
     "section": "",
-    "text": "Los documentos son los informes que se entregan en Word y que se publican también en esta página. Cada uno puede leerse por separado: define sus términos, cita sus fuentes y remite a las memorias de cálculo para quien quiera reproducir las cifras.\n\nMetodología: marco conceptual, criterios de evaluación de los instrumentos y procedimiento de trabajo de la consultoría.\nPlan de trabajo: actividades, calendario, necesidades de información y riesgos.\nSectores económicos priorizados: caracterización de los seis sectores de política con datos oficiales, eslabonamientos productivos y catorce instrumentos propuestos.",
+    "text": "Metodología: marco conceptual, criterios de evaluación de los instrumentos y procedimiento de trabajo de la consultoría.\nPlan de trabajo: actividades, calendario, necesidades de información y riesgos.\nSectores económicos priorizados: caracterización de los seis sectores de política con datos oficiales, eslabonamientos productivos y catorce instrumentos propuestos.",
+    "crumbs": [
+      "Materiales",
+      "Documentos"
+    ]
+  },
+  {
+    "objectID": "materiales/documentos/index.html#actividad-1",
+    "href": "materiales/documentos/index.html#actividad-1",
+    "title": "Documentos",
+    "section": "",
+    "text": "Metodología: marco conceptual, criterios de evaluación de los instrumentos y procedimiento de trabajo de la consultoría.\nPlan de trabajo: actividades, calendario, necesidades de información y riesgos.\nSectores económicos priorizados: caracterización de los seis sectores de política con datos oficiales, eslabonamientos productivos y catorce instrumentos propuestos.",
     "crumbs": [
       "Materiales",
       "Documentos"
@@ -992,20 +1364,23 @@
     "href": "materiales/index.html",
     "title": "Materiales",
     "section": "",
-    "text": "Documentos\nInformes del Producto 1: metodología, plan de trabajo y análisis de los sectores económicos priorizados.\nVer documentos\n\n\n\n\n\n\nMemorias de cálculo\nProcesamiento paso a paso de las bases de datos que sustentan los documentos.\nVer memorias de cálculo\n\n\n\n\n\n\nPresentaciones\nDiapositivas que se pueden ver en la página o en pantalla completa.\nVer presentaciones",
+    "text": "Documentos\nInformes de la Actividad 1: metodología, plan de trabajo y análisis de los sectores económicos priorizados.\nVer documentos\n\n\n\n\n\n\nMemorias de cálculo\nProcesamiento paso a paso de las bases de datos que sustentan los documentos.\nVer memorias de cálculo\n\n\n\n\n\n\nPresentaciones\nDiapositivas que se pueden ver en la página o en pantalla completa.\nVer presentaciones",
     "crumbs": [
       "Materiales"
     ]
   },
   {
-    "objectID": "materiales/presentaciones/index.html",
-    "href": "materiales/presentaciones/index.html",
-    "title": "Presentaciones",
-    "section": "",
-    "text": "Las presentaciones se pueden ver dentro de la página o en pantalla completa.\n\nPresentación de ejemplo: estructura mínima de una presentación en revealjs.",
-    "crumbs": [
-      "Inicio",
-      "Presentaciones"
-    ]
+    "objectID": "materiales/presentaciones/sectores-metodologia-plan/index.html#objetivos",
+    "href": "materiales/presentaciones/sectores-metodologia-plan/index.html#objetivos",
+    "title": "Sectores priorizados, metodología y plan de trabajo",
+    "section": "Objetivos",
+    "text": "Objetivos\n\nMostrar qué ocurre en los seis sectores de política priorizados y por qué se proponen los instrumentos de política para la circularidad.\nPresentar la metodología con que se evalúan los sectores y los instrumentos.\nPresentar el plan de trabajo, sus hitos y sus riesgos."
+  },
+  {
+    "objectID": "materiales/presentaciones/sectores-metodologia-plan/index.html#documentos-de-referencia",
+    "href": "materiales/presentaciones/sectores-metodologia-plan/index.html#documentos-de-referencia",
+    "title": "Sectores priorizados, metodología y plan de trabajo",
+    "section": "Documentos de referencia",
+    "text": "Documentos de referencia\n\nAnálisis de los sectores económicos priorizados\nMetodología\nPlan de trabajo"
   }
 ]

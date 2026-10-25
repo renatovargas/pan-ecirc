@@ -67,6 +67,9 @@ $code-block-font-size: 0.5em;
     background-color: $theme-secondary;
   }
   color: white;
+  h1 {
+    color: white;
+  }
   h2 {
     color: white;
     font-weight: 700;
@@ -85,6 +88,10 @@ $code-block-font-size: 0.5em;
   a {
     color: $theme-highlight;
   }
+}
+
+.reveal .theme-content a {
+  color: $theme-highlight;
 }
 
 // Footer de tres columnas: texto izquierdo y derecho (vacíos por defecto) y

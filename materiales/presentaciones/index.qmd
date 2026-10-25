@@ -6,4 +6,4 @@ toc: false
 
 Presentaciones de la consultoría.
 
-- [Presentación de ejemplo](01-ejemplo.qmd): estructura mínima de una presentación en revealjs.
+- [Sectores priorizados, metodología y plan de trabajo](sectores-metodologia-plan/index.qmd): qué muestran los datos de los seis sectores de política, por qué se proponen los instrumentos, cómo se evalúan y qué sigue.

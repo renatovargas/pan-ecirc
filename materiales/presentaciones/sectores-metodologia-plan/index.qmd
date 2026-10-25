@@ -1,0 +1,24 @@
+---
+title: "Sectores priorizados, metodología y plan de trabajo"
+subtitle: "Instrumentos económicos para la economía circular en Panamá"
+---
+
+::::{.slide-embed}
+<iframe class="slide-deck" src="../../../slides/01-actividad-01/index.html" title="Sectores priorizados, metodología y plan de trabajo" loading="lazy"></iframe>
+::::
+
+::::{.slide-links}
+[⛶ Pantalla completa](../../../slides/01-actividad-01/index.html){target="_blank"}
+::::
+
+## Objetivos
+
+- Mostrar qué ocurre en los seis sectores de política priorizados y por qué se proponen los instrumentos de política para la circularidad.
+- Presentar la metodología con que se evalúan los sectores y los instrumentos.
+- Presentar el plan de trabajo, sus hitos y sus riesgos.
+
+## Documentos de referencia
+
+- [Análisis de los sectores económicos priorizados](../../documentos/a1c-sectores-economicos-priorizados/index.qmd)
+- [Metodología](../../documentos/a1a-metodologia/index.qmd)
+- [Plan de trabajo](../../documentos/a1b-plan-de-trabajo/index.qmd)
