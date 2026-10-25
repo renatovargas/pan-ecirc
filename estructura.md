@@ -49,7 +49,8 @@ raíz/
 │   │       ├── refs.bib
 │   │       └── images/
 │   └── presentaciones/
-│       └── <NN-nombre>.qmd      # página que embebe la presentación en un iframe
+│       └── <nombre-corto>/
+│           └── index.qmd        # página que embebe la presentación en un iframe
 ├── slides/
 │   ├── pstyles.scss             # tema revealjs compartido (look de la institución)
 │   └── <NN-nombre>/
@@ -82,7 +83,7 @@ Particularidades:
 
 - `output-dir: docs` permite publicar con GitHub Pages desde la carpeta `docs/` de la rama principal.
 - `execute-dir: project` hace que el código de R se ejecute desde la raíz del proyecto. Los paths dentro de los chunks son, por ejemplo, `read_excel("data/per/archivo.xlsx")`, sin importar en qué carpeta esté el `.qmd`.
-- `render` lista explícitamente qué se renderiza. `"!refs/"` excluye la carpeta de consulta (incluye un `.qmd` de pruebas, si lo hay). Para ocultar páginas aún no publicadas se agregan exclusiones como `"!materiales/presentaciones/01-*.qmd"` y se quitan al publicar.
+- `render` lista explícitamente qué se renderiza. `"!refs/"` excluye la carpeta de consulta (incluye un `.qmd` de pruebas, si lo hay). Para ocultar páginas aún no publicadas se agregan exclusiones como `"!materiales/presentaciones/<nombre-corto>/"` y se quitan al publicar.
 - `resources` copia `data/` y `assets/` a `docs/` al renderizar el **proyecto completo**. Al renderizar un solo archivo, Quarto no copia los recursos; por eso los enlaces a `data/` y los logos del CSS pueden fallar en una vista previa individual.
 
 El resto del archivo:
@@ -115,7 +116,7 @@ website:
               href: materiales/documentos/<nombre-documento>/index.qmd
         - section: Presentaciones
           contents:
-            - materiales/presentaciones/01-nombre.qmd
+            - materiales/presentaciones/<nombre-corto>/index.qmd
 
 format:
   html:
@@ -147,7 +148,7 @@ El tema del sitio web (`styles.scss` de la raíz) es más corto: solo reasigna `
 
 ## Presentaciones (revealjs)
 
-Cada presentación tiene su carpeta en `slides/` y una página envoltorio en `materiales/presentaciones/`.
+Cada presentación tiene su carpeta en `slides/` y una página envoltorio en `materiales/presentaciones/<nombre-corto>/index.qmd`, donde `<nombre-corto>` es el nombre de la presentación en corto con guiones, para que la URL sea `.../presentaciones/<nombre-corto>/` sin `.html`.
 
 **`slides/<NN-nombre>/index.qmd`:**
 
@@ -190,7 +191,7 @@ Notas:
 - Vínculos internos con el id directo, `[texto](#suma)`, y ids explícitos en el título (`## Suma {#suma}`).
 - Quarto carga MathJax 2 en revealjs. La escala de las fórmulas se ajusta solo con el número `scale` del YAML. No forzar `font-size` con CSS. No definir `Macros` con colores hexadecimales (el `#` se lee como parámetro). Para resaltar con color usar `\bbox[#B5E6A2,3px]{\mathbf{Z}}` escrito de forma literal, y `\widehat{...}` en lugar de `\hat{...}`.
 
-**`materiales/presentaciones/<NN-nombre>.qmd`** (página que la embebe):
+**`materiales/presentaciones/<nombre-corto>/index.qmd`** (página que la embebe; las rutas suben tres niveles):
 
 ```markdown
 ---
@@ -199,11 +200,11 @@ subtitle: "Subtítulo"
 ---
 
 ::::{.slide-embed}
-<iframe class="slide-deck" src="../../slides/<NN-nombre>/index.html" title="Título" loading="lazy"></iframe>
+<iframe class="slide-deck" src="../../../slides/<NN-nombre>/index.html" title="Título" loading="lazy"></iframe>
 ::::
 
 ::::{.slide-links}
-[⛶ Pantalla completa](../../slides/<NN-nombre>/index.html){target="_blank"}
+[⛶ Pantalla completa](../../../slides/<NN-nombre>/index.html){target="_blank"}
 ::::
 
 ## Objetivos
@@ -332,7 +333,7 @@ Conviene crear un `AGENTS.md` en la raíz con las reglas que un asistente debe r
 3. Ajustar `slides/pstyles.scss` a la institución: paleta, tipografías, logo, texto de marca y de autor del footer.
 4. Ajustar `styles.scss` (color primario) y el título, la descripción, `repo-url` y la navegación de `_quarto.yml`.
 5. Crear `data/`, `data/examples/` y `data/outputs/`.
-6. Crear el primer documento (`materiales/documentos/<nombre>/index.qmd` con su `refs.bib`) y la primera presentación (`slides/<NN-nombre>/index.qmd` y su página en `materiales/presentaciones/`).
+6. Crear el primer documento (`materiales/documentos/<nombre>/index.qmd` con su `refs.bib`) y la primera presentación (`slides/<NN-nombre>/index.qmd` y su página en `materiales/presentaciones/<nombre-corto>/index.qmd`).
 7. Agregar ambos al `sidebar` de `_quarto.yml`.
 8. Renderizar el proyecto completo (`quarto render`) y revisar en pantalla el HTML, las presentaciones y el docx.
 9. Publicar `docs/` con GitHub Pages (rama principal, carpeta `/docs`).
