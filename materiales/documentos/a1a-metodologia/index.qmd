@@ -73,6 +73,7 @@ El documento describe, para cada actividad, las preguntas que responde, los mét
 - @tbl-criterios: Criterios de evaluación sectorial, indicadores y fuentes
 - @tbl-calidad: Banderas de calidad de los indicadores
 - @tbl-familias: Familias de instrumentos del inventario
+- @tbl-ficha: Campos de la ficha normalizada de instrumento
 - @tbl-factibilidad: Criterios del filtro de factibilidad
 - @tbl-capacidades: Funciones evaluadas en el análisis de capacidades institucionales
 - @tbl-actores: Grupos de actores y mecanismos de consulta
@@ -176,7 +177,7 @@ La consultoría se organiza en tres actividades con productos entregables, cada 
 
 cajas <- tribble(
   ~id, ~x, ~y, ~texto,
-  1, 1.2, 2.2, "Actividad 1\nPlan, metodología y\nanálisis sectorial\ne instrumentos",
+  1, 1.2, 2.2, "Actividad 1\nPlan, metodología,\nanálisis sectorial y\npropuesta de instrumentos",
   2, 4.0, 2.2, "Actividad 2\nFactibilidad,\ncapacidades y\nsistema financiero",
   3, 6.8, 2.2, "Actividad 3\nHoja de Ruta Nacional\ny mesa técnica\nde validación",
   4, 4.0, 0.5, "Bases de datos oficiales, memorias de cálculo y consulta a actores"
@@ -222,7 +223,7 @@ tribble(
   ~Producto, ~Actividad, ~`Contenido`,
   "Producto 1",
   "Actividad 1",
-  "Plan de trabajo y metodología; análisis de los sectores económicos priorizados con eslabonamientos productivos; identificación de instrumentos con experiencia internacional",
+  "Plan de trabajo y metodología; análisis de los sectores económicos priorizados con eslabonamientos productivos; propuesta de catorce instrumentos con experiencia internacional",
   "Producto 2",
   "Actividad 2",
   "Evaluación de la factibilidad política y técnica de los instrumentos, con análisis de efectos por sector; diagnóstico de capacidades institucionales; análisis del sistema financiero nacional",
@@ -239,9 +240,9 @@ Además de los informes, los términos piden una presentación para cada product
 
 # Metodología de la Actividad 1: análisis sectorial e instrumentos
 
-## Pregunta y producto
+## Qué se busca y producto
 
-La Actividad 1 responde dónde están las mayores oportunidades y restricciones para la circularidad en la economía panameña y qué instrumentos de política han funcionado en otros países. Su producto es el plan de trabajo, esta metodología, el análisis de los sectores priorizados con sus eslabonamientos, y una propuesta de catorce instrumentos organizados por familia.
+La Actividad 1 busca establecer dónde están las mayores oportunidades y restricciones para la circularidad en la economía panameña y qué instrumentos de política han funcionado en otros países. Su producto es el plan de trabajo, esta metodología, el análisis de los sectores priorizados con sus eslabonamientos, y una propuesta de catorce instrumentos organizados por familia.
 
 ## Delimitación de los sectores de política
 
@@ -330,9 +331,41 @@ El inventario de la Actividad 1 propone, con base en la experiencia internaciona
 
 # Metodología de la Actividad 2: factibilidad y capacidades
 
-## Pregunta y producto
+## Qué se busca y producto
 
-La Actividad 2 responde qué tan implementables y efectivos serían los instrumentos identificados, qué capacidades necesitan las instituciones y qué mecanismos permiten movilizar recursos desde el sistema financiero. Su producto es el segundo informe.
+La Actividad 2 busca determinar cuáles de los catorce instrumentos propuestos en la Actividad 1 son viables y convenientes para Panamá, y bajo qué condiciones. Para ello se convierte cada instrumento en una ficha, se evalúa su factibilidad política, técnica, institucional y financiera, se estima su efecto por sector, se diagnostican las capacidades del gobierno y del sistema financiero, y se mapean los mecanismos que permiten movilizar recursos. La actividad no diseña todavía los instrumentos en detalle, pues eso corresponde a la Actividad 3. Su producto es el segundo informe.
+
+## Fichas normalizadas y lista corta
+
+Cada instrumento propuesto en la Actividad 1 se documenta con una ficha normalizada (@tbl-ficha), que reúne en un mismo formato lo que se sabe de él y lo que falta por confirmar. Con las fichas se define la lista corta de instrumentos que pasa a la evaluación detallada. La evidencia de cada ficha lleva su nivel de verificación, y lo que no pudo leerse en la fuente se marca como no verificado, de modo que el lector distinga lo establecido de lo reportado de segunda mano.
+
+```{r}
+#| label: tbl-ficha
+#| tbl-cap: "Campos de la ficha normalizada de instrumento"
+
+tribble(
+  ~Campo, ~Contenido,
+  "Problema o barrera",
+  "Precio, riesgo, financiamiento, coordinación, información, capacidad o cumplimiento que busca corregir",
+  "Sector y flujo objetivo",
+  "Sector de política, producto o flujo de material, y actor cuyo comportamiento se pretende modificar",
+  "Mecanismo",
+  "Incentivo, obligación, reducción de riesgo, señal de precio, acceso a capital o facilitación de inversión",
+  "Requisitos normativos e institucionales",
+  "Base legal necesaria, entidades responsables, capacidad de fiscalización y seguimiento",
+  "Fuente de recursos",
+  "Costo fiscal o financiero, potencial de apalancamiento y sostenibilidad del mecanismo",
+  "Experiencia internacional",
+  "Países, base legal, año y evidencia de efectos, con su fuente y su grado de verificación",
+  "Datos e indicadores",
+  "Datos necesarios para implementarlo y monitorearlo",
+  "Riesgos",
+  "Elusión, efectos no deseados, efectos distributivos"
+) |>
+  tabla_ft_es(digitos = 0)
+```
+
+*Fuente: elaboración propia.*
 
 ## Evaluación de factibilidad
 
@@ -391,7 +424,15 @@ El análisis del sistema financiero mapea los actores (banca pública y privada,
 
 # Metodología de la Actividad 3: Hoja de Ruta
 
-La Actividad 3 consolida el trabajo anterior en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular. Su contenido es: el diseño de los instrumentos financieros aplicables a la realidad nacional, incluidos los modelos de REP; los actores responsables y sus roles en la implementación, el seguimiento y la evaluación; el mapeo de fuentes de financiamiento nacionales e internacionales, públicas y privadas; las reformas normativas, regulatorias o institucionales requeridas; los indicadores de seguimiento y evaluación; y la articulación con la Ley 502 y otros instrumentos nacionales.
+## Qué se busca y producto
+
+La Actividad 3 busca convertir los instrumentos que superen la evaluación de la Actividad 2 en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular, que MiAMBIENTE y el Consejo puedan usar en la implementación de la Ley 502. Para ello se diseña cada instrumento con sus montos, metas, responsables y plazos, se definen los actores y sus roles, se identifican las fuentes de financiamiento y las reformas necesarias, y se validan los resultados con actores del sector público, el sistema financiero, el sector privado, la academia y la sociedad civil. Su producto es el tercer informe.
+
+## Contenido de la Hoja de Ruta
+
+El contenido de la Hoja de Ruta es: el diseño de los instrumentos financieros aplicables a la realidad nacional, incluidos los modelos de REP; los actores responsables y sus roles en la implementación, el seguimiento y la evaluación; el mapeo de fuentes de financiamiento nacionales e internacionales, públicas y privadas; las reformas normativas, regulatorias o institucionales requeridas; los indicadores de seguimiento y evaluación; y la articulación con la Ley 502 y otros instrumentos nacionales.
+
+## Reglas para ordenar las recomendaciones
 
 Para ordenar las recomendaciones se aplican tres reglas:
 
