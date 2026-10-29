@@ -46,9 +46,8 @@ source("materiales/calculos/scripts/funciones_comunes.R")
 tareas <- tribble(
   ~actividad, ~tarea, ~inicio, ~fin,
   "Actividad 1", "Producto 1: plan, metodología y análisis", "2026-10-14", "2026-10-29",
-  "Actividad 2", "Fichas de instrumentos y lista corta", "2026-11-02", "2026-11-06",
+  "Actividad 2", "Fichas de instrumentos", "2026-11-02", "2026-11-06",
   "Actividad 2", "Solicitudes formales de información", "2026-11-02", "2026-11-13",
-  "Actividad 2", "Entrevistas, primera ronda", "2026-11-02", "2026-11-13",
   "Actividad 2", "Factibilidad y efectos por sector", "2026-11-09", "2026-11-20",
   "Actividad 2", "Capacidades institucionales y sistema financiero", "2026-11-09", "2026-11-20",
   "Actividad 2", "Redacción del Producto 2", "2026-11-16", "2026-12-03",
@@ -86,12 +85,12 @@ El plan parte de que el Producto 1 (plan, metodología y análisis sectorial) se
 Los hitos principales son:
 
 - **29 de octubre.** Entrega del Producto 1.
-- **2 al 20 de noviembre.** Fichas de instrumentos, solicitudes de información, entrevistas y análisis de factibilidad, capacidades y sistema financiero.
-- **Semana del 23 al 27 de noviembre.** Mesa técnica de validación con actores del sector público, privado, académico y de la sociedad civil.
+- **2 al 20 de noviembre.** Fichas de instrumentos, solicitudes de información y análisis de factibilidad, capacidades y sistema financiero.
+- **Semana del 23 al 27 de noviembre.** Mesa técnica de validación, realizada de forma virtual, con actores del sector público, privado, académico y de la sociedad civil.
 - **4 de diciembre.** Borradores completos de los Productos 2 y 3.
 - **7 al 18 de diciembre.** Revisión de CEPAL y MiAMBIENTE, ajustes y entrega de las versiones finales.
 
-El plan identifica los riesgos que podrían desplazar el calendario (reglamentación en curso de la Ley 502, disponibilidad de actores a fines de noviembre, tiempos de entrega de datos) y las medidas para reducirlos. La más importante es adelantar, desde la segunda semana de noviembre, los insumos con traducción reglamentaria directa, para que el trabajo de la consultoría pueda alimentar el reglamento mientras se elabora.
+El plan identifica los riesgos que podrían desplazar el calendario (reglamentación en curso de la Ley 502, disponibilidad de actores a fines de noviembre, tiempos de entrega de datos) y las medidas para reducirlos. La más importante es adelantar, desde mediados de noviembre, las propuestas que MiAMBIENTE puede incorporar directamente al texto del reglamento, para que el trabajo de la consultoría pueda alimentarlo mientras se elabora.
 
 # Lista de cuadros y figuras {.unnumbered}
 
@@ -106,6 +105,25 @@ El plan identifica los riesgos que podrían desplazar el calendario (reglamentac
 **Figuras**
 
 - @fig-gantt: Cronograma de la consultoría, octubre a diciembre de 2026
+
+# Glosario de siglas {.unnumbered}
+
+```{r}
+#| label: tbl-siglas
+#| tbl-cap: "Glosario de siglas"
+
+tribble(
+  ~Sigla, ~Significado,
+  "AAUD", "Autoridad de Aseo Urbano y Domiciliario",
+  "CEPAL", "Comisión Económica para América Latina y el Caribe",
+  "MEF", "Ministerio de Economía y Finanzas",
+  "MICI", "Ministerio de Comercio e Industrias",
+  "MiAMBIENTE", "Ministerio de Ambiente de Panamá",
+  "REP", "Responsabilidad extendida del productor"
+) |>
+  tabla_ft_es(digitos = 0)
+```
+
 
 # Introducción
 
@@ -123,7 +141,7 @@ Organizar la ejecución de las tres actividades de la consultoría de modo que l
 
 1. Fijar el calendario de las Actividades 2 y 3 a partir de la entrega del Producto 1.
 2. Concentrar el trabajo con actores y la validación en las fechas de mayor disponibilidad institucional.
-3. Identificar las solicitudes de información que deben formalizarse de inmediato.
+3. Identificar las solicitudes de información que complementan el análisis.
 4. Anticipar los riesgos de calendario y de datos, con medidas de mitigación.
 
 # Antecedentes
@@ -147,12 +165,6 @@ En las reuniones de arranque con MiAMBIENTE se informaron condiciones que ordena
 
 Panamá cuenta con una Taxonomía de Finanzas Sostenibles [@sbp2024TaxonomiaPanama] y con un Marco de Financiamiento Sostenible de la República [@mef2024MarcoFinanciamientoSostenible], que son piezas sobre las cuales construir en vez de duplicar. El contacto con las superintendencias del sector financiero y con el grupo de trabajo de finanzas sostenibles forma parte de las tareas de la Actividad 2.
 
-# Principios del plan
-
-1. **Insumos tempranos para el reglamento.** Los contenidos con traducción reglamentaria directa se adelantan a mediados de noviembre, sin esperar los borradores completos.
-2. **Solicitudes de datos en la primera semana.** Los tiempos de respuesta de las instituciones condicionan el análisis, por lo que las solicitudes formales se envían entre el 2 y el 6 de noviembre.
-3. **Participación a lo largo del proceso.** Las entrevistas comienzan en la semana del 2 de noviembre, y la mesa técnica funciona como validación final de un proceso de consulta que ya está en marcha.
-
 # Plan por actividad
 
 La @tbl-tareas resume las tareas, sus resultados y los actores que intervienen. Las fechas se muestran en la sección de cronograma.
@@ -168,9 +180,9 @@ tribble(
   "Producto 1, que se entrega el 29 de octubre",
   "Consultor; supervisión de CEPAL; MiAMBIENTE",
   "Actividad 2",
-  "Fichas normalizadas de instrumentos y lista corta; evaluación de factibilidad por criterio; análisis de efectos por sector; capacidades institucionales; análisis del sistema financiero",
+  "Fichas normalizadas de los catorce instrumentos; evaluación de factibilidad por criterio; análisis de efectos por sector; capacidades institucionales; análisis del sistema financiero",
   "Producto 2: informe de factibilidad y capacidades con matriz de evaluación",
-  "Consultor; MiAMBIENTE; MEF; MICI; superintendencias; banca pública y privada; AAUD; INEC",
+  "Consultor; MiAMBIENTE; MEF; MICI; superintendencias; banca pública y privada; AAUD",
   "Actividad 3",
   "Diseño de instrumentos; actores y roles; mapeo de fuentes de financiamiento; reformas requeridas; indicadores; articulación con la Ley 502; mesa técnica",
   "Producto 3: Hoja de Ruta Nacional para el Financiamiento de la Economía Circular y sistematización de la mesa técnica",
@@ -187,15 +199,15 @@ tribble(
 
 ## Actividad 2: factibilidad y capacidades
 
-Entre el 2 y el 6 de noviembre se convierten los catorce instrumentos propuestos en el Producto 1 en fichas normalizadas y en una lista corta, a partir de los criterios de la metodología. Al mismo tiempo se envían las solicitudes de información y se programa la primera ronda de entrevistas con MiAMBIENTE, el MEF, el MICI y las superintendencias. Entre el 9 y el 20 de noviembre se evalúa la factibilidad de cada instrumento, se estima su efecto por sector con el modelo de precios de insumo-producto cuando los datos lo permiten, y se analizan las capacidades de gobierno y del sistema financiero. La redacción del Producto 2 comienza el 16 de noviembre y su borrador se completa el 3 de diciembre.
+Entre el 2 y el 6 de noviembre se convierten los catorce instrumentos propuestos en el Producto 1 en fichas normalizadas, a partir de los criterios de la metodología. Al mismo tiempo se envían las solicitudes de información a las instituciones. Entre el 9 y el 20 de noviembre se evalúa la factibilidad de los catorce instrumentos, sin descartar ninguno, para que MiAMBIENTE y la CEPAL decidan con cuáles avanzar, se estima su efecto por sector con el modelo de precios de insumo-producto cuando los datos lo permiten, y se analizan las capacidades de gobierno y del sistema financiero. La redacción del Producto 2 comienza el 16 de noviembre y su borrador se completa el 3 de diciembre.
 
 ## Actividad 3: Hoja de Ruta
 
-El diseño de la Hoja de Ruta comienza el 16 de noviembre, con los instrumentos que superen el filtro de factibilidad. Se definen los actores y sus roles, se mapean las fuentes de financiamiento nacionales e internacionales y se identifican las reformas normativas, regulatorias e institucionales necesarias. Los indicadores de seguimiento se diseñan en coordinación con la plataforma de indicadores de la Ley 502 [@panama2025Ley502, art. 11]. La mesa técnica de validación se realiza en la semana del 23 al 27 de noviembre. Sus aportes se sistematizan entre el 30 de noviembre y el 4 de diciembre, con la redacción del Producto 3.
+El diseño de la Hoja de Ruta comienza el 16 de noviembre, a partir de la evaluación de los instrumentos. Se definen los actores y sus roles, se mapean las fuentes de financiamiento nacionales e internacionales y se identifican las reformas normativas, regulatorias e institucionales necesarias. Los indicadores de seguimiento se diseñan en coordinación con la plataforma de indicadores de la Ley 502 [@panama2025Ley502, art. 11]. La mesa técnica de validación se realiza de forma virtual en la semana del 23 al 27 de noviembre. Sus aportes se sistematizan entre el 30 de noviembre y el 4 de diciembre, con la redacción del Producto 3.
 
 ## Insumos adelantados para el reglamento
 
-Dado que la reglamentación de la Ley 502 se encuentra en elaboración, la consultoría prepara a mediados de noviembre un documento breve con los contenidos que pueden traducirse en normas: flujos prioritarios sugeridos para la REP, estructura de tarifas y criterios de ecomodulación, obligaciones de registro y reporte, y condiciones de trazabilidad. Ese documento se entrega a MiAMBIENTE antes de los borradores completos y es independiente de ellos.
+Dado que la reglamentación de la Ley 502 se encuentra en elaboración, la consultoría prepara a mediados de noviembre un documento breve con propuestas que MiAMBIENTE puede incorporar directamente al texto del reglamento, es decir, ya redactadas en términos normativos y con el detalle necesario para aplicarse: flujos prioritarios sugeridos para la REP, estructura de tarifas y criterios de ecomodulación, obligaciones de registro y reporte, y condiciones de trazabilidad. Ese documento se entrega a MiAMBIENTE antes de los borradores completos y es independiente de ellos.
 
 # Cronograma
 
@@ -237,8 +249,8 @@ ggplot(tareas) +
 tribble(
   ~Fecha, ~Hito, ~Entregable,
   "29 de octubre", "Entrega del Producto 1", "Plan de trabajo, metodología y análisis sectorial, con las bases de datos y memorias de cálculo",
-  "2 al 6 de noviembre", "Solicitudes formales de información", "Cartas a MEF, superintendencias, MICI, AAUD, INEC y otras entidades",
-  "Mediados de noviembre", "Insumos para el reglamento", "Documento breve con contenidos de traducción reglamentaria directa",
+  "2 al 6 de noviembre", "Solicitudes formales de información", "Cartas a MEF, superintendencias, MICI, AAUD y otras entidades",
+  "Mediados de noviembre", "Insumos para el reglamento", "Documento breve con propuestas que pueden incorporarse directamente al reglamento",
   "23 al 27 de noviembre", "Mesa técnica de validación", "Presentación de la propuesta y registro de aportes",
   "3 y 4 de diciembre", "Borradores de los Productos 2 y 3", "Informes completos para revisión",
   "7 al 14 de diciembre", "Revisión", "Comentarios de CEPAL y MiAMBIENTE",
@@ -249,17 +261,15 @@ tribble(
 
 *Fuente: elaboración propia.*
 
-Los feriados nacionales de noviembre reducen los días hábiles de varias semanas del cronograma. El calendario debe confirmarse con las contrapartes al programar entrevistas y la mesa técnica.
+Los feriados nacionales de noviembre reducen los días hábiles de varias semanas del cronograma. El calendario debe confirmarse con las contrapartes al programar la mesa técnica.
 
-# Misión a Panamá y mesa técnica
+# Mesa técnica de validación
 
-La consultoría contempla un viaje a Ciudad de Panamá en la última semana de noviembre, del 23 al 27. La visita se justifica si permite combinar en la misma semana la mesa técnica de validación con reuniones bilaterales con MiAMBIENTE, el MEF y las superintendencias. Si el viaje no procede, la mesa puede realizarse de forma híbrida.
-
-La mesa técnica reúne al sector público, el sector privado, la academia y la sociedad civil. Las redes y plataformas de economía circular que operan en el país ofrecen un canal para convocar a las organizaciones participantes, y MiAMBIENTE valida la lista de invitados. La agenda presenta los instrumentos de la lista corta, las condiciones habilitantes y la secuencia propuesta, y recoge comentarios por escrito. Los aportes se sistematizan en un documento que registra qué se recibió, qué se incorporó y por qué se descartó lo demás.
+La mesa técnica de validación se realiza de forma virtual, igual que las reuniones bilaterales que resulten necesarias con MiAMBIENTE, el MEF y las superintendencias. La mesa reúne al sector público, el sector privado, la academia y la sociedad civil. Las redes y plataformas de economía circular que operan en el país ofrecen un canal para convocar a las organizaciones participantes, y MiAMBIENTE valida la lista de invitados. La agenda presenta los catorce instrumentos con su evaluación, las condiciones habilitantes y la secuencia propuesta, y recoge comentarios por escrito. Los aportes se sistematizan en un documento que registra qué se recibió, qué se incorporó y por qué se descartó lo demás.
 
 # Gestión de datos y solicitudes de información
 
-Las solicitudes de información se formalizan entre el 2 y el 6 de noviembre, para que las respuestas lleguen antes del análisis de factibilidad. El @tbl-datos resume las principales.
+El análisis se apoya en las fuentes públicas ya reunidas. Para complementarlo, las solicitudes de información se formalizan entre el 2 y el 6 de noviembre, y sus respuestas se incorporan al análisis a medida que lleguen. El @tbl-datos resume las principales.
 
 ```{r}
 #| label: tbl-datos
@@ -279,9 +289,6 @@ tribble(
   "AAUD y MiAMBIENTE",
   "Datos de generación y composición de residuos, sitios de disposición, registros de gestores, segregadores y recicladores",
   "Potencial de recuperación y diseño de REP",
-  "INEC",
-  "Microdatos de la Encuesta de Mercado Laboral por división de actividad, conciliación de empleo en las secciones D y E, actualización de la matriz insumo-producto",
-  "Empleo por género y formalidad; eslabonamientos",
   "Autoridad de competencia",
   "Estudios sectoriales de mercado en cemento, plásticos, residuos y distribución eléctrica",
   "Concentración y barreras de entrada"
@@ -303,23 +310,20 @@ tribble(
   "Los instrumentos propuestos llegan después de las decisiones normativas",
   "Insumos adelantados a mediados de noviembre; interlocución directa con MiAMBIENTE",
   "Baja disponibilidad de actores a fines de noviembre y en diciembre",
-  "Entrevistas y mesa técnica con poca participación",
-  "Primera ronda de entrevistas desde el 2 de noviembre; agenda de la mesa confirmada a comienzos de noviembre; respuestas escritas como alternativa",
+  "Mesa técnica de validación con poca participación",
+  "Agenda y lista de invitados confirmadas a comienzos de noviembre; respuestas escritas como alternativa",
   "Demora en la entrega de datos",
   "Análisis cuantitativo incompleto",
-  "Solicitudes formales en la primera semana; tratamiento alternativo documentado para cada brecha",
+  "Análisis con fuentes públicas desde el inicio; solicitudes formales en la primera semana; tratamiento alternativo documentado para cada brecha",
   "Datos insuficientes sobre recicladores y concentración",
   "Análisis cualitativo en lugar de cuantitativo",
-  "Se trata como hallazgo y como agenda de formalización; entrevistas dirigidas",
+  "Se trata como hallazgo y como agenda de formalización; consulta dirigida en la mesa técnica",
   "Consejo Nacional de Economía Circular no integrado",
   "Falta una instancia de validación formal",
   "La Hoja de Ruta se redacta como insumo para la primera agenda del Consejo",
   "Feriados de noviembre",
   "Reducción de días hábiles",
-  "Calendario confirmado con las contrapartes; holgura de la segunda semana de diciembre",
-  "Viaje a Panamá no viable",
-  "La mesa técnica pierde interacción presencial",
-  "Mesa híbrida; reuniones bilaterales virtuales"
+  "Calendario confirmado con las contrapartes; holgura de la segunda semana de diciembre"
 ) |>
   tabla_ft_es(digitos = 0)
 ```
@@ -331,25 +335,6 @@ tribble(
 La consultoría mantiene reuniones semanales de seguimiento con la CEPAL y un canal de coordinación con MiAMBIENTE. Se acuerdan con MiAMBIENTE los formatos y plazos de las solicitudes de datos. También se coordina con la consultoría paralela de sistema de información e indicadores, para que los indicadores de seguimiento de la Hoja de Ruta sean los mismos que alimenten la plataforma de la Ley 502.
 
 Todas las cifras de los productos provienen de bases de datos con memorias de cálculo públicas, y cada informe se revisa contra esas memorias antes de su entrega. Las referencias se verifican contra la fuente, y lo que no pudo verificarse se marca así en el texto.
-
-# Glosario de siglas {.unnumbered}
-
-```{r}
-#| label: tbl-siglas
-#| tbl-cap: "Glosario de siglas"
-
-tribble(
-  ~Sigla, ~Significado,
-  "AAUD", "Autoridad de Aseo Urbano y Domiciliario",
-  "CEPAL", "Comisión Económica para América Latina y el Caribe",
-  "INEC", "Instituto Nacional de Estadística y Censo",
-  "MEF", "Ministerio de Economía y Finanzas",
-  "MICI", "Ministerio de Comercio e Industrias",
-  "MiAMBIENTE", "Ministerio de Ambiente de Panamá",
-  "REP", "Responsabilidad extendida del productor"
-) |>
-  tabla_ft_es(digitos = 0)
-```
 
 # Referencias {.unnumbered}
 

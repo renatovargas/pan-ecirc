@@ -74,7 +74,8 @@ El documento describe, para cada actividad, las preguntas que responde, los mét
 - @tbl-calidad: Banderas de calidad de los indicadores
 - @tbl-familias: Familias de instrumentos del inventario
 - @tbl-ficha: Campos de la ficha normalizada de instrumento
-- @tbl-factibilidad: Criterios del filtro de factibilidad
+- @tbl-escala: Escala de puntuación de los criterios de factibilidad
+- @tbl-factibilidad: Criterios de evaluación de la factibilidad
 - @tbl-capacidades: Funciones evaluadas en el análisis de capacidades institucionales
 - @tbl-actores: Grupos de actores y mecanismos de consulta
 - @tbl-productos: Productos y contenidos mínimos de los informes
@@ -83,6 +84,29 @@ El documento describe, para cada actividad, las preguntas que responde, los mét
 **Figuras**
 
 - @fig-flujo: Encadenamiento de las actividades de la consultoría
+
+# Glosario de siglas {.unnumbered}
+
+```{r}
+#| label: tbl-siglas
+#| tbl-cap: "Glosario de siglas"
+
+tribble(
+  ~Sigla, ~Significado,
+  "CEPAL", "Comisión Económica para América Latina y el Caribe",
+  "EDGAR", "Base de datos de emisiones para la investigación atmosférica global (Emissions Database for Global Atmospheric Research)",
+  "GIZ", "Agencia Alemana de Cooperación Internacional",
+  "IED", "Inversión extranjera directa",
+  "INEC", "Instituto Nacional de Estadística y Censo",
+  "IPCC", "Grupo Intergubernamental de Expertos sobre el Cambio Climático",
+  "ITBMS", "Impuesto de transferencia de bienes corporales muebles y la prestación de servicios",
+  "MEF", "Ministerio de Economía y Finanzas",
+  "MiAMBIENTE", "Ministerio de Ambiente de Panamá",
+  "PNUD", "Programa de las Naciones Unidas para el Desarrollo",
+  "REP", "Responsabilidad extendida del productor"
+) |>
+  tabla_ft_es(digitos = 0)
+```
 
 # Introducción
 
@@ -272,7 +296,7 @@ tribble(
   "INEC; Contraloría; solicitudes al MEF",
   "Concentración de mercado, barreras de entrada y salida",
   "Número de empresas por tamaño y clase de actividad; análisis cualitativo de barreras",
-  "Directorio de Empresas y Locales; Censos Económicos; entrevistas",
+  "Directorio de Empresas y Locales; Censos Económicos",
   "Emisiones de gases de efecto invernadero",
   "Emisiones por sector y categoría del IPCC, intensidad por valor agregado",
   "EDGAR; inventario nacional de MiAMBIENTE",
@@ -335,9 +359,9 @@ El inventario de la Actividad 1 propone, con base en la experiencia internaciona
 
 La Actividad 2 busca determinar cuáles de los catorce instrumentos propuestos en la Actividad 1 son viables y convenientes para Panamá, y bajo qué condiciones. Para ello se convierte cada instrumento en una ficha, se evalúa su factibilidad política, técnica, institucional y financiera, se estima su efecto por sector, se diagnostican las capacidades del gobierno y del sistema financiero, y se mapean los mecanismos que permiten movilizar recursos. La actividad no diseña todavía los instrumentos en detalle, pues eso corresponde a la Actividad 3. Su producto es el segundo informe.
 
-## Fichas normalizadas y lista corta
+## Fichas normalizadas
 
-Cada instrumento propuesto en la Actividad 1 se documenta con una ficha normalizada (@tbl-ficha), que reúne en un mismo formato lo que se sabe de él y lo que falta por confirmar. Con las fichas se define la lista corta de instrumentos que pasa a la evaluación detallada. La evidencia de cada ficha lleva su nivel de verificación, y lo que no pudo leerse en la fuente se marca como no verificado, de modo que el lector distinga lo establecido de lo reportado de segunda mano.
+Cada instrumento propuesto en la Actividad 1 se documenta con una ficha normalizada (@tbl-ficha), que reúne en un mismo formato lo que se sabe de él y lo que falta por confirmar. Las catorce fichas son la base de la evaluación y en esta etapa no se descarta ningún instrumento, de modo que MiAMBIENTE y la CEPAL puedan decidir con cuáles avanzar a partir de la evaluación completa. La evidencia de cada ficha lleva su nivel de verificación, y lo que no pudo leerse en la fuente se marca como no verificado, de modo que el lector distinga lo establecido de lo reportado de segunda mano.
 
 ```{r}
 #| label: tbl-ficha
@@ -369,11 +393,30 @@ tribble(
 
 ## Evaluación de factibilidad
 
-Cada instrumento de la lista corta se evalúa con los criterios de la @tbl-factibilidad, en una escala ordinal con justificación escrita. La puntuación no determina la selección: ordena la discusión con los actores y hace explícitos los juicios.
+Cada uno de los catorce instrumentos se evalúa con los criterios de la @tbl-factibilidad. Cada criterio se puntúa de 1 a 5 según la escala de la @tbl-escala, y cada puntaje lleva una justificación escrita con su fuente y una bandera de confianza de la evidencia (alta, media o baja), de modo que se distinga un juicio apoyado en una norma o en un dato de otro que se apoya en la analogía con otros países. Para el criterio de tiempo de implementación, 5 corresponde a una acción inmediata. La evaluación se realiza con fuentes públicas y con la información que remitan las instituciones, y se actualiza si llega información adicional.
+
+```{r}
+#| label: tbl-escala
+#| tbl-cap: "Escala de puntuación de los criterios de factibilidad"
+
+tribble(
+  ~Puntaje, ~Significado,
+  "1", "Barrera grave: la condición no existe y no hay una vía clara para crearla en el corto plazo",
+  "2", "Barrera importante: la condición existe de forma marginal o requiere reformas amplias",
+  "3", "Condición parcial: existe una base, pero se necesitan reformas o capacidades adicionales",
+  "4", "Condición favorable: existe la base y faltan ajustes menores",
+  "5", "Condición plenamente favorable: el instrumento puede iniciarse con los medios actuales"
+) |>
+  tabla_ft_es(digitos = 0)
+```
+
+*Fuente: elaboración propia.*
+
+Los siete criterios tienen pesos iguales como punto de partida, y se presenta un análisis de sensibilidad que muestra si el orden de los instrumentos cambia con otros pesos. La puntuación ordena la discusión y hace explícitos los juicios; no sustituye la decisión de MiAMBIENTE y la CEPAL sobre los instrumentos con los que se avanza.
 
 ```{r}
 #| label: tbl-factibilidad
-#| tbl-cap: "Criterios del filtro de factibilidad"
+#| tbl-cap: "Criterios de evaluación de la factibilidad"
 
 tribble(
   ~Criterio, ~`Pregunta de evaluación`,
@@ -392,13 +435,13 @@ tribble(
 
 ## Análisis de efectos por sector
 
-El análisis de efectos es cuantitativo cuando los datos lo permiten y cualitativo estructurado cuando no. Para los instrumentos que operan como un cargo sobre un producto (un impuesto, una tarifa de REP o un depósito), se usa el modelo de precios de insumo-producto: si un cargo eleva el costo de una actividad, el modelo traslada ese costo a los precios de las actividades que la usan como insumo, bajo el supuesto de traslado completo [@millerblair2022]. Con él se estima la incidencia sobre los sectores y sobre los hogares, a partir de los coeficientes de la matriz. Para los instrumentos financieros (garantías, líneas de crédito, bonos), el análisis se basa en la capacidad del sistema financiero, la demanda potencial de proyectos y las experiencias comparadas.
+El análisis de efectos por sector es cuantitativo cuando los datos lo permiten y cualitativo estructurado cuando no. Para los instrumentos que operan como un cargo sobre un producto (un impuesto, una tarifa de REP o una tasa), se usa el modelo de precios de insumo-producto: si un cargo eleva el costo de una actividad, el modelo traslada ese costo a los precios de las actividades que la usan como insumo, bajo el supuesto de traslado completo [@millerblair2022]. Como en Panamá todavía no hay tarifas definidas, se trabaja con escenarios de un cargo ilustrativo, expresado como porcentaje del valor de la producción de las actividades afectadas, y se reporta el aumento relativo de costos que se transmite a los sectores de política. El resultado es una cota de orden de magnitud y no un pronóstico, porque el modelo usa los coeficientes de 2018 y no incluye cambios de comportamiento. Para los demás instrumentos (depósito reembolsable, incentivos, instrumentos financieros y de promoción), el análisis es cualitativo estructurado: se identifica quién paga, quién se beneficia, por qué canal actúa el instrumento y qué sectores de política están más expuestos, con una bandera de confianza de la evidencia.
 
 Toda estimación se acompaña de una nota sobre la disponibilidad y el grado de confianza de los datos. Cuando la cuantificación no es defendible, se usa un análisis cualitativo con criterios y escalas explícitas, como corresponde cuando faltan datos.
 
 ## Capacidades institucionales
 
-La evaluación de capacidades de gobierno y del sistema financiero identifica fortalezas, brechas y necesidades de fortalecimiento en las funciones de la @tbl-capacidades. Se basa en el análisis de mandatos legales, en entrevistas semiestructuradas y en la revisión de informes institucionales.
+La evaluación de capacidades de gobierno y del sistema financiero identifica fortalezas, brechas y necesidades de fortalecimiento en las funciones de la @tbl-capacidades. Se basa en el análisis de mandatos legales, en la información solicitada a las instituciones y en la revisión de informes institucionales. Cada celda de la matriz de funciones por institución se marca como "documentada" cuando una norma o un informe público la respalda, y como "por confirmar" cuando es una inferencia que debe contrastarse con la institución, de modo que la matriz distinga lo establecido de lo supuesto.
 
 ```{r}
 #| label: tbl-capacidades
@@ -420,17 +463,23 @@ tribble(
 
 ## Análisis del sistema financiero
 
-El análisis del sistema financiero mapea los actores (banca pública y privada, fondos de inversión, aseguradoras, mercado de valores, financiamiento verde y otras fuentes de financiamiento sostenible), los instrumentos que ofrecen y las barreras que enfrentan los proyectos circulares. Se articula con la taxonomía de finanzas sostenibles [@sbp2024TaxonomiaPanama] y con el marco soberano de financiamiento sostenible [@mef2024MarcoFinanciamientoSostenible]. El aporte diferenciado es cerrar la brecha entre lo que la taxonomía define como elegible y la demanda real de proyectos circulares financiables.
+El análisis del sistema financiero mapea los actores (banca pública y privada, fondos de inversión, aseguradoras, mercado de valores, financiamiento verde y otras fuentes de financiamiento sostenible), los instrumentos que ofrecen y las barreras que enfrentan los proyectos circulares. Se articula con la taxonomía de finanzas sostenibles [@sbp2024TaxonomiaPanama] y con el marco soberano de financiamiento sostenible [@mef2024MarcoFinanciamientoSostenible]. El aporte diferenciado es contrastar lo que la taxonomía define como elegible con los proyectos circulares que identifican la Hoja de Ruta, los instrumentos propuestos y la estructura empresarial del análisis sectorial, para señalar dónde puede haber cartera financiable y qué barreras la limitan.
 
 # Metodología de la Actividad 3: Hoja de Ruta
 
 ## Qué se busca y producto
 
-La Actividad 3 busca convertir los instrumentos que superen la evaluación de la Actividad 2 en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular, que MiAMBIENTE y el Consejo puedan usar en la implementación de la Ley 502. Para ello se diseña cada instrumento con sus montos, metas, responsables y plazos, se definen los actores y sus roles, se identifican las fuentes de financiamiento y las reformas necesarias, y se validan los resultados con actores del sector público, el sistema financiero, el sector privado, la academia y la sociedad civil. Su producto es el tercer informe.
+La Actividad 3 busca convertir la evaluación de la Actividad 2 en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular, que MiAMBIENTE y el Consejo puedan usar en la implementación de la Ley 502. Para ello se diseña cada instrumento con parámetros de referencia, se definen los actores y sus roles, se identifican las fuentes de financiamiento y las reformas necesarias, se proponen indicadores de seguimiento y se validan los resultados con actores del sector público, el sistema financiero, el sector privado, la academia y la sociedad civil. Su producto es el tercer informe.
 
 ## Contenido de la Hoja de Ruta
 
 El contenido de la Hoja de Ruta es: el diseño de los instrumentos financieros aplicables a la realidad nacional, incluidos los modelos de REP; los actores responsables y sus roles en la implementación, el seguimiento y la evaluación; el mapeo de fuentes de financiamiento nacionales e internacionales, públicas y privadas; las reformas normativas, regulatorias o institucionales requeridas; los indicadores de seguimiento y evaluación; y la articulación con la Ley 502 y otros instrumentos nacionales.
+
+## Cómo se elabora cada componente
+
+El diseño de cada instrumento se presenta en una ficha de diseño con su objetivo, los sujetos obligados o beneficiarios, el mecanismo y los parámetros de referencia, es decir, rangos de tarifas, metas y plazos tomados de la experiencia internacional y ajustados a los datos de Panamá. El costo fiscal o financiero se estima en orden de magnitud con supuestos explícitos; cuando falta información no se fijan montos definitivos, sino rangos y la indicación del dato que los precisaría. El nivel de detalle es proporcional a la evidencia disponible para cada instrumento, y la decisión sobre cuáles se adoptan corresponde a MiAMBIENTE y la CEPAL.
+
+Los actores y sus roles se organizan en una matriz de instrumentos por instituciones que asigna, con las mismas funciones de la @tbl-capacidades, quién regula, registra, recauda, controla, monitorea y financia. El mapeo de fuentes de financiamiento reúne las fuentes nacionales e internacionales, públicas y privadas, y para cada una indica a qué instrumentos puede servir, qué requisitos de elegibilidad tiene y qué escala y plazos son realistas. Las reformas se identifican comparando los requisitos de cada instrumento con el marco vigente, que incluye las Leyes 502, 33 y 187, la taxonomía y el marco soberano de financiamiento, y se clasifican según el nivel de norma que exigen (ley, reglamento o resolución) y la entidad responsable. Los indicadores se eligen por su relevancia para el instrumento, por la posibilidad de medirlos con datos existentes o con la plataforma de la Ley 502, por su fuente institucional, por su periodicidad y, cuando existe, por su línea de base.
 
 ## Reglas para ordenar las recomendaciones
 
@@ -462,7 +511,7 @@ La evidencia sobre instrumentos proviene de leyes, informes técnicos de institu
 
 # Participación de actores
 
-La participación no se limita a la mesa técnica de validación final. Se realizan entrevistas semiestructuradas y reuniones técnicas durante el desarrollo de las actividades, para completar vacíos de datos, probar la factibilidad, identificar incentivos y anticipar cuellos de botella. La @tbl-actores resume los grupos y su propósito.
+La participación se organiza en torno a la mesa técnica de validación, que se realiza de forma virtual, y a las solicitudes formales de información a las instituciones. Cuando una solicitud requiere aclaración, se realizan reuniones técnicas virtuales con la contraparte para completar vacíos de datos, probar la factibilidad, identificar incentivos y anticipar cuellos de botella. La @tbl-actores resume los grupos y su propósito.
 
 ```{r}
 #| label: tbl-actores
@@ -472,16 +521,16 @@ tribble(
   ~Grupo, ~`Propósito de la consulta`, ~Mecanismo,
   "Gobierno",
   "MiAMBIENTE y entidades con competencias económicas, financieras, productivas, comerciales, tributarias, municipales y de gestión de residuos; el Ministerio de Economía y Finanzas, incluida la Dirección de Crédito Público",
-  "Entrevistas y reuniones técnicas",
+  "Solicitudes de información y reuniones técnicas virtuales",
   "Sistema financiero",
   "Banca pública y privada, fondos de inversión, superintendencias y proveedores de financiamiento sostenible",
-  "Entrevistas",
+  "Solicitudes de información y reuniones técnicas virtuales",
   "Sector privado",
   "Gremios y empresas de los sectores de política, productores e importadores sujetos o potencialmente sujetos a REP, gestores y valorizadores de residuos",
-  "Entrevistas y mesa técnica",
+  "Mesa técnica de validación",
   "Academia y sociedad civil",
   "Centros técnicos, universidades y organizaciones con experiencia en circularidad y gestión de residuos",
-  "Entrevistas y mesa técnica"
+  "Mesa técnica de validación"
 ) |>
   tabla_ft_es(digitos = 0)
 ```
@@ -497,29 +546,6 @@ La mesa técnica de validación, con participación del sector público, privado
 - **Sectores de política.** La equivalencia entre sectores y actividades es un trabajo de la consultoría y requiere validación.
 - **Evidencia internacional.** Las evaluaciones de efectos son más abundantes para algunos instrumentos (bolsas plásticas, depósito y reembolso, vertedero) que para otros (REP, ecomodulación), y su transferencia a Panamá depende del contexto.
 - **Efectos de los instrumentos.** El análisis cuantitativo usa un modelo de precios con traslado completo, que es una aproximación. No incluye cambios de comportamiento de los consumidores ni de los productores.
-
-# Glosario de siglas {.unnumbered}
-
-```{r}
-#| label: tbl-siglas
-#| tbl-cap: "Glosario de siglas"
-
-tribble(
-  ~Sigla, ~Significado,
-  "CEPAL", "Comisión Económica para América Latina y el Caribe",
-  "EDGAR", "Base de datos de emisiones para la investigación atmosférica global (Emissions Database for Global Atmospheric Research)",
-  "GIZ", "Agencia Alemana de Cooperación Internacional",
-  "IED", "Inversión extranjera directa",
-  "INEC", "Instituto Nacional de Estadística y Censo",
-  "IPCC", "Grupo Intergubernamental de Expertos sobre el Cambio Climático",
-  "ITBMS", "Impuesto de transferencia de bienes corporales muebles y la prestación de servicios",
-  "MEF", "Ministerio de Economía y Finanzas",
-  "MiAMBIENTE", "Ministerio de Ambiente de Panamá",
-  "PNUD", "Programa de las Naciones Unidas para el Desarrollo",
-  "REP", "Responsabilidad extendida del productor"
-) |>
-  tabla_ft_es(digitos = 0)
-```
 
 # Referencias {.unnumbered}
 
