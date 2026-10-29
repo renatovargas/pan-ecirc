@@ -69,6 +69,7 @@ ied <- leer_salida("ied_grupo_sector_2022_2024")
 estructura <- leer_salida("estructura_empresarial_sector_2022")
 composicion <- leer_salida("residuos_composicion_2021")
 otros_residuos <- leer_salida("residuos_otros_indicadores")
+fbkf_resumen <- leer_salida("fbkf_sector_resumen")
 ```
 
 # Indicadores por criterio
@@ -159,7 +160,7 @@ comercio <- bind_rows(
 
 ## Inversión
 
-La inversión extranjera directa solo se publica para la sección de electricidad, gas y agua en conjunto. Repetimos el valor del grupo en los tres sectores que contiene y lo marcamos como calidad baja.
+La inversión se mide con dos fuentes. La formación bruta de capital fijo (FBKF) por sector se estima en la memoria 9 con dos métodos de asignación; tomamos el método 1 como valor central y el mínimo y el máximo de ambos métodos como rango, con calidad baja porque la asignación es un supuesto. La inversión extranjera directa solo se publica para la sección de electricidad, gas y agua en conjunto; repetimos el valor del grupo en los tres sectores que contiene y lo marcamos como calidad baja.
 
 ```{r}
 #| label: crit-inversion
@@ -184,7 +185,30 @@ grupo_de_sector <- tibble(
   )
 )
 
+fbkf_ind <- fbkf_resumen |>
+  mutate(metodo = if_else(str_starts(metodo, "Método 1"), "m1", "m2")) |>
+  pivot_wider(id_cols = sector_principal, names_from = metodo, values_from = c(fbkf_2024, tasa_media_2022_2024)) |>
+  transmute(
+    sector_principal,
+    fbkf_central = fbkf_2024_m1,
+    fbkf_min = pmin(fbkf_2024_m1, fbkf_2024_m2),
+    fbkf_max = pmax(fbkf_2024_m1, fbkf_2024_m2),
+    tasa_central = tasa_media_2022_2024_m1
+  )
+
 inversion <- bind_rows(
+  fbkf_ind |>
+    transmute(sector_principal, indicador = "FBKF estimada, valor central", valor = fbkf_central,
+              unidad = "millones de B/.", anio = 2024, calidad = "Baja"),
+  fbkf_ind |>
+    transmute(sector_principal, indicador = "FBKF estimada, mínimo de los dos métodos", valor = fbkf_min,
+              unidad = "millones de B/.", anio = 2024, calidad = "Baja"),
+  fbkf_ind |>
+    transmute(sector_principal, indicador = "FBKF estimada, máximo de los dos métodos", valor = fbkf_max,
+              unidad = "millones de B/.", anio = 2024, calidad = "Baja"),
+  fbkf_ind |>
+    transmute(sector_principal, indicador = "Tasa de inversión (FBKF sobre valor agregado)", valor = tasa_central,
+              unidad = "% (media 2022-2024)", anio = 2024, calidad = "Baja"),
   grupo_de_sector |>
     left_join(ied_flujo, by = "grupo_sector") |>
     transmute(sector_principal, indicador = "IED, flujo acumulado 2022-2024", valor,
@@ -195,9 +219,10 @@ inversion <- bind_rows(
               unidad = "millones de B/.", anio = 2024)
 ) |>
   mutate(
-    criterio = "Inversión", memoria = "c07",
-    calidad = if_else(
-      sector_principal %in% c("Residuos", "Energía", "Recursos hídricos"), "Baja", "Media"
+    criterio = "Inversión", memoria = "c07 y c09",
+    calidad = coalesce(
+      calidad,
+      if_else(sector_principal %in% c("Residuos", "Energía", "Recursos hídricos"), "Baja", "Media")
     )
   )
 ```
@@ -348,7 +373,7 @@ sectores_priorizados <- bind_rows(
 count(sectores_priorizados, criterio, calidad)
 ```
 
-Dos aspectos de los Términos de Referencia no tienen indicadores cuantitativos en la base: la formación bruta de capital por actividad, que ningún cuadro público de Panamá desagrega, y las barreras de entrada y salida de los mercados. Se tratan en el documento de análisis de forma cualitativa. La competitividad internacional se aproxima solo con el comercio exterior, porque no hay un índice de ventajas comparativas por sector con la información disponible.
+Las barreras de entrada y salida de los mercados no tienen indicadores cuantitativos en la base y se tratan en el documento de análisis de forma cualitativa. La inversión por sector tiene una estimación (memoria 9), porque las cuentas nacionales publican la formación bruta de capital por producto y no por actividad que invierte. La competitividad internacional se aproxima solo con el comercio exterior, porque no hay un índice de ventajas comparativas por sector con la información disponible.
 
 # Matriz de relevancia sectorial
 

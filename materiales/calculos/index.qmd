@@ -14,3 +14,4 @@ Las memorias de cálculo documentan, con código en R y texto breve, cómo se co
 - [C6. Recursos y residuos](c06-recursos-y-residuos/index.qmd): energía, agua, materiales, residuos y señales de recuperación.
 - [C7. Inversión y estructura empresarial](c07-inversion-y-estructura-empresarial/index.qmd): inversión extranjera directa y tamaño de las empresas por sector.
 - [C8. Base sectorial integrada](c08-base-sectorial-integrada/index.qmd): integración de todos los indicadores y matriz de relevancia sectorial.
+- [C9. Formación bruta de capital](c09-formacion-bruta-capital/index.qmd): FBKF por producto, sector de origen del bien y estimación por actividad que invierte.

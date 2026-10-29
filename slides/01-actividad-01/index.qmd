@@ -36,6 +36,10 @@ emisiones_sector <- leer_salida("emisiones_sector_1970_2025")
 composicion <- leer_salida("residuos_composicion_2021")
 otros_res <- leer_salida("residuos_otros_indicadores")
 contraste_rec <- leer_salida("recuperacion_contraste_2021")
+estructura_emp <- leer_salida("estructura_empresarial_sector_2022")
+fbkf_tipo <- leer_salida("fbkf_tipo_2018_2024")
+fbkf_origen <- leer_salida("fbkf_sector_origen_2018_2024")
+fbkf_sector <- leer_salida("fbkf_sector_estimada_2018_2024")
 mapeo <- leer_salida("mapeo_sectores_scn")
 matriz_ancha <- leer_salida("matriz_relevancia_sectorial_ancha")
 
@@ -52,6 +56,24 @@ part_energia_agro <- sum(emis_2023$participacion[emis_2023$sector_principal %in%
 rsm_mt <- sum(composicion$toneladas_anio) / 1e6
 cobertura <- otros_res$valor[str_detect(otros_res$indicador, "Cobertura")]
 imp_industrias <- 100 * enlaces_sector$coef_importacion[enlaces_sector$sector_principal == "Industrias"]
+
+# Inversión (FBKF), como en el documento de sectores
+vab_total <- cuentas |> summarize(v = sum(vab), .by = anio)
+vab_total_2024 <- vab_total$v[vab_total$anio == 2024]
+fbkf_total_2024 <- sum(fbkf_tipo$fbkf[fbkf_tipo$anio == 2024])
+fbkf_origen_part <- function(sector) fbkf_origen$participacion[fbkf_origen$anio == 2024 & fbkf_origen$sector_origen == sector]
+fbkf_tasa_total <- fbkf_tipo |>
+  summarize(f = sum(fbkf), .by = anio) |>
+  left_join(vab_total, by = "anio") |>
+  filter(anio >= 2022) |>
+  summarize(t = mean(100 * f / v)) |>
+  pull(t)
+fbkf_pp_seis <- fbkf_sector |>
+  filter(str_starts(metodo, "Método 1"), sector_principal %in% seis, anio >= 2022) |>
+  summarize(f = sum(fbkf), .by = anio) |>
+  left_join(vab_total, by = "anio") |>
+  summarize(pp = mean(100 * f / v)) |>
+  pull(pp)
 
 # Formato de los cuadros y gráficos para pantalla
 tabla_slide <- function(x, tamano = 18, ...) tabla_ft_es(x, tamano = tamano, ...)
@@ -177,29 +199,114 @@ empleo_perfil |>
 Estimación con el perfil de la Encuesta de Mercado Laboral por grupo de actividades económicas. Memoria [C3](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c03-empleo-sectorial/){target="_blank"}.
 :::
 
-## Los obligados de una REP serán sobre todo importadores
+## La inversión se concentra en construcción
 
-- Industrias tuvo un saldo comercial de `r formato_es(val("Saldo comercial", "Industrias"), 0)` millones de balboas en 2024.
-- Agricultura y alimentos tuvo un saldo de `r formato_es(val("Saldo comercial", "Agricultura y alimentos"), 0)` millones.
-- Industrias importa insumos equivalentes al `r formato_es(imp_industrias, 0)` % de su producción, el coeficiente más alto de los seis sectores.
-- Una REP recae sobre quien pone el producto en el mercado, y en Panamá ese actor suele importar.
-- Por eso hace falta un registro de importadores por partida arancelaria, con la aduana como aliada.
+:::: {.columns}
+::: {.column width="58%"}
+```{r}
+fbkf_origen |>
+  filter(anio == 2024) |>
+  select(sector_origen, fbkf_origen = fbkf) |>
+  full_join(
+    si |>
+      filter(indicador %in% c("FBKF estimada, valor central", "Tasa de inversión (FBKF sobre valor agregado)")) |>
+      select(sector_origen = sector_principal, indicador, valor) |>
+      mutate(sector_origen = as.character(sector_origen)) |>
+      pivot_wider(names_from = indicador, values_from = valor),
+    by = "sector_origen"
+  ) |>
+  mutate(orden = match(sector_origen, c(seis, "Resto de la economía", "Bienes importados"))) |>
+  arrange(orden) |>
+  transmute(
+    `Sector de política` = sector_origen,
+    `Bienes de capital que produce` = coalesce(fbkf_origen, 0),
+    `FBKF estimada que realiza` = `FBKF estimada, valor central`,
+    `Tasa de inversión (%)` = `Tasa de inversión (FBKF sobre valor agregado)`
+  ) |>
+  (\(d) bind_rows(d, tibble(
+    `Sector de política` = "Total",
+    `Bienes de capital que produce` = sum(d[[2]], na.rm = TRUE),
+    `FBKF estimada que realiza` = sum(d[[3]], na.rm = TRUE),
+    `Tasa de inversión (%)` = fbkf_tasa_total
+  )))() |>
+  tabla_slide(tamano = 13, digitos = 1, enteros = c("Bienes de capital que produce", "FBKF estimada que realiza")) |>
+  colformat_double(j = "FBKF estimada que realiza", digits = 0, big.mark = ".", decimal.mark = ",", na_str = "n. a.") |>
+  colformat_double(j = "Tasa de inversión (%)", digits = 1, big.mark = ".", decimal.mark = ",", na_str = "n. a.") |>
+  bold(i = 9, part = "body") |>
+  hline_top(border = officer::fp_border(width = 0.75), part = "body") |>
+  border(i = 8, border.bottom = officer::fp_border(width = 0.75), part = "body")
+```
+:::
+::: {.column width="42%" .smaller}
+- La inversión fue de `r formato_es(fbkf_total_2024, 0)` millones de balboas en 2024, `r formato_es(100 * fbkf_total_2024 / vab_total_2024, 1)` % del valor agregado.
+- Las cuentas nacionales la publican por producto; la inversión por sector se estimó con dos métodos.
+- La construcción produce el `r formato_es(fbkf_origen_part("Ciudades y construcción"), 0)` % de los bienes de capital, y el `r formato_es(fbkf_origen_part("Bienes importados"), 0)` % es importado.
+- Los seis sectores aportan `r formato_es(fbkf_pp_seis, 1)` de los `r formato_es(fbkf_tasa_total, 1)` puntos porcentuales de la tasa de inversión, porque las viviendas se asignan al alquiler.
+- Residuos es el sector con menor inversión estimada.
+:::
+::::
 
 ::: aside
-Elaboración propia con datos del INEC (cuadros de oferta y utilización y matriz insumo-producto de 2018).
+Elaboración propia con datos del INEC. Cifras por sector como órdenes de magnitud. Memoria [C9](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c09-formacion-bruta-capital/){target="_blank"}.
+:::
+
+## Los obligados de una REP serán sobre todo importadores
+
+```{r}
+si |>
+  filter(
+    sector_principal %in% seis,
+    indicador %in% c("Exportaciones", "Importaciones", "Saldo comercial", "Exportaciones sobre producción")
+  ) |>
+  select(sector_principal, indicador, valor) |>
+  pivot_wider(names_from = indicador, values_from = valor) |>
+  transmute(
+    `Sector de política` = sector_principal,
+    Exportaciones,
+    Importaciones,
+    `Saldo comercial`,
+    `Exportaciones sobre producción (%)` = `Exportaciones sobre producción`
+  ) |>
+  tabla_slide(tamano = 15, digitos = 1, enteros = c("Exportaciones", "Importaciones", "Saldo comercial"))
+```
+
+::: smaller
+- Industrias y agricultura y alimentos tienen saldos comerciales negativos; industrias importa insumos equivalentes al `r formato_es(imp_industrias, 0)` % de su producción, el coeficiente más alto de los seis sectores.
+- Una REP recae sobre quien pone el producto en el mercado, y en Panamá ese actor suele importar; hace falta un registro de importadores por partida arancelaria, con la aduana como aliada.
+:::
+
+::: aside
+Elaboración propia con datos del INEC (cuadros de oferta y utilización, millones de balboas de 2024, y matriz insumo-producto de 2018). El cero indica que el sector no tiene comercio registrado.
 :::
 
 ## Mercados concentrados arriba y atomizados abajo
 
-- La inversión extranjera directa de 2022 a 2024 se concentró en electricidad, gas y agua: `r formato_es(val("IED, flujo acumulado 2022-2024", "Energía"), 0)` millones de balboas.
+:::: {.columns}
+::: {.column width="55%"}
+```{r}
+estructura_emp |>
+  transmute(
+    `Grupo de actividades` = grupo_sector,
+    Empresas = empresas,
+    Micro = micro,
+    Pequeña = pequena,
+    Mediana = mediana,
+    Grande = grande,
+    `Grandes (%)` = pct_grande
+  ) |>
+  tabla_slide(tamano = 13, digitos = 1, enteros = c("Empresas", "Micro", "Pequeña", "Mediana", "Grande"))
+```
+:::
+::: {.column width="45%" .smaller}
 - `r formato_es(val("Empresas grandes en la sección", "Energía"), 0)` % de las empresas de electricidad, gas y vapor son grandes; en industria, agricultura y construcción son menos de 9 %.
-- 13 empresas fabrican cemento, cal y yeso, y 49 fabrican productos de plástico.
-- La recuperación de materiales reúne 77 empresas con menos de cuatro empleados en promedio.
-- Pocos interlocutores en el cemento facilitan una norma de contenido reciclado.
-- La recuperación atomizada requiere formalización antes que tarifas.
+- La inversión extranjera de 2022 a 2024 se concentró en electricidad, gas y agua: `r formato_es(val("IED, flujo acumulado 2022-2024", "Energía"), 0)` millones de balboas.
+- 13 empresas fabrican cemento, cal y yeso, lo que facilita una norma de contenido reciclado.
+- La recuperación de materiales reúne 77 empresas con menos de cuatro empleados en promedio, y requiere formalización antes que tarifas.
+:::
+::::
 
 ::: aside
-Elaboración propia con datos del INEC (inversión extranjera directa y Directorio de Empresas 2022). Memoria [C7](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c07-inversion-y-estructura-empresarial/){target="_blank"}.
+Elaboración propia con datos del INEC (Directorio de Empresas 2022 e inversión extranjera directa). Memoria [C7](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c07-inversion-y-estructura-empresarial/){target="_blank"}.
 :::
 
 ## Residuos: pequeño en valor agregado, grande en emisiones
@@ -360,13 +467,13 @@ Elaboración propia. Una celda vacía indica que el sector no tiene el indicador
 5.  Construcción y cemento concentran una oportunidad de demanda con pocos interlocutores.
 6.  Energía y agua atraen inversión y ya tienen marcos de financiamiento.
 
-## Una secuencia en dos momentos
+## Una secuencia en dos pasos
 
 Sin registro y control, los nuevos gravámenes y tarifas no se sostienen [@eea2023EconomicInstruments; @pinos2018InstrumentosEcuador, p. 130].
 
 :::: {.columns}
 ::: {.column width="50%"}
-### Primer momento
+### [Primer paso]{.emphasis}
 
 - Registro de productores e importadores y trazabilidad.
 - Formalización de recicladores de base.
@@ -374,7 +481,7 @@ Sin registro y control, los nuevos gravámenes y tarifas no se sostienen [@eea20
 - Financiamiento, compras públicas e incentivos que no dependen del registro.
 :::
 ::: {.column width="50%"}
-### Segundo momento
+### [Segundo paso]{.emphasis}
 
 - REP con metas por flujo y ecomodulación.
 - Depósito y retorno de envases.
@@ -383,123 +490,158 @@ Sin registro y control, los nuevos gravámenes y tarifas no se sostienen [@eea20
 :::
 ::::
 
-## Seis familias de instrumentos
-
-- **Habilitantes:** registro, trazabilidad y formalización.
-- **Normativos y regulatorios:** REP, ecomodulación y contenido reciclado.
-- **Tributarios y tarifarios:** depósito y retorno, tarifa de aseo e incentivos fiscales.
-- **Financieros:** taxonomía, bonos temáticos, crédito y garantías.
-- **Promoción de inversiones:** compras públicas y alianzas público-privadas.
-- **Capacidades:** información, formación y certificación.
-
 ::: aside
-Clasificación basada en la Directiva marco de residuos de la Unión Europea [@ue2018Directiva851] y en la tipología de la GIZ [@giz2026InstrumentosFinancieros].
+Los catorce instrumentos se agrupan en seis familias: habilitantes, normativos, tributarios y tarifarios, financieros, de promoción de inversiones y de capacidades. Clasificación basada en la Directiva marco de residuos de la Unión Europea [@ue2018Directiva851] y en la tipología de la GIZ [@giz2026InstrumentosFinancieros].
 :::
 
-## Registro de productores e importadores {.smaller}
+## Instrumentos habilitantes {.smaller}
 
-- **Qué es.** Un registro obligatorio donde productores e importadores declaran qué ponen en el mercado y con qué materiales.
-- **Para qué.** Es la base de cálculo de cualquier tarifa o meta de REP.
-- **Por qué en Panamá.** Los saldos comerciales negativos obligan a construirlo sobre las importaciones.
-- **Cómo.** Dentro de la plataforma de indicadores de la Ley 502, alimentado por la aduana por partida arancelaria [@panama2025Ley502, art. 11].
+:::: {.columns}
+::: {.column width="50%"}
+### [Registro de productores e importadores]{.emphasis}
+
+- **Qué es.** Un registro obligatorio donde se declara qué se pone en el mercado y con qué materiales; es la base de cálculo de cualquier tarifa o meta de REP.
+- **En Panamá.** Dentro de la plataforma de indicadores de la Ley 502, alimentado por la aduana por partida arancelaria [@panama2025Ley502, art. 11].
 - **Ejemplo.** Chile exige inscripción y reporte a los productores de seis productos prioritarios [@chile2016Ley20920, arts. 10-24].
 - **Riesgo.** Sin auditoría, los volúmenes se subdeclaran.
-
-## Formalización de recicladores de base {.smaller}
+:::
+::: {.column width="50%"}
+### [Formalización de recicladores de base]{.emphasis}
 
 - **Qué es.** Registrar, organizar y pagar a quienes recuperan materiales como prestadores de un servicio.
-- **Por qué en Panamá.** La recuperación está atomizada, y el último conteo de segregadores urbanos (6.085 personas) es de 2010 [@res-bid-eval2010, p. 143].
-- **Cómo.** Pasar del reconocimiento de las Leyes 33 y 502 al pago por tonelada recuperada [@panama2018Ley33; @panama2025Ley502, art. 10].
+- **En Panamá.** El último conteo de segregadores urbanos (6.085 personas) es de 2010 [@res-bid-eval2010, p. 143]; hay que pasar del reconocimiento de las Leyes 33 y 502 al pago por tonelada [@panama2018Ley33; @panama2025Ley502, art. 10].
 - **Ejemplo.** Colombia remunera el aprovechamiento con la tarifa de aseo [@minvivienda2016Decreto596].
-- **Ejemplo.** En Chile, los recicladores registrados pueden cumplir metas de la REP [@chile2016Ley20920, art. 32].
 - **Riesgo.** En Ecuador, los intermediarios captaron la mayor parte del beneficio [@pinos2018InstrumentosEcuador, p. 130].
+:::
+::::
 
-## Responsabilidad extendida del productor con metas {.smaller}
+## Instrumentos normativos: REP y ecomodulación {.smaller}
 
-- **Qué es.** Productores e importadores pagan la gestión de sus productos cuando se vuelven residuo.
-- **Efecto.** El costo del final de vida pasa del presupuesto municipal al precio del producto.
-- **Flujos sugeridos.** Envases (hasta 38 % del peso de los residuos municipales), aparatos electrónicos, neumáticos, aceites, baterías y envases de agroquímicos.
+:::: {.columns}
+::: {.column width="50%"}
+### [REP con metas por flujo]{.emphasis}
+
+- **Qué es.** Productores e importadores pagan la gestión de sus productos cuando se vuelven residuo, y el costo pasa del presupuesto municipal al precio.
+- **En Panamá.** Flujos sugeridos: envases (hasta 38 % del peso de los residuos municipales), aparatos electrónicos, neumáticos, aceites, baterías y envases de agroquímicos.
 - **Ejemplo.** Chile sube la meta de envases plásticos de 3 % a 45 % en doce años [@mmaChile2020DS12Envases, art. 21].
-- **Diseño.** Conviene empezar con pocos flujos y metas moderadas.
-- **Recursos.** Las contribuciones pueden alimentar un fondo para infraestructura municipal y recicladores [@chile2016Ley20920, art. 31].
+- **Diseño.** Pocos flujos y metas moderadas; las contribuciones pueden alimentar un fondo para infraestructura municipal [@chile2016Ley20920, art. 31].
+:::
+::: {.column width="50%"}
+### [Ecomodulación de las contribuciones]{.emphasis}
 
-## Ecomodulación de las contribuciones {.smaller}
-
-- **Qué es.** La tarifa de la REP sube o baja según el diseño del producto: reciclabilidad, durabilidad y contenido reciclado.
-- **Por qué.** Sin ecomodulación, la REP financia la gestión pero no incentiva el rediseño.
+- **Qué es.** La tarifa de la REP sube o baja según reciclabilidad, durabilidad y contenido reciclado.
 - **En Panamá.** Un envase monomaterial pagaría menos que uno multicapa que no puede reciclarse.
-- **Ejemplo.** Chile aplica recargos y bonificaciones según reciclabilidad y uso de material reciclado nacional [@mmaChile2020DS12Envases, art. 20].
 - **Ejemplo.** Francia descuenta 50 % en textiles con 15 % de fibras recicladas [@ocde2024EPRGarments, p. 31].
-- **Condición.** La diferencia de tarifa debe pesar frente al precio del producto.
+- **Condición.** La diferencia de tarifa debe pesar frente al precio; de lo contrario el incentivo al rediseño es débil.
+:::
+::::
 
-## Contenido mínimo de material reciclado {.smaller}
+## Contenido reciclado y depósito y retorno {.smaller}
 
-- **Qué es.** Una proporción mínima obligatoria de material reciclado en ciertos productos.
-- **Por qué.** Crea demanda para lo que recuperan la REP y los recicladores.
-- **Botellas.** Panamá ya regula los plásticos de un solo uso [@panama2020Ley187], y una meta gradual daría salida al plástico recuperado.
-- **Construcción.** Una norma de áridos reciclados abriría la "mina urbana" que propone la Hoja de Ruta [@miambiente2024HojaRutaEC, p. 57].
+:::: {.columns}
+::: {.column width="50%"}
+### [Contenido mínimo de material reciclado]{.emphasis}
+
+- **Qué es.** Una proporción mínima obligatoria de material reciclado en ciertos productos, que crea demanda para lo que recuperan la REP y los recicladores.
+- **En Panamá.** Una meta gradual en botellas [@panama2020Ley187] y una norma de áridos reciclados para la "mina urbana" [@miambiente2024HojaRutaEC, p. 57].
 - **Ejemplo.** La Unión Europea exige 25 % de plástico reciclado en botellas desde 2025 y 30 % desde 2030 [@ue2019Directiva904, art. 6].
 - **Condición.** Capacidad de reciclaje que cumpla las especificaciones.
-
-## Depósito y retorno de envases de bebidas {.smaller}
+:::
+::: {.column width="50%"}
+### [Depósito y retorno de envases]{.emphasis}
 
 - **Qué es.** El consumidor paga un depósito y lo recupera al devolver el envase.
-- **Por qué en Panamá.** Plástico, vidrio y metal suman cerca de un cuarto de los residuos municipales.
-- **Antecedente.** La Hoja de Ruta propone un estudio de prefactibilidad en la ciudad de Panamá [@miambiente2024HojaRutaEC, p. 42].
-- **Ejemplo.** En Europa, la recogida supera el 85 % y la basura dispersa cae entre 40 % y 60 % [@sidorczuk2025DepositReturn, p. 1 y 7].
-- **Ejemplo.** Ecuador recolectó más del 100 % porque entraron botellas de países vecinos [@pinos2018InstrumentosEcuador, p. 129-130].
-- **Condición.** Control aduanero y una red de retorno en los comercios.
+- **En Panamá.** Plástico, vidrio y metal suman cerca de un cuarto de los residuos municipales, y la Hoja de Ruta propone un estudio de prefactibilidad [@miambiente2024HojaRutaEC, p. 42].
+- **Ejemplo.** En Europa, la recogida supera el 85 % [@sidorczuk2025DepositReturn, p. 1 y 7]; en Ecuador superó el 100 % porque entraron botellas de países vecinos [@pinos2018InstrumentosEcuador, p. 129-130].
+- **Condición.** Control aduanero y red de retorno en los comercios.
+:::
+::::
 
-## Tarifa de aseo y tasa de disposición final {.smaller}
+## Instrumentos tributarios y tarifarios {.smaller}
 
-- **Qué es.** La tarifa a costo real financia la recolección, y el pago por generación premia a quien separa.
-- **Complemento.** La tasa de disposición final encarece el vertido frente al reciclaje.
-- **Por qué en Panamá.** La recolección cubre `r formato_es(cobertura, 0)` % del peso y hay más de 57 vertederos [@res-pnud-residuos, p. 4].
+:::: {.columns}
+::: {.column width="50%"}
+### [Tarifa de aseo y tasa de disposición final]{.emphasis}
+
+- **Qué es.** La tarifa a costo real financia la recolección, el pago por generación premia a quien separa y la tasa encarece el vertido frente al reciclaje.
+- **En Panamá.** La recolección cubre `r formato_es(cobertura, 0)` % del peso y hay más de 57 vertederos [@res-pnud-residuos, p. 4].
 - **Equidad.** Una tarifa solidaria protege a los hogares vulnerables [@cepal2021EconomiaCircularALC, p. 72-73].
-- **Evidencia.** En Europa, ningún instrumento aislado logra tasas altas de reciclaje [@eea2023EconomicInstruments].
 - **Riesgo.** Una tasa sin alternativas de valorización incentiva el vertido ilegal.
-
-## Incentivos fiscales a la inversión circular {.smaller}
+:::
+::: {.column width="50%"}
+### [Incentivos fiscales a la inversión circular]{.emphasis}
 
 - **Qué es.** Exoneraciones, depreciación acelerada y créditos fiscales para invertir en reciclaje, valorización y tratamiento de agua.
-- **Precedente.** El régimen de energía solar de Panamá ya combina esos tres beneficios [@panama2013Ley37Solar, art. 20].
-- **Mandato.** La Ley 33 de 2018 ordena incentivos a la recuperación de materiales [@panama2018Ley33, arts. 25-27].
-- **Ejemplo.** Colombia exime del impuesto al valor agregado la maquinaria para reciclar y depurar aguas [@colombia1989EstatutoTributario, art. 428].
-- **Condición.** Estimar el gasto tributario, definir los bienes elegibles y fijar plazos con evaluación.
+- **En Panamá.** El régimen de energía solar ya combina esos beneficios [@panama2013Ley37Solar, art. 20], y la Ley 33 ordena incentivos a la recuperación de materiales [@panama2018Ley33, arts. 25-27].
+- **Ejemplo.** Colombia exime del impuesto al valor agregado la maquinaria para reciclar [@colombia1989EstatutoTributario, art. 428].
+- **Condición.** Estimar el gasto tributario y fijar plazos con evaluación.
+:::
+::::
 
-## Taxonomía y bonos temáticos {.smaller}
+## Instrumentos financieros: taxonomía y bonos {.smaller}
 
-- **Taxonomía.** La economía circular es un objetivo, pero fuera del uso del suelo solo opera como requisito de no causar daño [@sbp2024TaxonomiaPanama, p. 43-44].
+:::: {.columns}
+::: {.column width="50%"}
+### [Taxonomía de finanzas sostenibles]{.emphasis}
+
+- **Qué es.** Un lenguaje común de criterios técnicos para bancos, inversionistas y emisores.
+- **En Panamá.** La economía circular es un objetivo, pero fuera del uso del suelo solo opera como requisito de no causar daño [@sbp2024TaxonomiaPanama, p. 43-44].
 - **Propuesta.** Criterios de contribución sustancial para residuos, construcción y manufactura.
-- **Bonos.** El Marco de Financiamiento Sostenible ya tiene categorías de economía circular y de agua [@mef2024MarcoFinanciamientoSostenible, p. 22-24].
-- **Propuesta.** Una cartera de proyectos elegibles: acopio, compostaje, residuos de obra y reducción de pérdidas de agua.
-- **Cuello de botella.** La preparación de proyectos limita más que el marco.
+- **Condición.** Coordinar a las tres superintendencias y MiAMBIENTE.
+:::
+::: {.column width="50%"}
+### [Bonos temáticos y marco soberano]{.emphasis}
 
-## Crédito verde, garantías y financiamiento combinado {.smaller}
+- **Qué es.** Bonos cuyos fondos van a proyectos verdes elegibles o dependen de metas de desempeño.
+- **En Panamá.** El Marco de Financiamiento Sostenible ya tiene categorías de economía circular y de agua [@mef2024MarcoFinanciamientoSostenible, p. 22-24].
+- **Propuesta.** Una cartera de acopio, compostaje, residuos de obra y reducción de pérdidas de agua.
+- **Cuello de botella.** La preparación de proyectos limita más que el marco.
+:::
+::::
+
+## Crédito verde y compras públicas {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+### [Crédito verde y garantías]{.emphasis}
 
 - **Qué es.** Crédito de largo plazo, garantías parciales y recursos concesionales para negocios que la banca considera riesgosos.
-- **Por qué en Panamá.** Las micro, pequeñas y medianas empresas son cerca del 96 % de las empresas.
-- **A quién.** Recicladores formalizados, pequeñas industrias con ecodiseño y productores que valoricen subproductos.
-- **Ejemplo.** Bancóldex en Colombia y CORFO en Chile ofrecen plazos de hasta 15 años [@unepfi2023CircularFinanceLAC, p. 32, 38 y 48].
-- **Condición.** Formalización previa de los beneficiarios y analistas de crédito capacitados.
-
-## Compras públicas circulares {.smaller}
+- **En Panamá.** Las micro, pequeñas y medianas empresas son cerca del 96 % de las empresas; el destino serían recicladores formalizados, pequeñas industrias y productores agropecuarios.
+- **Ejemplo.** Bancóldex y CORFO ofrecen plazos de hasta 15 años [@unepfi2023CircularFinanceLAC, p. 32, 38 y 48].
+- **Condición.** Formalización previa y analistas de crédito capacitados.
+:::
+::: {.column width="50%"}
+### [Compras públicas circulares]{.emphasis}
 
 - **Qué es.** El Estado usa su poder de compra para demandar bienes y obras circulares.
-- **Mandato.** La Ley 502 ordena criterios de economía circular en las contrataciones públicas [@panama2025Ley502, art. 12]; falta reglamentarlos.
-- **Punto de entrada.** La obra pública, con áridos, bases y bloques con contenido reciclado.
+- **En Panamá.** La Ley 502 ordena criterios de economía circular en las contrataciones [@panama2025Ley502, art. 12]; falta reglamentarlos. El punto de entrada es la obra pública, con áridos y bloques reciclados.
 - **Por qué.** Construcción es el mayor sector por valor agregado y tiene `r formato_es(val("Empleo informal (estimado)", "Ciudades y construcción"), 0)` % de informalidad estimada.
-- **Beneficio adicional.** Una exigencia de formalidad en los pliegos mejora la calidad del empleo.
+- **Beneficio.** Exigir formalidad en los pliegos mejora la calidad del empleo.
+:::
+::::
 
-## Alianzas, innovación y capacidades {.smaller}
+## Alianzas y capacidades {.smaller}
 
-- **Alianzas público-privadas.** Infraestructura municipal de separación, compostaje y valorización con operador privado.
+:::: {.columns}
+::: {.column width="50%"}
+### [Alianzas público-privadas y promoción existente]{.emphasis}
+
+- **Qué es.** Infraestructura municipal de separación, compostaje y valorización con operador privado.
+- **En Panamá.** Amarrar los incentivos a los mecanismos del Ministerio de Comercio e Industrias, como el sello "Hecho en Panamá".
 - **Ejemplo.** El centro de clasificación de París XVII es público y lo opera una empresa privada [@giz2026InstrumentosFinancieros].
-- **Promoción existente.** Amarrar los incentivos a los mecanismos del Ministerio de Comercio e Industrias, como el sello "Hecho en Panamá".
-- **Capacidades.** Capacitar a analistas de crédito y a compradores públicos.
-- **Información.** Certificar a los recicladores y publicar un reporte de indicadores [@panama2025Ley502, arts. 5-7 y 11].
+- **Condición.** Contratos con pagos por desempeño y flujo de residuo asegurado al operador.
+:::
+::: {.column width="50%"}
+### [Información, formación y certificación]{.emphasis}
 
-## Primer momento: nueve instrumentos que pueden empezar ya
+- **Qué es.** Formación técnica, asistencia, campañas y certificación de competencias que dan sustento a los demás instrumentos.
+- **En Panamá.** La Ley 502 ya contiene el mandato [@panama2025Ley502, arts. 5-7 y 11].
+- **Propuesta.** Capacitar a analistas de crédito y compradores públicos, certificar a los recicladores y publicar un reporte de indicadores.
+- **Límite.** Por sí solos no cambian el comportamiento de productores y consumidores.
+:::
+::::
+
+## Primer paso: nueve instrumentos que pueden empezar ya
 
 ```{r}
 tribble(
@@ -517,7 +659,7 @@ tribble(
   tabla_slide(digitos = 0, tamano = 16)
 ```
 
-## Segundo momento: cinco instrumentos que dependen del registro
+## Segundo paso: cinco instrumentos que dependen del registro
 
 ```{r}
 tribble(
@@ -546,7 +688,6 @@ Pueden prepararse en paralelo y entran en vigor cuando el registro esté operati
 
 ## Brechas de información
 
-- No hay formación bruta de capital por actividad económica.
 - No hay cuotas de mercado ni estudios de competencia públicos.
 - No hay un registro reciente de recicladores de base.
 - No hay series anuales oficiales de generación y reciclaje de residuos.
@@ -564,7 +705,7 @@ Cómo se evalúan los sectores y los instrumentos.
 - **Datos oficiales primero.** Cada cifra sale de estadísticas oficiales procesadas en memorias de cálculo públicas.
 - **Evidencia con grado de confianza.** Cada indicador lleva una bandera de calidad, y lo que falta se registra como hallazgo.
 - **Juicio técnico explícito.** Los criterios son transparentes y los pesos se acuerdan con CEPAL y MiAMBIENTE.
-- **Secuencia en dos momentos.** Las condiciones habilitantes van antes que los instrumentos que dependen de ellas.
+- **Secuencia en dos pasos.** Las condiciones habilitantes van antes que los instrumentos que dependen de ellas.
 
 ## Tres actividades encadenadas
 
@@ -723,7 +864,7 @@ tribble(
 ## Hoja de Ruta: contenido y reglas
 
 - **Contenido.** Instrumentos, actores y roles, fuentes de financiamiento, reformas, indicadores y articulación con la Ley 502.
-- **Regla 1.** Secuencia en dos momentos.
+- **Regla 1.** Secuencia en dos pasos.
 - **Regla 2.** Usar la institucionalidad existente antes de crear instrumentos nuevos.
 - **Regla 3.** Cada recomendación se rastrea hasta su fuente y su criterio.
 - **Indicadores.** Se alinean con la plataforma de indicadores de la Ley 502 [@panama2025Ley502, art. 11].

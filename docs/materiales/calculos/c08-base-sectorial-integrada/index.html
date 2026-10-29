@@ -352,7 +352,8 @@ div.csl-indent {
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ied <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"ied_grupo_sector_2022_2024"</span>)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>estructura <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"estructura_empresarial_sector_2022"</span>)</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>composicion <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"residuos_composicion_2021"</span>)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>otros_residuos <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"residuos_otros_indicadores"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>otros_residuos <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"residuos_otros_indicadores"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>fbkf_resumen <span class="ot">&lt;-</span> <span class="fu">leer_salida</span>(<span class="st">"fbkf_sector_resumen"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="indicadores-por-criterio" class="level1" data-number="4">
@@ -435,7 +436,7 @@ div.csl-indent {
 </section>
 <section id="inversión" class="level2" data-number="4.4">
 <h2 data-number="4.4" class="anchored" data-anchor-id="inversión"><span class="header-section-number">4.4</span> Inversión</h2>
-<p>La inversión extranjera directa solo se publica para la sección de electricidad, gas y agua en conjunto. Repetimos el valor del grupo en los tres sectores que contiene y lo marcamos como calidad baja.</p>
+<p>La inversión se mide con dos fuentes. La formación bruta de capital fijo (FBKF) por sector se estima en la memoria 9 con dos métodos de asignación; tomamos el método 1 como valor central y el mínimo y el máximo de ambos métodos como rango, con calidad baja porque la asignación es un supuesto. La inversión extranjera directa solo se publica para la sección de electricidad, gas y agua en conjunto; repetimos el valor del grupo en los tres sectores que contiene y lo marcamos como calidad baja.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ied_flujo <span class="ot">&lt;-</span> ied <span class="sc">|&gt;</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(variable <span class="sc">==</span> <span class="st">"flujo"</span>) <span class="sc">|&gt;</span></span>
@@ -457,22 +458,46 @@ div.csl-indent {
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>inversion <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  grupo_de_sector <span class="sc">|&gt;</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(ied_flujo, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"IED, flujo acumulado 2022-2024"</span>, valor,</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>),</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  grupo_de_sector <span class="sc">|&gt;</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(ied_posicion, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"IED, posición al cierre"</span>, valor,</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>)</span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">criterio =</span> <span class="st">"Inversión"</span>, <span class="at">memoria =</span> <span class="st">"c07"</span>,</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">calidad =</span> <span class="fu">if_else</span>(</span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>      sector_principal <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Residuos"</span>, <span class="st">"Energía"</span>, <span class="st">"Recursos hídricos"</span>), <span class="st">"Baja"</span>, <span class="st">"Media"</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>fbkf_ind <span class="ot">&lt;-</span> fbkf_resumen <span class="sc">|&gt;</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">metodo =</span> <span class="fu">if_else</span>(<span class="fu">str_starts</span>(metodo, <span class="st">"Método 1"</span>), <span class="st">"m1"</span>, <span class="st">"m2"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> sector_principal, <span class="at">names_from =</span> metodo, <span class="at">values_from =</span> <span class="fu">c</span>(fbkf_2024, tasa_media_2022_2024)) <span class="sc">|&gt;</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">transmute</span>(</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    sector_principal,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">fbkf_central =</span> fbkf_2024_m1,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">fbkf_min =</span> <span class="fu">pmin</span>(fbkf_2024_m1, fbkf_2024_m2),</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">fbkf_max =</span> <span class="fu">pmax</span>(fbkf_2024_m1, fbkf_2024_m2),</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">tasa_central =</span> tasa_media_2022_2024_m1</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>inversion <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  fbkf_ind <span class="sc">|&gt;</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"FBKF estimada, valor central"</span>, <span class="at">valor =</span> fbkf_central,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Baja"</span>),</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  fbkf_ind <span class="sc">|&gt;</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"FBKF estimada, mínimo de los dos métodos"</span>, <span class="at">valor =</span> fbkf_min,</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Baja"</span>),</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>  fbkf_ind <span class="sc">|&gt;</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"FBKF estimada, máximo de los dos métodos"</span>, <span class="at">valor =</span> fbkf_max,</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Baja"</span>),</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  fbkf_ind <span class="sc">|&gt;</span></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"Tasa de inversión (FBKF sobre valor agregado)"</span>, <span class="at">valor =</span> tasa_central,</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"% (media 2022-2024)"</span>, <span class="at">anio =</span> <span class="dv">2024</span>, <span class="at">calidad =</span> <span class="st">"Baja"</span>),</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>  grupo_de_sector <span class="sc">|&gt;</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(ied_flujo, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"IED, flujo acumulado 2022-2024"</span>, valor,</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>),</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>  grupo_de_sector <span class="sc">|&gt;</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(ied_posicion, <span class="at">by =</span> <span class="st">"grupo_sector"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">transmute</span>(sector_principal, <span class="at">indicador =</span> <span class="st">"IED, posición al cierre"</span>, valor,</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>              <span class="at">unidad =</span> <span class="st">"millones de B/."</span>, <span class="at">anio =</span> <span class="dv">2024</span>)</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">criterio =</span> <span class="st">"Inversión"</span>, <span class="at">memoria =</span> <span class="st">"c07 y c09"</span>,</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>    <span class="at">calidad =</span> <span class="fu">coalesce</span>(</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>      calidad,</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>      <span class="fu">if_else</span>(sector_principal <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Residuos"</span>, <span class="st">"Energía"</span>, <span class="st">"Recursos hídricos"</span>), <span class="st">"Baja"</span>, <span class="st">"Media"</span>)</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="concentración-de-mercado" class="level2" data-number="4.5">
@@ -613,7 +638,7 @@ div.csl-indent {
  2 Empleo                    Alta       21
  3 Empleo                    Media      14
  4 Comercio exterior         Media      35
- 5 Inversión                 Baja        6
+ 5 Inversión                 Baja       34
  6 Inversión                 Media       8
  7 Concentración de mercado  Baja       12
  8 Emisiones de GEI          Media      14
@@ -622,7 +647,7 @@ div.csl-indent {
 11 Eslabonamientos           Media      28</code></pre>
 </div>
 </div>
-<p>Dos aspectos de los Términos de Referencia no tienen indicadores cuantitativos en la base: la formación bruta de capital por actividad, que ningún cuadro público de Panamá desagrega, y las barreras de entrada y salida de los mercados. Se tratan en el documento de análisis de forma cualitativa. La competitividad internacional se aproxima solo con el comercio exterior, porque no hay un índice de ventajas comparativas por sector con la información disponible.</p>
+<p>Las barreras de entrada y salida de los mercados no tienen indicadores cuantitativos en la base y se tratan en el documento de análisis de forma cualitativa. La inversión por sector tiene una estimación (memoria 9), porque las cuentas nacionales publican la formación bruta de capital por producto y no por actividad que invierte. La competitividad internacional se aproxima solo con el comercio exterior, porque no hay un índice de ventajas comparativas por sector con la información disponible.</p>
 </section>
 <section id="matriz-de-relevancia-sectorial" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Matriz de relevancia sectorial</h1>

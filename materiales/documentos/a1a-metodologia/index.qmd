@@ -24,10 +24,12 @@ format:
     number-sections: true
     css: ../estilos.css
   docx:
+    output-file: a1a-metodologia.docx
     toc: true
     toc-depth: 3
     number-sections: true
     reference-doc: ../../../assets/reference.docx
+    fig-dpi: 150
 execute:
   echo: false
   warning: false
@@ -53,14 +55,14 @@ n_indicadores <- si |> distinct(indicador) |> nrow()
 
 Este documento presenta la metodología de la consultoría para desarrollar instrumentos económicos que aumenten los flujos de recursos hacia la economía circular y potencien las inversiones en iniciativas de circularidad en Panamá, incluidos los modelos de responsabilidad extendida del productor (REP). La consultoría se ejecuta con el apoyo del programa de cooperación CEPAL-BMZ/GIZ "Promoviendo la Economía Circular" y responde a una solicitud de asistencia técnica del Ministerio de Ambiente (MiAMBIENTE) para implementar la Ley 502 de 2025 [@panama2025Ley502].
 
-La metodología organiza el trabajo en tres actividades que se alimentan en secuencia. La Actividad 1 caracteriza los sectores priorizados con indicadores cuantitativos y con eslabonamientos productivos, e identifica instrumentos con experiencia internacional. La Actividad 2 evalúa la factibilidad política y técnica de esos instrumentos, las capacidades institucionales del gobierno y del sistema financiero, y los mecanismos de movilización de recursos. La Actividad 3 diseña la Hoja de Ruta Nacional para el Financiamiento de la Economía Circular, con actores, fuentes de financiamiento, reformas, indicadores y una mesa técnica de validación.
+La metodología organiza el trabajo en tres actividades que se alimentan en secuencia. La Actividad 1 caracteriza los sectores priorizados con indicadores cuantitativos y con eslabonamientos productivos, y propone catorce instrumentos con experiencia internacional. La Actividad 2 evalúa la factibilidad política y técnica de esos instrumentos, las capacidades institucionales del gobierno y del sistema financiero, y los mecanismos de movilización de recursos. La Actividad 3 diseña la Hoja de Ruta Nacional para el Financiamiento de la Economía Circular, con actores, fuentes de financiamiento, reformas, indicadores y una mesa técnica de validación.
 
 Cuatro decisiones de método orientan todo el trabajo:
 
 - **Datos oficiales primero.** Las cifras salen de bases construidas con estadísticas oficiales, con cada paso de cálculo documentado en memorias públicas, de modo que cualquier resultado puede rastrearse y reproducirse.
 - **Evidencia con grado de confianza.** Cada indicador lleva una bandera de calidad (alta, media, baja o sin dato), y la información faltante se registra como hallazgo con su tratamiento, que puede ser un proxy o un análisis cualitativo estructurado.
-- **Juicio técnico explícito.** La matriz de relevancia sectorial hace transparentes los criterios y deja los pesos para acordarlos con CEPAL y MiAMBIENTE, para que el ejercicio no incorpore las preferencias del consultor.
-- **Secuencia en dos tiempos.** Las recomendaciones distinguen las condiciones habilitantes (registro, trazabilidad, capacidad institucional) de los instrumentos que dependen de ellas, porque la experiencia internacional muestra que los impuestos, tarifas y prohibiciones pierden eficacia sin fiscalización [@eea2023EconomicInstruments].
+- **Juicio técnico explícito.** La matriz de relevancia sectorial hace transparentes los criterios y deja los pesos para acordarlos con CEPAL y MiAMBIENTE, para que el ejercicio no incorpore preferencias implícitas.
+- **Secuencia en dos pasos.** Las recomendaciones distinguen las condiciones habilitantes (registro, trazabilidad, capacidad institucional) de los instrumentos que dependen de ellas, porque la experiencia internacional muestra que los impuestos, tarifas y prohibiciones pierden eficacia sin fiscalización [@eea2023EconomicInstruments].
 
 El documento describe, para cada actividad, las preguntas que responde, los métodos, las fuentes, los productos y los criterios de calidad, y precisa los límites del enfoque.
 
@@ -71,7 +73,6 @@ El documento describe, para cada actividad, las preguntas que responde, los mét
 - @tbl-criterios: Criterios de evaluación sectorial, indicadores y fuentes
 - @tbl-calidad: Banderas de calidad de los indicadores
 - @tbl-familias: Familias de instrumentos del inventario
-- @tbl-ficha: Campos de la ficha normalizada de instrumento
 - @tbl-factibilidad: Criterios del filtro de factibilidad
 - @tbl-capacidades: Funciones evaluadas en el análisis de capacidades institucionales
 - @tbl-actores: Grupos de actores y mecanismos de consulta
@@ -117,7 +118,7 @@ En el sistema financiero, la Taxonomía de Finanzas Sostenibles de Panamá, publ
 
 ## Experiencia regional e internacional
 
-La CEPAL analizó las hojas de ruta de economía circular de nueve países de la región y encontró que los instrumentos económicos son una cuarta parte de las iniciativas del eje de políticas y que las estrategias de financiamiento son solo el 7 %. Concluyó que existe un amplio espacio para identificar fuentes de financiamiento y diseñar estrategias de financiamiento de la transición [@cepal2022HojasRuta, p. 26-27]. La REP cuenta con la mayor trayectoria regional, con marcos legales en Chile [@chile2016Ley20920], Colombia [@minambienteCo2018Res1407], Perú [@peru2016DL1278] y otros países, y con una guía de la Organización para la Cooperación y el Desarrollo Económicos [@ocde2016EPR]. La Unión Europea ordena sus instrumentos económicos para la jerarquía de residuos en el anexo IV bis de su directiva marco [@ue2018Directiva851].
+La CEPAL analizó las hojas de ruta de economía circular de nueve países de la región y encontró que los instrumentos económicos son una cuarta parte de las iniciativas del eje de políticas y que las estrategias de financiamiento son solo el 7 %. Concluyó que existe un amplio espacio para identificar fuentes de financiamiento y diseñar estrategias de financiamiento de la transición [@cepal2022HojasRuta, p. 26-27]. La REP cuenta con la mayor trayectoria regional, con marcos legales en Chile [@chile2016Ley20920], Colombia [@minambienteCo2018Res1407], Perú [@peru2016DL1278] y otros países, y con una guía de la Organización para la Cooperación y el Desarrollo Económicos [@ocde2016EPR]. La Unión Europea ordena sus instrumentos económicos para la jerarquía de residuos en el anexo IV de su directiva marco [@ue2018Directiva851].
 
 # Marco conceptual
 
@@ -127,7 +128,7 @@ La Ley 502 define la economía circular a través de sus principios, entre ellos
 
 ## Instrumentos económicos y financieros
 
-Los instrumentos se organizan en familias que siguen la clasificación de la Unión Europea [@ue2018Directiva851] y del conjunto de herramientas de la Agencia Alemana de Cooperación Internacional (GIZ), que distingue mecanismos públicos, público-privados, basados en REP y privados [@giz2026InstrumentosFinancieros]. La @tbl-familias adapta esa clasificación a los tipos que mencionan los Términos de Referencia.
+Los instrumentos se organizan en familias que siguen la clasificación de la Unión Europea [@ue2018Directiva851] y del conjunto de herramientas de la Agencia Alemana de Cooperación Internacional (GIZ), que distingue mecanismos públicos, público-privados, basados en REP y privados [@giz2026InstrumentosFinancieros]. La @tbl-familias adapta esa clasificación a los tipos de instrumentos de la Ley 502.
 
 ```{r}
 #| label: tbl-familias
@@ -135,6 +136,9 @@ Los instrumentos se organizan en familias que siguen la clasificación de la Uni
 
 tribble(
   ~Familia, ~`Qué incluye`, ~`Ejemplos`,
+  "Habilitantes",
+  "Registro de productores e importadores, trazabilidad, formalización de recicladores de base",
+  "Artículo 11 de la Ley 502; artículo 19 de la Ley 33 de 2018",
   "Normativos y regulatorios",
   "Leyes marco, prohibiciones, metas obligatorias, REP, contenido mínimo de material reciclado, ecomodulación",
   "Ley 502 de Panamá; Ley 20.920 de Chile; Directiva 2019/904 de la Unión Europea",
@@ -148,7 +152,7 @@ tribble(
   "Compras públicas circulares, alianzas público-privadas, subsidios, ventanillas de facilitación",
   "Artículo 12 de la Ley 502; criterios de sostenibilidad en contrataciones",
   "Capacidades y conciencia ambiental",
-  "Formación, asistencia técnica, campañas, información y trazabilidad",
+  "Formación, asistencia técnica, campañas e información",
   "Artículos 5 a 7 de la Ley 502; plataforma de indicadores"
 ) |>
   tabla_ft_es(digitos = 0)
@@ -208,7 +212,7 @@ ggplot() +
   theme_void()
 ```
 
-Cada actividad responde preguntas distintas, usa métodos propios y entrega productos específicos. La @tbl-productos resume los contenidos mínimos de los informes, que siguen los requisitos de los Términos de Referencia: introducción, resumen ejecutivo, objetivos, antecedentes, bibliografía, tabla de contenido con listas de cuadros y figuras, glosario de siglas, redacción en español y formatos editables.
+Cada actividad responde preguntas distintas, usa métodos propios y entrega productos específicos. La @tbl-productos resume los contenidos mínimos de los informes, que incluyen introducción, resumen ejecutivo, objetivos, antecedentes, bibliografía, tabla de contenido con listas de cuadros y figuras, glosario de siglas, redacción en español y formatos editables.
 
 ```{r}
 #| label: tbl-productos
@@ -229,7 +233,7 @@ tribble(
   tabla_ft_es(digitos = 0)
 ```
 
-*Fuente: elaboración propia con base en los Términos de Referencia de la consultoría.*
+*Fuente: elaboración propia.*
 
 Además de los informes, los términos piden una presentación para cada producto y que se entreguen los documentos preliminares y finales en formatos editables (Word o Excel).
 
@@ -237,15 +241,15 @@ Además de los informes, los términos piden una presentación para cada product
 
 ## Pregunta y producto
 
-La Actividad 1 responde dónde están las mayores oportunidades y restricciones para la circularidad en la economía panameña y qué instrumentos de política han funcionado en otros países. Su producto es el plan de trabajo, esta metodología, el análisis de los sectores priorizados con sus eslabonamientos, y un inventario de familias de instrumentos.
+La Actividad 1 responde dónde están las mayores oportunidades y restricciones para la circularidad en la economía panameña y qué instrumentos de política han funcionado en otros países. Su producto es el plan de trabajo, esta metodología, el análisis de los sectores priorizados con sus eslabonamientos, y una propuesta de catorce instrumentos organizados por familia.
 
-## Delimitación de los sectores
+## Delimitación de los sectores de política
 
-Los sectores son los priorizados por las políticas existentes, que son los seis de la Hoja de Ruta [@miambiente2024HojaRutaEC]. Como la Hoja de Ruta y la Ley 502 no listan actividades económicas, la consultoría construye una tabla de equivalencias entre cada sector y las `r n_actividades` actividades de las cuentas nacionales del Instituto Nacional de Estadística y Censo (INEC) [@inec2026cou]. La regla es que cada actividad tiene un único sector principal, para que las cifras sumen sin doble conteo, y que las relaciones con otros sectores se registran aparte como sectores secundarios. Cada asignación lleva su evidencia (artículo o página de la fuente) y se marca como `Fuente` si el documento de política menciona la actividad, o `Inferido` si el vínculo se deduce del flujo de materiales. La tabla se entrega en formato editable para que MiAMBIENTE y el Ministerio de Comercio e Industrias la validen.
+Los sectores de política son los priorizados por las políticas existentes, que son los seis de la Hoja de Ruta [@miambiente2024HojaRutaEC]. Como la Hoja de Ruta y la Ley 502 no listan actividades económicas, la consultoría construye una tabla de equivalencias entre cada sector de política y las `r n_actividades` actividades de las cuentas nacionales del Instituto Nacional de Estadística y Censo (INEC) [@inec2026cou]. La regla es que cada actividad tiene un único sector principal, para que las cifras sumen sin doble conteo, y que las relaciones con otros sectores de política se registran aparte como secundarios. Cada asignación lleva su evidencia (artículo o página de la fuente) y se marca como `Fuente` si el documento de política menciona la actividad, o `Inferido` si el vínculo se deduce del flujo de materiales. La tabla se entrega en formato editable para que MiAMBIENTE y el Ministerio de Comercio e Industrias la validen.
 
 ## Criterios, indicadores y fuentes
 
-Los Términos de Referencia fijan los criterios mínimos de evaluación. Cada criterio se traduce en indicadores con una fuente oficial primaria, y cuando no hay un dato oficial se usa un proxy o se trata de forma cualitativa. La @tbl-criterios los presenta. En total, la base integrada contiene `r n_indicadores` indicadores distintos.
+Los criterios de evaluación sectorial son los de la @tbl-criterios. Cada criterio se traduce en indicadores con una fuente oficial primaria, y cuando no hay un dato oficial se usa un proxy o se trata de forma cualitativa. En total, el análisis sectorial utiliza `r n_indicadores` indicadores distintos.
 
 ```{r}
 #| label: tbl-criterios
@@ -263,7 +267,7 @@ tribble(
   "Exportaciones, importaciones, saldo comercial, apertura, importación de insumos",
   "Cuadros de oferta y utilización; matriz insumo-producto",
   "Inversión",
-  "Inversión extranjera directa como aproximación; formación bruta de capital cuando se disponga",
+  "Formación bruta de capital fijo por producto y su estimación por actividad; inversión extranjera directa como complemento",
   "INEC; Contraloría; solicitudes al MEF",
   "Concentración de mercado, barreras de entrada y salida",
   "Número de empresas por tamaño y clase de actividad; análisis cualitativo de barreras",
@@ -273,7 +277,7 @@ tribble(
   "EDGAR; inventario nacional de MiAMBIENTE",
   "Uso de recursos",
   "Consumo de energía y de agua, consumo material doméstico",
-  "Balance Energético Nacional; AQUASTAT; estadísticas de las Naciones Unidas",
+  "Balance Energético Nacional; Banco Mundial (extracciones de agua); estadísticas de las Naciones Unidas",
   "Potencial de recuperación de materiales secundarios",
   "Generación y composición de residuos, exportaciones de desechos, residuos de construcción y electrónicos",
   "Banco Mundial; UN Comtrade; diagnóstico nacional de residuos",
@@ -284,9 +288,9 @@ tribble(
   tabla_ft_es(digitos = 0)
 ```
 
-*Fuente: elaboración propia con base en los Términos de Referencia y en las fuentes citadas en el análisis sectorial.*
+*Fuente: elaboración propia con base en las fuentes citadas en el análisis sectorial.*
 
-Cada indicador de la base integrada lleva una bandera que comunica su grado de confianza (@tbl-calidad). El análisis sectorial presenta esa bandera junto a las cifras.
+Cada indicador del análisis sectorial lleva una bandera que comunica su grado de confianza (@tbl-calidad). El análisis sectorial presenta esa bandera junto a las cifras.
 
 ```{r}
 #| label: tbl-calidad
@@ -322,37 +326,7 @@ La matriz de relevancia sintetiza una selección de indicadores en puntajes de 1
 
 ## Inventario de instrumentos
 
-El inventario de la Actividad 1 identifica, con base en la experiencia internacional, los instrumentos de política pública, principalmente económicos, que pueden promover la circularidad en los sectores prioritarios. Procede en tres pasos. Primero, se revisan fuentes primarias (leyes, informes técnicos de instituciones y estudios de acceso abierto) sobre cada familia de instrumentos de la @tbl-familias. Segundo, cada instrumento se documenta con una ficha normalizada (@tbl-ficha). Tercero, se asocia cada instrumento con los sectores donde los datos del análisis sectorial indican relevancia, sin evaluar todavía su viabilidad.
-
-```{r}
-#| label: tbl-ficha
-#| tbl-cap: "Campos de la ficha normalizada de instrumento"
-
-tribble(
-  ~Campo, ~Contenido,
-  "Problema o barrera",
-  "Precio, riesgo, financiamiento, coordinación, información, capacidad o cumplimiento que busca corregir",
-  "Sector y flujo objetivo",
-  "Sector, producto o flujo de material, y actor cuyo comportamiento se pretende modificar",
-  "Mecanismo",
-  "Incentivo, obligación, reducción de riesgo, señal de precio, acceso a capital o facilitación de inversión",
-  "Requisitos normativos e institucionales",
-  "Base legal necesaria, entidades responsables, capacidad de fiscalización y seguimiento",
-  "Fuente de recursos",
-  "Costo fiscal o financiero, potencial de apalancamiento y sostenibilidad del mecanismo",
-  "Experiencia internacional",
-  "Países, base legal, año y evidencia de efectos, con su fuente y su grado de verificación",
-  "Datos e indicadores",
-  "Datos necesarios para implementarlo y monitorearlo",
-  "Riesgos",
-  "Elusión, efectos no deseados, efectos distributivos"
-) |>
-  tabla_ft_es(digitos = 0)
-```
-
-*Fuente: elaboración propia.*
-
-La evidencia de cada ficha lleva su nivel de verificación. Lo que no pudo leerse en la fuente se marca como no verificado y se resume en una lista, de modo que el lector distinga lo establecido de lo reportado de segunda mano.
+El inventario de la Actividad 1 propone, con base en la experiencia internacional, un conjunto de instrumentos de política pública, principalmente económicos, que pueden promover la circularidad en los sectores prioritarios. Primero, se revisan fuentes primarias (leyes, informes técnicos de instituciones y estudios de acceso abierto) sobre cada familia de instrumentos de la @tbl-familias. Segundo, se seleccionan los instrumentos que cumplen cuatro criterios: tienen respaldo en el marco legal panameño o en la Hoja de Ruta; responden a un rasgo de la economía panameña documentado en el análisis sectorial; cuentan con experiencia internacional documentada en una fuente primaria; y, en conjunto, cubren las familias de la @tbl-familias y los seis sectores de política. Tercero, se asocia cada instrumento seleccionado con los sectores donde los datos indican relevancia y con el paso en que conviene iniciarlo, sin evaluar todavía su factibilidad. Lo que no pudo leerse en la fuente se marca como no verificado, de modo que el lector distinga lo establecido de lo reportado de segunda mano.
 
 # Metodología de la Actividad 2: factibilidad y capacidades
 
@@ -387,7 +361,7 @@ tribble(
 
 El análisis de efectos es cuantitativo cuando los datos lo permiten y cualitativo estructurado cuando no. Para los instrumentos que operan como un cargo sobre un producto (un impuesto, una tarifa de REP o un depósito), se usa el modelo de precios de insumo-producto: si un cargo eleva el costo de una actividad, el modelo traslada ese costo a los precios de las actividades que la usan como insumo, bajo el supuesto de traslado completo [@millerblair2022]. Con él se estima la incidencia sobre los sectores y sobre los hogares, a partir de los coeficientes de la matriz. Para los instrumentos financieros (garantías, líneas de crédito, bonos), el análisis se basa en la capacidad del sistema financiero, la demanda potencial de proyectos y las experiencias comparadas.
 
-Toda estimación se acompaña de una nota sobre la disponibilidad y el grado de confianza de los datos. Cuando la cuantificación no es defendible, se usa un análisis cualitativo con criterios y escalas explícitas, como permiten los Términos de Referencia.
+Toda estimación se acompaña de una nota sobre la disponibilidad y el grado de confianza de los datos. Cuando la cuantificación no es defendible, se usa un análisis cualitativo con criterios y escalas explícitas, como corresponde cuando faltan datos.
 
 ## Capacidades institucionales
 
@@ -417,11 +391,11 @@ El análisis del sistema financiero mapea los actores (banca pública y privada,
 
 # Metodología de la Actividad 3: Hoja de Ruta
 
-La Actividad 3 consolida el trabajo anterior en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular. Su contenido mínimo, según los Términos de Referencia, es: el diseño de los instrumentos financieros aplicables a la realidad nacional, incluidos los modelos de REP; los actores responsables y sus roles en la implementación, el seguimiento y la evaluación; el mapeo de fuentes de financiamiento nacionales e internacionales, públicas y privadas; las reformas normativas, regulatorias o institucionales requeridas; los indicadores de seguimiento y evaluación; y la articulación con la Ley 502 y otros instrumentos nacionales.
+La Actividad 3 consolida el trabajo anterior en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular. Su contenido es: el diseño de los instrumentos financieros aplicables a la realidad nacional, incluidos los modelos de REP; los actores responsables y sus roles en la implementación, el seguimiento y la evaluación; el mapeo de fuentes de financiamiento nacionales e internacionales, públicas y privadas; las reformas normativas, regulatorias o institucionales requeridas; los indicadores de seguimiento y evaluación; y la articulación con la Ley 502 y otros instrumentos nacionales.
 
 Para ordenar las recomendaciones se aplican tres reglas:
 
-1. **Secuencia en dos tiempos.** Primero los instrumentos habilitantes (registro, trazabilidad, capacidad institucional) y después los que dependen de ellos, como tarifas, impuestos y metas.
+1. **Secuencia en dos pasos.** Primero los instrumentos habilitantes (registro, trazabilidad, capacidad institucional) y después los que dependen de ellos, como tarifas, impuestos y metas.
 2. **Utilización de la institucionalidad existente.** Se prefieren los mecanismos que se apoyan en instrumentos ya vigentes, como los incentivos del Ministerio de Comercio e Industrias, la taxonomía y el marco soberano de financiamiento, antes que crear instrumentos nuevos.
 3. **Trazabilidad de cada recomendación.** Cada recomendación se rastrea hasta una fuente, un criterio de selección y una necesidad institucional o de mercado identificada.
 
@@ -431,11 +405,11 @@ Los indicadores de seguimiento se diseñan en coordinación con la plataforma de
 
 ## Principios
 
-La estrategia de datos sigue un orden de preferencia: primero información oficial nacional, luego fuentes internacionales comparables y por último proxies o evidencia cualitativa cuando hay vacíos. Toda cifra utilizada proviene de una base de datos construida por la consultoría, y cada base tiene una memoria de cálculo pública que documenta los pasos en código, de modo que pueden auditarse y reproducirse. Las memorias cubren la equivalencia de sectores, las cuentas por actividad, el empleo, los eslabonamientos, las emisiones, los recursos y residuos, la inversión y la estructura empresarial, y la base integrada.
+La estrategia de datos sigue un orden de preferencia: primero información oficial nacional, luego fuentes internacionales comparables y por último proxies o evidencia cualitativa cuando hay vacíos. Toda cifra utilizada proviene de una base de datos construida por la consultoría, y cada base tiene una memoria de cálculo pública que documenta los pasos en código, de modo que pueden auditarse y reproducirse. Las memorias cubren la equivalencia de sectores, las cuentas por actividad, el empleo, los eslabonamientos, las emisiones, los recursos y residuos, la inversión y la estructura empresarial, y la síntesis sectorial.
 
 ## Registro de brechas
 
-La consultoría mantiene un registro de vacíos de información y de las decisiones que se tomaron para suplirlos. Las brechas más relevantes son la ausencia de formación bruta de capital por actividad, de cuotas de mercado, de datos sobre recicladores de base y de series anuales de residuos. Cada brecha se traduce en una solicitud de información por las vías formales, con la contraparte, y en un tratamiento alternativo documentado. La coordinación con la consultoría de sistema de información e indicadores del programa evita duplicar solicitudes.
+La consultoría mantiene un registro de vacíos de información y de las decisiones que se tomaron para suplirlos. Las brechas más relevantes son la ausencia de cuotas de mercado, de datos sobre recicladores de base y de series anuales de residuos. Cada brecha se traduce en una solicitud de información por las vías formales, con la contraparte, y en un tratamiento alternativo documentado. La coordinación con la consultoría de sistema de información e indicadores del programa evita duplicar solicitudes.
 
 ## Reproducibilidad
 
@@ -462,7 +436,7 @@ tribble(
   "Banca pública y privada, fondos de inversión, superintendencias y proveedores de financiamiento sostenible",
   "Entrevistas",
   "Sector privado",
-  "Gremios y empresas de los sectores priorizados, productores e importadores sujetos o potencialmente sujetos a REP, gestores y valorizadores de residuos",
+  "Gremios y empresas de los sectores de política, productores e importadores sujetos o potencialmente sujetos a REP, gestores y valorizadores de residuos",
   "Entrevistas y mesa técnica",
   "Academia y sociedad civil",
   "Centros técnicos, universidades y organizaciones con experiencia en circularidad y gestión de residuos",
@@ -473,7 +447,7 @@ tribble(
 
 *Fuente: elaboración propia.*
 
-La mesa técnica de validación, que los Términos de Referencia exigen con participación del sector público, privado, académico y de la sociedad civil, presenta la propuesta de la Actividad 3. Sus aportes se sistematizan en un documento que registra qué se recibió, qué se incorporó y por qué se descartó lo demás.
+La mesa técnica de validación, con participación del sector público, privado, académico y de la sociedad civil, presenta la propuesta de la Actividad 3. Sus aportes se sistematizan en un documento que registra qué se recibió, qué se incorporó y por qué se descartó lo demás.
 
 # Limitaciones del enfoque
 

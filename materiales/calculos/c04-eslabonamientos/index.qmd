@@ -188,22 +188,18 @@ indicadores <- indicadores |>
   left_join(sector_mip, by = "cod_mip")
 ```
 
-La siguiente tabla muestra las actividades núcleo y las más relevantes para los sectores prioritarios.
+La siguiente tabla muestra los indicadores de las 76 actividades de la matriz, con su sector de política y su clasificación según los dos índices.
 
 ```{r}
 #| label: tbl-actividades-nucleo
-#| tbl-cap: "Eslabonamientos de actividades seleccionadas, matriz insumo-producto de Panamá, 2018"
-
-actividades_seleccion <- c(
-  "AE38", "AE39", "AE40", "AE41", "AE42", "AE43",
-  "AE16", "AE23", "AE27", "AE31", "AE32", "AE34"
-)
+#| tbl-cap: "Eslabonamientos de las 76 actividades de la matriz insumo-producto de Panamá, 2018"
 
 indicadores |>
-  filter(cod_mip %in% actividades_seleccion) |>
+  arrange(cod_mip) |>
   select(
     Código = cod_mip,
     Actividad = actividad_mip,
+    `Sector de política` = sector_principal,
     `Índice atrás` = indice_atras,
     `Índice adelante` = indice_adelante,
     `Mult. VAB` = mult_vab,

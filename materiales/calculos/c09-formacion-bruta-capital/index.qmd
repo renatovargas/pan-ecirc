@@ -1,0 +1,423 @@
+---
+title: "Memoria de cálculo 9: formación bruta de capital fijo por producto, actividad y sector de política"
+description: "Formación bruta de capital fijo de Panamá, 2018 a 2024, según el producto de capital, y estimación de la inversión por actividad que la realiza con dos métodos de asignación"
+author: "Renato Vargas"
+date: "2026-10-28"
+lang: es
+categories:
+  - inversión
+  - formación bruta de capital
+  - cuentas nacionales
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Esta memoria cuantifica la inversión de las actividades económicas, uno de los criterios de evaluación sectorial. Los cuadros de oferta y utilización del Instituto Nacional de Estadística y Censo (INEC) [@inec2026cou] registran la formación bruta de capital fijo (FBKF) en la columna de demanda final, **por producto**: cuánto se invirtió en edificaciones, en maquinaria, en equipos de transporte, en programas informáticos y en otros bienes de capital. No la registran por la actividad que invierte, porque no existe una matriz de inversión que diga qué actividad compró cada bien de capital.
+
+Esto da dos lecturas de la inversión, y esta memoria produce ambas:
+
+1. **FBKF por sector de origen del bien.** Se suma la FBKF de los productos que produce cada sector. Es un dato directo, sin supuestos de asignación, y responde a qué sectores abastecen la inversión del país.
+2. **FBKF estimada por actividad que invierte.** Se reparte la FBKF de cada producto entre las actividades que lo usan, con reglas explícitas. Es una estimación, y por eso se calcula con dos métodos para mostrar su sensibilidad.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+# Limpiar el área de trabajo
+rm(list = ls())
+
+# Funciones y constantes compartidas
+source("materiales/calculos/scripts/funciones_comunes.R")
+library(readxl)
+
+mapeo <- leer_salida("mapeo_sectores_scn")
+clave <- leer_salida("clave_producto_actividad")
+cuentas_sector <- leer_salida("cuentas_sector_2018_2024")
+```
+
+# FBKF por producto
+
+Leemos la base consolidada de los cuadros de oferta y utilización y tomamos la columna de formación bruta de capital fijo del cuadro de utilización (área `ATC07`), por producto y año.
+
+```{r}
+#| label: lectura-scn
+
+scn <- readRDS("data/inec/pan_scn_oficial.RDS") |>
+  rename(
+    anio = `Año`,
+    cuadro = Cuadro,
+    area = `Código área transaccional columnas`,
+    transaccion = Transacciones,
+    cod_scn = `Código Clasificación Actividades`,
+    cod_prod = `Código Nomenclatura Local de Productos`,
+    producto = `Nomenclatura Local de Productos`,
+    valor = Valor
+  )
+
+fbkf_producto <- scn |>
+  filter(
+    cuadro == "02 Utilización", area == "ATC07",
+    transaccion == "Formación bruta de capital fijo"
+  ) |>
+  summarize(fbkf = sum(valor), .by = c(anio, cod_prod, producto)) |>
+  filter(fbkf != 0)
+
+# Total nacional por año (millones de B/.)
+fbkf_producto |> summarize(fbkf_total = sum(fbkf), .by = anio) |> arrange(anio)
+```
+
+Clasificamos los productos en cuatro tipos según su naturaleza. Los códigos 4701 a 4703 son construcción (edificaciones residenciales, no residenciales y obras de ingeniería civil); los códigos 01 a 15 son activos biológicos (plantaciones y ganado de cría); el resto es maquinaria, equipo, programas informáticos, investigación y otros bienes.
+
+```{r}
+#| label: tipos
+
+fbkf_producto <- fbkf_producto |>
+  mutate(
+    tipo = case_when(
+      cod_prod == "4701" ~ "Edificaciones residenciales",
+      cod_prod == "4702" ~ "Edificaciones no residenciales",
+      cod_prod == "4703" ~ "Obras de ingeniería civil",
+      str_sub(cod_prod, 1, 2) %in% sprintf("%02d", 1:15) ~ "Activos biológicos",
+      TRUE ~ "Maquinaria, equipo y otros bienes"
+    )
+  )
+
+fbkf_tipo <- fbkf_producto |>
+  summarize(fbkf = sum(fbkf), .by = c(anio, tipo)) |>
+  mutate(participacion = 100 * fbkf / sum(fbkf), .by = anio)
+```
+
+```{r}
+#| label: tbl-fbkf-tipo
+#| tbl-cap: "FBKF por tipo de bien de capital, 2024 (millones de B/. corrientes)"
+
+fbkf_tipo |>
+  filter(anio == 2024) |>
+  arrange(desc(fbkf)) |>
+  select(Tipo = tipo, `FBKF` = fbkf, `Participación (%)` = participacion) |>
+  tabla_ft(digitos = 1)
+```
+
+La construcción reúne la mayor parte de la inversión del país, de modo que la pregunta de qué actividad invierte depende sobre todo de quién compra edificaciones y obras civiles.
+
+# FBKF por sector de origen del bien
+
+Asignamos cada producto de capital a la actividad que lo produce con la clave de producto a actividad de la memoria 2. Los productos con menos de la mitad de oferta nacional (bienes que el país importa) quedan en un grupo aparte, porque su producción no ocurre en Panamá.
+
+```{r}
+#| label: origen
+
+actividad_origen <- clave |>
+  transmute(cod_prod, cod_origen = cod_scn, proporcion_nacional)
+
+fbkf_origen <- fbkf_producto |>
+  left_join(actividad_origen, by = "cod_prod") |>
+  left_join(select(mapeo, cod_origen = cod_scn, sector_principal), by = "cod_origen") |>
+  mutate(
+    sector_origen = case_when(
+      cod_origen == "REEXP" ~ "Bienes importados",
+      is.na(sector_principal) ~ "Bienes importados",
+      TRUE ~ as.character(sector_principal)
+    )
+  ) |>
+  summarize(fbkf = sum(fbkf), .by = c(anio, sector_origen)) |>
+  mutate(participacion = 100 * fbkf / sum(fbkf), .by = anio)
+
+fbkf_origen |> filter(anio == 2024) |> arrange(desc(fbkf))
+```
+
+# FBKF estimada por actividad que invierte
+
+## Insumos de la asignación
+
+Necesitamos dos claves para repartir la FBKF de cada producto entre actividades.
+
+**Clave 1: consumo intermedio del producto.** Para cada producto de capital tomamos cuánto consume de él cada actividad como insumo, en el cuadro de utilización. Una actividad que usa mucho de un bien (por ejemplo repuestos de equipos de transporte) probablemente invierte en ese bien en una proporción similar. Esta clave se aplica donde el producto tiene consumo intermedio.
+
+```{r}
+#| label: clave-ci
+
+peso_ci <- scn |>
+  filter(
+    cuadro == "02 Utilización", area == "ATC01",
+    !is.na(cod_prod), !is.na(cod_scn)
+  ) |>
+  summarize(ci = sum(valor), .by = c(anio, cod_prod, cod_scn)) |>
+  filter(ci > 0) |>
+  mutate(peso = ci / sum(ci), .by = c(anio, cod_prod)) |>
+  select(anio, cod_prod, cod_scn, peso)
+```
+
+Esta clave tiene un límite que conviene comprobar: los productos de construcción no tienen consumo intermedio, porque las edificaciones y obras civiles no se usan como insumo corriente.
+
+```{r}
+#| label: ci-construccion
+
+peso_ci |>
+  filter(anio == 2024, cod_prod %in% c("4701", "4702", "4703")) |>
+  nrow()
+```
+
+La clave 1 no sirve, entonces, para el tipo de bien que domina la inversión. Para la construcción usamos una segunda clave.
+
+**Clave 2: excedente bruto de explotación.** Es el ingreso del capital de cada actividad, de la matriz de empleo de las cuentas nacionales [@inec2026empleo]. Las actividades con más capital productivo tienen mayor excedente y mayor inversión necesaria para mantenerlo. El excedente incluye el ingreso mixto de los trabajadores por cuenta propia.
+
+```{r}
+#| label: clave-eob
+
+archivo_empleo <- "data/inec/P00140176420260930102437Componentes del valor agregado y matriz de empleo años 2018-24.xlsx"
+
+eob <- read_excel(
+  archivo_empleo,
+  sheet = "Tabla",
+  col_types = "text",
+  .name_repair = "unique_quiet"
+) |>
+  filter(Idf_Producto == "B2b") |>
+  mutate(
+    anio = as.numeric(str_extract(`Año`, "^\\d{4}")),
+    cod_scn = str_extract(Idf_Actividad, "^\\d{2}\\.\\d"),
+    eob = as.numeric(Valor)
+  ) |>
+  summarize(eob = sum(eob), .by = c(anio, cod_scn)) |>
+  # Un excedente negativo (pérdidas) no atrae inversión en la asignación
+  mutate(eob = pmax(eob, 0))
+
+# Control: años y actividades cubiertos
+eob |> summarize(actividades = n(), eob_total = sum(eob), .by = anio) |> arrange(anio)
+```
+
+## Método 1: reglas por tipo de bien
+
+El método central combina las dos claves con reglas por tipo de bien. Las reglas son supuestos y se documentan para poder revisarlos.
+
+| Tipo de bien | Regla |
+|---|---|
+| Activos biológicos | La actividad que produce el activo (plantaciones y cría para uso propio) |
+| Edificaciones residenciales | La actividad de alquiler de viviendas (`43.1`), que incluye el alquiler imputado de las viviendas ocupadas por sus dueños |
+| Edificaciones no residenciales y obras de ingeniería civil | Excedente bruto de explotación, sin la construcción (`36.x`) ni el alquiler de viviendas |
+| Maquinaria, equipo y otros bienes | Consumo intermedio del producto; si el producto no tiene, excedente bruto de explotación |
+
+```{r}
+#| label: metodo1
+
+peso_eob <- eob |> mutate(peso = eob / sum(eob), .by = anio)
+peso_eob_edif <- eob |>
+  filter(!str_starts(cod_scn, "36"), cod_scn != "43.1") |>
+  mutate(peso = eob / sum(eob), .by = anio)
+
+principal <- clave |> select(cod_prod, cod_origen = actividad_principal)
+
+# Biológicos: la actividad que produce el activo
+m1_bio <- fbkf_producto |>
+  filter(tipo == "Activos biológicos") |>
+  left_join(principal, by = "cod_prod") |>
+  transmute(anio, cod_scn = cod_origen, fbkf, regla = "Activos biológicos")
+
+# Residenciales: alquiler de viviendas
+m1_res <- fbkf_producto |>
+  filter(tipo == "Edificaciones residenciales") |>
+  transmute(anio, cod_scn = "43.1", fbkf, regla = "Edificaciones residenciales")
+
+# No residenciales y obras civiles: excedente sin construcción ni vivienda
+m1_edif <- fbkf_producto |>
+  filter(tipo %in% c("Edificaciones no residenciales", "Obras de ingeniería civil")) |>
+  inner_join(select(peso_eob_edif, anio, cod_scn, peso), by = "anio", relationship = "many-to-many") |>
+  transmute(anio, cod_scn, fbkf = fbkf * peso, regla = tipo)
+
+# Resto: consumo intermedio del producto o, si no hay, excedente
+resto <- fbkf_producto |> filter(tipo == "Maquinaria, equipo y otros bienes")
+
+m1_resto_ci <- resto |>
+  inner_join(peso_ci, by = c("anio", "cod_prod")) |>
+  transmute(anio, cod_scn, fbkf = fbkf * peso, regla = "Maquinaria y otros (consumo intermedio)")
+
+sin_ci <- resto |> anti_join(distinct(peso_ci, anio, cod_prod), by = c("anio", "cod_prod"))
+
+m1_resto_eob <- sin_ci |>
+  inner_join(select(peso_eob, anio, cod_scn, peso), by = "anio", relationship = "many-to-many") |>
+  transmute(anio, cod_scn, fbkf = fbkf * peso, regla = "Maquinaria y otros (excedente)")
+
+fbkf_m1 <- bind_rows(m1_bio, m1_res, m1_edif, m1_resto_ci, m1_resto_eob) |>
+  summarize(fbkf = sum(fbkf), .by = c(anio, cod_scn)) |>
+  mutate(metodo = "Método 1: reglas por tipo de bien")
+```
+
+## Método 2: excedente bruto de explotación
+
+El método alternativo reparte toda la FBKF según el excedente bruto de explotación de cada actividad. Es una regla única y sencilla que sirve de contraste.
+
+```{r}
+#| label: metodo2
+
+total_anio <- fbkf_producto |> summarize(total = sum(fbkf), .by = anio)
+
+fbkf_m2 <- peso_eob |>
+  left_join(total_anio, by = "anio") |>
+  transmute(anio, cod_scn, fbkf = total * peso, metodo = "Método 2: excedente bruto de explotación")
+```
+
+## Control
+
+Los dos métodos deben reproducir el total nacional de cada año.
+
+```{r}
+#| label: control
+
+bind_rows(fbkf_m1, fbkf_m2) |>
+  summarize(total_asignado = sum(fbkf), .by = c(anio, metodo)) |>
+  left_join(total_anio, by = "anio") |>
+  mutate(diferencia = total_asignado - total) |>
+  arrange(metodo, anio)
+```
+
+# Agregación a los sectores de política
+
+```{r}
+#| label: sector
+
+fbkf_actividad <- bind_rows(fbkf_m1, fbkf_m2) |>
+  left_join(select(mapeo, cod_scn, actividad, sector_principal), by = "cod_scn")
+
+# Actividades sin sector (no deberían existir)
+fbkf_actividad |> filter(is.na(sector_principal)) |> distinct(cod_scn)
+
+vab <- cuentas_sector |> select(anio, sector_principal, vab)
+
+fbkf_sector <- fbkf_actividad |>
+  summarize(fbkf = sum(fbkf), .by = c(anio, sector_principal, metodo)) |>
+  left_join(vab, by = c("anio", "sector_principal")) |>
+  mutate(
+    participacion = 100 * fbkf / sum(fbkf),
+    tasa_inversion = 100 * fbkf / vab,
+    .by = c(anio, metodo)
+  ) |>
+  arrange(anio, metodo, sector_principal)
+```
+
+La tasa de inversión es la FBKF estimada sobre el valor agregado del sector. Como la FBKF de un año es volátil (una obra grande mueve la cifra), calculamos también el promedio de 2022 a 2024.
+
+```{r}
+#| label: sector-resumen
+
+resumen_sector <- fbkf_sector |>
+  filter(anio >= 2022) |>
+  summarize(
+    fbkf_2024 = fbkf[anio == 2024],
+    fbkf_media_2022_2024 = mean(fbkf),
+    tasa_media_2022_2024 = mean(tasa_inversion),
+    .by = c(sector_principal, metodo)
+  )
+
+resumen_sector |>
+  select(sector_principal, metodo, fbkf_2024, tasa_media_2022_2024) |>
+  mutate(across(where(is.numeric), \(x) round(x, 1)))
+```
+
+```{r}
+#| label: tbl-fbkf-sector
+#| tbl-cap: "FBKF estimada por sector con los dos métodos, 2024 (millones de B/.) y tasa de inversión media 2022-2024"
+
+resumen_sector |>
+  mutate(metodo = if_else(str_starts(metodo, "Método 1"), "m1", "m2")) |>
+  pivot_wider(
+    id_cols = sector_principal,
+    names_from = metodo,
+    values_from = c(fbkf_2024, tasa_media_2022_2024)
+  ) |>
+  transmute(
+    Sector = sector_principal,
+    `FBKF método 1` = fbkf_2024_m1,
+    `FBKF método 2` = fbkf_2024_m2,
+    `Tasa método 1 (%)` = tasa_media_2022_2024_m1,
+    `Tasa método 2 (%)` = tasa_media_2022_2024_m2
+  ) |>
+  tabla_ft(digitos = 1)
+```
+
+Los dos métodos coinciden en el orden de magnitud para residuos, recursos hídricos e industrias, y difieren de forma importante en construcción (que el método 1 excluye por regla de las edificaciones no residenciales y obras civiles), en energía y en agricultura y alimentos. La diferencia es una medida de la incertidumbre de la asignación. La base integrada (memoria 8) toma el método 1 como valor central y el mínimo y el máximo de ambos como rango, con calidad baja.
+
+# Dos lecturas de la inversión: quien adquiere el bien y quien lo produce
+
+La FBKF registra la adquisición de un activo, de modo que estrictamente la inversión es de quien lo posee. Una constructora que edifica viviendas para vender produce el bien, y la inversión corresponde al comprador. Por eso el método 1 asigna las edificaciones residenciales a la actividad de alquiler de viviendas (`43.1`), que incluye el alquiler imputado de las viviendas ocupadas por sus dueños. Las viviendas que los hogares construyen para sí mismos figuran como producción de construcción de edificios para uso final propio, y quien las posee sigue siendo el dueño.
+
+Para evaluar el papel de los sectores de política en la circularidad, la lectura de producción también es útil, porque los flujos de materiales y de residuos de obra pasan por la actividad que construye. Calculamos entonces un escenario en el que las viviendas se atribuyen a la actividad de construcción de edificios (`36.1`), que pertenece a ciudades y construcción, y lo comparamos con el método 1. Además tomamos la participación de los seis sectores en la producción de todos los bienes de capital, que es el dato directo de la sección de sector de origen.
+
+```{r}
+#| label: lectura-viviendas
+
+seis <- sectores_politica[1:6]
+
+vab_total <- cuentas_sector |> summarize(vab_total = sum(vab), .by = anio)
+
+fbkf_viviendas <- fbkf_tipo |>
+  filter(tipo == "Edificaciones residenciales") |>
+  select(anio, fbkf_viviendas = fbkf)
+
+fbkf_total <- fbkf_tipo |> summarize(fbkf_total = sum(fbkf), .by = anio)
+
+# FBKF estimada de los seis sectores con el método 1, sin y con las viviendas
+seis_m1 <- fbkf_sector |>
+  filter(str_starts(metodo, "Método 1"), sector_principal %in% seis) |>
+  summarize(fbkf_seis = sum(fbkf), .by = anio)
+
+# Participación de los seis en la producción de los bienes de capital
+produccion_seis <- fbkf_origen |>
+  filter(sector_origen %in% seis) |>
+  summarize(part_produccion_seis = sum(participacion), .by = anio)
+
+fbkf_lectura_viviendas <- seis_m1 |>
+  left_join(fbkf_viviendas, by = "anio") |>
+  left_join(fbkf_total, by = "anio") |>
+  left_join(vab_total, by = "anio") |>
+  left_join(produccion_seis, by = "anio") |>
+  mutate(
+    # Lectura de quien adquiere (viviendas en alquiler de viviendas)
+    pp_seis_adquiere = 100 * fbkf_seis / vab_total,
+    part_seis_adquiere = 100 * fbkf_seis / fbkf_total,
+    # Escenario: viviendas atribuidas a quien las construye
+    pp_seis_construye = 100 * (fbkf_seis + fbkf_viviendas) / vab_total,
+    part_seis_construye = 100 * (fbkf_seis + fbkf_viviendas) / fbkf_total
+  )
+
+fbkf_lectura_viviendas |>
+  filter(anio >= 2022) |>
+  summarize(across(c(pp_seis_adquiere, part_seis_adquiere, pp_seis_construye,
+                     part_seis_construye, part_produccion_seis), mean))
+```
+
+Con el método 1, los seis sectores aportan 5,2 puntos porcentuales de la tasa de inversión nacional, el 16 % de la FBKF, en el promedio de 2022 a 2024. Si las viviendas se atribuyeran a quien las construye, el aporte subiría a 17,8 puntos y el 56 % de la FBKF. La participación en la producción de todos los bienes de capital es todavía mayor, porque incluye también las edificaciones no residenciales y las obras civiles.
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(fbkf_producto, "fbkf_producto_2018_2024", hoja = "producto")
+guardar_salida(fbkf_tipo, "fbkf_tipo_2018_2024", hoja = "tipo")
+guardar_salida(fbkf_origen, "fbkf_sector_origen_2018_2024", hoja = "origen")
+guardar_salida(fbkf_actividad, "fbkf_actividad_estimada_2018_2024", hoja = "actividad")
+guardar_salida(fbkf_sector, "fbkf_sector_estimada_2018_2024", hoja = "sector")
+guardar_salida(resumen_sector, "fbkf_sector_resumen", hoja = "resumen")
+guardar_salida(fbkf_lectura_viviendas, "fbkf_lectura_viviendas", hoja = "viviendas")
+```
+
+# Referencias
+
+::: {#refs}
+:::
