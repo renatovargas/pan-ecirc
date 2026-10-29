@@ -117,11 +117,12 @@ $code-block-font-size: 0.5em;
   align-items: center;
 
   &::before {
-    content: "";
+    content: "Renato Vargas";
     grid-column: 1;
     text-align: left;
     font-size: 0.75em;
     font-weight: 700;
+    color: $theme-white;
   }
   > p {
     grid-column: 2;
@@ -134,6 +135,16 @@ $code-block-font-size: 0.5em;
     font-size: 0.75em;
     color: $theme-grey;
   }
+}
+
+// Conteo de diapositivas (c/t) sobre la columna derecha del footer
+.reveal .slide-number {
+  bottom: 0.45em !important;
+  right: 1.5em !important;
+  z-index: 30;
+  background-color: transparent !important;
+  color: $theme-white !important;
+  font-size: 16px !important;
 }
 
 .reveal .slide-menu-button {

@@ -11,7 +11,7 @@ csl: ../../assets/apa-es.csl
 format:
   revealjs:
     theme: [simple, ../pstyles.scss]
-    slide-number: true
+    slide-number: c/t
     footer: "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo"
 execute:
   echo: false
@@ -395,16 +395,16 @@ Elaboración propia con datos de UN Comtrade [@uncomtrade2026] y del Banco Mundi
 ```{r}
 #| fig-width: 6.5
 #| fig-height: 5.4
-etiquetas <- c("AE38", "AE39", "AE40", "AE41", "AE31", "AE32", "AE23")
+actividades_clave <- enlaces_act |> filter(clasificacion == "Clave")
 
 enlaces_act |>
   ggplot(aes(x = indice_atras, y = indice_adelante, color = sector_principal)) +
   geom_hline(yintercept = 1, linetype = "dashed") +
   geom_vline(xintercept = 1, linetype = "dashed") +
   geom_point(size = 2.5) +
-  geom_text(
-    data = enlaces_act |> filter(cod_mip %in% etiquetas),
-    aes(label = cod_mip), vjust = -0.8, size = 3.5, show.legend = FALSE
+  ggrepel::geom_text_repel(
+    data = actividades_clave,
+    aes(label = cod_mip), size = 3.5, show.legend = FALSE
   ) +
   scale_color_manual(values = colores_sector) +
   labs(x = "Encadenamiento hacia atrás (índice)", y = "Encadenamiento hacia adelante (índice)") +
@@ -421,7 +421,7 @@ enlaces_act |>
 ::::
 
 ::: aside
-La matriz tiene 76 actividades y las cuentas nacionales 80, porque reúne pesca y acuicultura, el comercio y el apoyo al transporte por agua. Memoria [C4](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c04-eslabonamientos/){target="_blank"}.
+La matriz tiene 76 actividades y las cuentas nacionales 80, porque reúne pesca y acuicultura, el comercio y el apoyo al transporte por agua. Se rotulan las `r nrow(actividades_clave)` actividades clave, con ambos índices superiores a 1: `r paste(paste0(actividades_clave$cod_mip, " ", str_to_lower(str_sub(actividades_clave$actividad_mip, 1, 1)), str_sub(actividades_clave$actividad_mip, 2)), collapse = "; ")`. Memoria [C4](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c04-eslabonamientos/){target="_blank"}.
 :::
 
 ## La matriz de relevancia mide tamaño
@@ -714,7 +714,7 @@ Cómo se evalúan los sectores y los instrumentos.
 #| fig-height: 4
 cajas <- tribble(
   ~id, ~x, ~y, ~texto,
-  1, 1.2, 2.2, "Actividad 1\nPlan, metodología y\nanálisis sectorial\ne instrumentos",
+  1, 1.2, 2.2, "Actividad 1\nPlan, metodología,\nanálisis sectorial y\npropuesta de instrumentos",
   2, 4.0, 2.2, "Actividad 2\nFactibilidad,\ncapacidades y\nsistema financiero",
   3, 6.8, 2.2, "Actividad 3\nHoja de Ruta Nacional\ny mesa técnica\nde validación",
   4, 4.0, 0.5, "Bases de datos oficiales, memorias de cálculo y consulta a actores"
@@ -741,7 +741,7 @@ ggplot() +
   theme_void()
 ```
 
-- Cada actividad responde preguntas propias y se apoya en la anterior.
+- Cada actividad responde preguntas propias y se apoya en la anterior: la primera propone, la segunda evalúa y la tercera diseña.
 
 ## Marco conceptual
 
@@ -751,16 +751,25 @@ ggplot() +
 - La eficacia de la REP depende de la ecomodulación y de la capacidad operativa [@ue2018Directiva851, art. 8 bis].
 - Sin registro y control, los instrumentos pierden eficacia.
 
+## Cómo se seleccionaron los catorce instrumentos
+
+- **Respaldo legal.** Tienen base en el marco legal panameño o en la Hoja de Ruta.
+- **Rasgo de la economía panameña.** Responden a un hallazgo del análisis sectorial.
+- **Experiencia internacional.** Cuentan con evidencia documentada en una fuente primaria.
+- **Cobertura.** En conjunto cubren las familias de instrumentos y los seis sectores de política.
+- La factibilidad se evalúa después, en la Actividad 2.
+
 ## Familias de instrumentos
 
 ```{r}
 tribble(
   ~Familia, ~`Qué incluye`,
+  "Habilitantes", "Registro de productores e importadores, trazabilidad, formalización de recicladores de base",
   "Normativos y regulatorios", "Leyes marco, metas obligatorias, REP, contenido reciclado, ecomodulación",
   "Tributarios y tarifarios", "Impuestos y tasas, depósito y reembolso, pago por generación, incentivos fiscales",
   "Financieros", "Crédito, garantías, financiamiento combinado, bonos temáticos, taxonomías",
   "Promoción y facilitación de inversiones", "Compras públicas circulares, alianzas público-privadas, subsidios",
-  "Capacidades y conciencia ambiental", "Formación, asistencia técnica, campañas, información y trazabilidad"
+  "Capacidades y conciencia ambiental", "Formación, asistencia técnica, campañas e información"
 ) |>
   tabla_slide(digitos = 0, tamano = 18)
 ```
@@ -777,7 +786,7 @@ tribble(
   "Producto interno bruto", "Cuadros de oferta y utilización del INEC, 2018-2024",
   "Empleo, género y condición laboral", "Matriz de empleo del INEC; Encuesta de Mercado Laboral",
   "Comercio exterior y competitividad", "Cuadros de oferta y utilización; matriz insumo-producto",
-  "Inversión", "Inversión extranjera directa del INEC",
+  "Inversión", "Formación bruta de capital fijo e inversión extranjera directa del INEC",
   "Concentración y barreras", "Directorio de Empresas y Locales; entrevistas",
   "Emisiones de gases de efecto invernadero", "EDGAR; inventario nacional",
   "Uso de recursos", "Balance Energético Nacional; Banco Mundial",
@@ -805,10 +814,18 @@ tribble(
 
 ## Herramientas del análisis sectorial
 
-- **Tabla de equivalencias.** Asigna las 80 actividades a los seis sectores y se entrega editable para que MiAMBIENTE y el Ministerio de Comercio e Industrias la validen.
+- **Tabla de equivalencias.** Asigna las 80 actividades a los seis sectores de política y se entrega editable para que MiAMBIENTE y el Ministerio de Comercio e Industrias la validen.
 - **Eslabonamientos.** El modelo de Leontief sobre la matriz insumo-producto de 2018 mide arrastre e impulso entre actividades [@millerblair2022].
 - **Matriz de relevancia.** Ordena los sectores de 1 a 5 en cada indicador para comparar unidades distintas.
 - **Memorias de cálculo.** Cada paso está documentado en código en el [sitio del proyecto](https://renatovargas.github.io/pan-ecirc/materiales/calculos/){target="_blank"}.
+
+## Actividad 2: qué se busca
+
+- Determinar cuáles de los catorce instrumentos son viables y convenientes para Panamá, y bajo qué condiciones.
+- Documentar cada instrumento en una ficha normalizada y definir una lista corta.
+- Evaluar su factibilidad política, técnica, institucional y financiera.
+- Estimar su efecto por sector y diagnosticar las capacidades del gobierno y del sistema financiero.
+- Todavía no se diseñan en detalle: eso corresponde a la Actividad 3.
 
 ## Una ficha normalizada por instrumento
 
@@ -861,6 +878,13 @@ tribble(
 - La taxonomía [@sbp2024TaxonomiaPanama] y el marco soberano [@mef2024MarcoFinanciamientoSostenible] son los puntos de articulación.
 - El aporte es acercar lo que la taxonomía declara elegible a proyectos circulares financiables.
 
+## Actividad 3: qué se busca
+
+- Convertir los instrumentos que superen la evaluación en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular.
+- Diseñar cada instrumento con montos, metas, responsables y plazos, y definir actores y roles.
+- Identificar fuentes de financiamiento y reformas necesarias.
+- Validar los resultados en una mesa técnica con actores de todos los grupos.
+
 ## Hoja de Ruta: contenido y reglas
 
 - **Contenido.** Instrumentos, actores y roles, fuentes de financiamiento, reformas, indicadores y articulación con la Ley 502.
@@ -900,14 +924,6 @@ Qué sigue, con quién y cuándo.
 - Los datos se facilitan con solicitudes formales, y conviene sumar al MEF y su Dirección de Crédito Público.
 - El Ministerio de Comercio e Industrias opera incentivos aprovechables, como el sello "Hecho en Panamá".
 
-## Cinco principios del plan
-
-- **Concentración en noviembre.** El trabajo analítico y con actores ocurre entre el 26 de octubre y el 27 de noviembre.
-- **Insumos tempranos para el reglamento.** Se adelantan a mediados de noviembre.
-- **Solicitudes de datos en la primera semana.** Se envían entre el 26 y el 30 de octubre.
-- **Participación continua.** Las entrevistas comienzan el 2 de noviembre.
-- **Holgura antes del cierre.** Las versiones finales se entregan el 18 de diciembre.
-
 ## Cronograma
 
 ```{r}
@@ -915,9 +931,9 @@ Qué sigue, con quién y cuándo.
 #| fig-height: 5.2
 tareas <- tribble(
   ~actividad, ~tarea, ~inicio, ~fin,
-  "Actividad 1", "Plan, metodología y análisis", "2026-10-14", "2026-10-23",
-  "Actividad 2", "Fichas de instrumentos y lista corta", "2026-10-26", "2026-11-06",
-  "Actividad 2", "Solicitudes formales de información", "2026-10-26", "2026-11-13",
+  "Actividad 1", "Plan, metodología y análisis", "2026-10-14", "2026-10-29",
+  "Actividad 2", "Fichas de instrumentos y lista corta", "2026-11-02", "2026-11-06",
+  "Actividad 2", "Solicitudes formales de información", "2026-11-02", "2026-11-13",
   "Actividad 2", "Entrevistas, primera ronda", "2026-11-02", "2026-11-13",
   "Actividad 2", "Factibilidad y efectos por sector", "2026-11-09", "2026-11-20",
   "Actividad 2", "Capacidades institucionales y sistema financiero", "2026-11-09", "2026-11-20",
@@ -928,8 +944,7 @@ tareas <- tribble(
   "Actividad 3", "Mesa técnica de validación", "2026-11-23", "2026-11-27",
   "Actividad 3", "Sistematización y redacción de la Hoja de Ruta", "2026-11-30", "2026-12-04",
   "Revisión", "Revisión de CEPAL y MiAMBIENTE", "2026-12-07", "2026-12-14",
-  "Revisión", "Ajustes y versiones finales", "2026-12-14", "2026-12-18",
-  "Revisión", "Reserva de contingencia", "2026-12-21", "2026-12-31"
+  "Revisión", "Ajustes y versiones finales", "2026-12-14", "2026-12-18"
 ) |>
   mutate(
     inicio = as.Date(inicio),
@@ -938,7 +953,7 @@ tareas <- tribble(
     tarea = fct_inorder(tarea)
   )
 
-hitos <- tibble(fecha = as.Date(c("2026-10-23", "2026-11-27", "2026-12-04", "2026-12-18")))
+hitos <- tibble(fecha = as.Date(c("2026-10-29", "2026-11-27", "2026-12-04", "2026-12-18")))
 
 ggplot(tareas) +
   geom_segment(
@@ -958,7 +973,7 @@ ggplot(tareas) +
 ```
 
 ::: aside
-Las líneas verticales marcan los hitos: 23 de octubre, 27 de noviembre, 4 y 18 de diciembre.
+Las líneas verticales marcan los hitos: 29 de octubre, 27 de noviembre, 4 y 18 de diciembre.
 :::
 
 ## Hitos
@@ -966,14 +981,13 @@ Las líneas verticales marcan los hitos: 23 de octubre, 27 de noviembre, 4 y 18 
 ```{r}
 tribble(
   ~Fecha, ~Hito,
-  "22 y 23 de octubre", "Entrega del plan de trabajo, la metodología y el análisis sectorial",
-  "26 al 30 de octubre", "Solicitudes formales de información",
+  "29 de octubre", "Entrega del plan de trabajo, la metodología y el análisis sectorial",
+  "2 al 6 de noviembre", "Solicitudes formales de información",
   "Mediados de noviembre", "Insumos para el reglamento de la Ley 502",
   "23 al 27 de noviembre", "Mesa técnica de validación",
   "3 y 4 de diciembre", "Borradores de factibilidad y de la Hoja de Ruta",
   "7 al 14 de diciembre", "Revisión de CEPAL y MiAMBIENTE",
-  "18 de diciembre", "Versiones finales y presentaciones",
-  "21 al 31 de diciembre", "Reserva de contingencia, solo para ajustes"
+  "18 de diciembre", "Versiones finales y presentaciones"
 ) |>
   tabla_slide(digitos = 0, tamano = 18)
 ```
@@ -988,9 +1002,8 @@ tribble(
 
 ## Misión a Panamá y mesa técnica
 
-- La misión ocurriría del 23 al 27 de noviembre en Ciudad de Panamá.
+- La consultoría contempla un viaje a Ciudad de Panamá del 23 al 27 de noviembre.
 - La misma semana combina la mesa técnica con reuniones con MiAMBIENTE, el MEF y las superintendencias.
-- La decisión sobre el viaje se toma a más tardar el 6 de noviembre.
 - Si el viaje no procede, la mesa se realiza de forma híbrida.
 - MiAMBIENTE valida la lista de invitados.
 - La agenda presenta la lista corta de instrumentos, las condiciones habilitantes y la secuencia propuesta.
@@ -1020,8 +1033,8 @@ tribble(
   "Demora en la entrega de datos", "Solicitudes en la primera semana; tratamiento alternativo documentado",
   "Pocos datos de recicladores y concentración", "Análisis cualitativo y entrevistas dirigidas",
   "Consejo de Economía Circular no integrado", "Hoja de Ruta como insumo para su primera agenda",
-  "Feriados y cierre institucional", "Holgura en diciembre; entrega final el 18",
-  "Viaje no aprobado", "Mesa híbrida y reuniones virtuales"
+  "Feriados de noviembre", "Calendario confirmado con las contrapartes; holgura en diciembre",
+  "Viaje a Panamá no viable", "Mesa híbrida y reuniones virtuales"
 ) |>
   tabla_slide(digitos = 0, tamano = 16)
 ```
