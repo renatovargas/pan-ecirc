@@ -787,7 +787,7 @@ tribble(
   "Empleo, género y condición laboral", "Matriz de empleo del INEC; Encuesta de Mercado Laboral",
   "Comercio exterior y competitividad", "Cuadros de oferta y utilización; matriz insumo-producto",
   "Inversión", "Formación bruta de capital fijo e inversión extranjera directa del INEC",
-  "Concentración y barreras", "Directorio de Empresas y Locales; entrevistas",
+  "Concentración y barreras", "Directorio de Empresas y Locales",
   "Emisiones de gases de efecto invernadero", "EDGAR; inventario nacional",
   "Uso de recursos", "Balance Energético Nacional; Banco Mundial",
   "Recuperación de materiales", "Banco Mundial; UN Comtrade; diagnóstico nacional de residuos",
@@ -822,7 +822,7 @@ tribble(
 ## Actividad 2: qué se busca
 
 - Determinar cuáles de los catorce instrumentos son viables y convenientes para Panamá, y bajo qué condiciones.
-- Documentar cada instrumento en una ficha normalizada y definir una lista corta.
+- Documentar cada uno de los catorce instrumentos en una ficha normalizada, sin descartar ninguno.
 - Evaluar su factibilidad política, técnica, institucional y financiera.
 - Estimar su efecto por sector y diagnosticar las capacidades del gobierno y del sistema financiero.
 - Todavía no se diseñan en detalle: eso corresponde a la Actividad 3.
@@ -860,28 +860,30 @@ tribble(
   tabla_slide(digitos = 0, tamano = 17)
 ```
 
-- Cada criterio se puntúa en escala ordinal con justificación escrita; la puntuación ordena la discusión con los actores.
+- Cada criterio se puntúa de 1 a 5 con justificación escrita y una bandera de confianza de la evidencia; los pesos son iguales y se muestra su sensibilidad.
+- La puntuación ordena la discusión; MiAMBIENTE y la CEPAL deciden con cuáles instrumentos avanzar.
 
 ## Efectos por sector
 
 - Los cargos sobre productos (REP, depósito, impuestos) se analizan con el modelo de precios de insumo-producto [@millerblair2022].
-- El modelo estima cuánto suben los precios de cada sector cuando una actividad paga un cargo.
+- El modelo estima cuánto suben los costos de cada sector cuando una actividad paga un cargo ilustrativo, en escenarios.
 - Supone traslado completo del cargo y no incluye cambios de comportamiento.
-- Los instrumentos financieros se analizan de forma cualitativa estructurada, con criterios explícitos.
+- Los demás instrumentos se analizan de forma cualitativa estructurada: quién paga, quién se beneficia y por qué canal actúan.
 - Toda estimación lleva una nota sobre la confianza de los datos.
 
 ## Capacidades institucionales y sistema financiero
 
 - Se evalúan seis funciones: regular, registrar, recaudar, fiscalizar, monitorear y financiar.
-- Las fuentes son los mandatos legales, las entrevistas y los informes institucionales.
+- Las fuentes son los mandatos legales, la información solicitada y los informes institucionales.
+- Cada celda se marca como documentada o por confirmar.
 - El mapa del sistema financiero cubre banca, fondos, aseguradoras y mercado de valores.
 - La taxonomía [@sbp2024TaxonomiaPanama] y el marco soberano [@mef2024MarcoFinanciamientoSostenible] son los puntos de articulación.
-- El aporte es acercar lo que la taxonomía declara elegible a proyectos circulares financiables.
+- El aporte es contrastar lo que la taxonomía declara elegible con los proyectos circulares que ya se han identificado.
 
 ## Actividad 3: qué se busca
 
-- Convertir los instrumentos que superen la evaluación en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular.
-- Diseñar cada instrumento con montos, metas, responsables y plazos, y definir actores y roles.
+- Convertir la evaluación en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular.
+- Diseñar cada instrumento con parámetros de referencia (rangos de tarifas, metas y plazos) y definir actores y roles.
 - Identificar fuentes de financiamiento y reformas necesarias.
 - Validar los resultados en una mesa técnica con actores de todos los grupos.
 
@@ -899,7 +901,7 @@ tribble(
 - **Sistema financiero:** banca pública y privada, fondos de inversión y superintendencias.
 - **Sector privado:** gremios, productores e importadores, y gestores de residuos.
 - **Academia y sociedad civil:** centros técnicos, universidades y organizaciones de economía circular.
-- Las entrevistas acompañan todo el proceso, y la mesa técnica valida al final.
+- La mesa técnica de validación, virtual, reúne a todos los grupos, y las solicitudes de información complementan el análisis.
 - Los aportes se sistematizan: qué se recibió, qué se incorporó y por qué se descartó lo demás.
 
 ## Limitaciones del enfoque
@@ -932,9 +934,8 @@ Qué sigue, con quién y cuándo.
 tareas <- tribble(
   ~actividad, ~tarea, ~inicio, ~fin,
   "Actividad 1", "Plan, metodología y análisis", "2026-10-14", "2026-10-29",
-  "Actividad 2", "Fichas de instrumentos y lista corta", "2026-11-02", "2026-11-06",
+  "Actividad 2", "Fichas de instrumentos", "2026-11-02", "2026-11-06",
   "Actividad 2", "Solicitudes formales de información", "2026-11-02", "2026-11-13",
-  "Actividad 2", "Entrevistas, primera ronda", "2026-11-02", "2026-11-13",
   "Actividad 2", "Factibilidad y efectos por sector", "2026-11-09", "2026-11-20",
   "Actividad 2", "Capacidades institucionales y sistema financiero", "2026-11-09", "2026-11-20",
   "Actividad 2", "Redacción del informe de factibilidad", "2026-11-16", "2026-12-03",
@@ -995,18 +996,18 @@ tribble(
 ## Insumos adelantados para el reglamento
 
 - El reglamento de la Ley 502 se elabora mientras avanza este trabajo.
-- A mediados de noviembre se entrega a MiAMBIENTE un documento breve con contenidos de traducción normativa directa.
+- A mediados de noviembre se entrega a MiAMBIENTE un documento breve con propuestas que pueden incorporarse directamente al texto del reglamento.
 - Incluye los flujos prioritarios sugeridos para la REP.
 - Incluye la estructura de tarifas y los criterios de ecomodulación.
 - Incluye las obligaciones de registro y reporte, y las condiciones de trazabilidad.
 
-## Misión a Panamá y mesa técnica
+## Mesa técnica de validación
 
-- La consultoría contempla un viaje a Ciudad de Panamá del 23 al 27 de noviembre.
-- La misma semana combina la mesa técnica con reuniones con MiAMBIENTE, el MEF y las superintendencias.
-- Si el viaje no procede, la mesa se realiza de forma híbrida.
+- La mesa se realiza de forma virtual en la semana del 23 al 27 de noviembre.
+- Reúne al sector público, el sector privado, la academia y la sociedad civil.
+- Pueden realizarse reuniones bilaterales virtuales con MiAMBIENTE, el MEF y las superintendencias.
 - MiAMBIENTE valida la lista de invitados.
-- La agenda presenta la lista corta de instrumentos, las condiciones habilitantes y la secuencia propuesta.
+- La agenda presenta los catorce instrumentos con su evaluación, las condiciones habilitantes y la secuencia propuesta.
 
 ## Solicitudes de información
 
@@ -1017,7 +1018,6 @@ tribble(
   "Superintendencias del sector financiero", "Piloto de la taxonomía, cartera verde y productos vigentes",
   "Ministerio de Comercio e Industrias", "Incentivos vigentes y registros de industrias",
   "AAUD y MiAMBIENTE", "Residuos, sitios de disposición, gestores y recicladores",
-  "INEC", "Microdatos de empleo, conciliación de empleo y matriz actualizada",
   "Autoridad de competencia", "Estudios de mercado en cemento, plásticos, residuos y electricidad"
 ) |>
   tabla_slide(digitos = 0, tamano = 17)
@@ -1029,22 +1029,20 @@ tribble(
 tribble(
   ~Riesgo, ~Mitigación,
   "El reglamento avanza antes que los productos", "Insumos adelantados a mediados de noviembre",
-  "Baja disponibilidad de actores a fin de año", "Entrevistas desde el 2 de noviembre; respuestas escritas",
-  "Demora en la entrega de datos", "Solicitudes en la primera semana; tratamiento alternativo documentado",
-  "Pocos datos de recicladores y concentración", "Análisis cualitativo y entrevistas dirigidas",
+  "Baja disponibilidad de actores a fin de año", "Agenda confirmada a comienzos de noviembre; respuestas escritas",
+  "Demora en la entrega de datos", "Análisis con fuentes públicas; solicitudes en la primera semana; tratamiento alternativo documentado",
+  "Pocos datos de recicladores y concentración", "Análisis cualitativo y consulta dirigida en la mesa técnica",
   "Consejo de Economía Circular no integrado", "Hoja de Ruta como insumo para su primera agenda",
-  "Feriados de noviembre", "Calendario confirmado con las contrapartes; holgura en diciembre",
-  "Viaje a Panamá no viable", "Mesa híbrida y reuniones virtuales"
+  "Feriados de noviembre", "Calendario confirmado con las contrapartes; holgura en diciembre"
 ) |>
   tabla_slide(digitos = 0, tamano = 16)
 ```
 
 ## Próximos pasos {.theme-content}
 
-- Convertir los catorce instrumentos en fichas y una lista corta.
+- Convertir los catorce instrumentos en fichas normalizadas.
 - Enviar las solicitudes formales de información.
-- Iniciar las entrevistas con gobierno y sistema financiero.
-- Evaluar factibilidad, efectos por sector y capacidades.
+- Evaluar la factibilidad de los catorce instrumentos, sus efectos por sector y las capacidades.
 - Validar la Hoja de Ruta en la mesa técnica de fines de noviembre.
 - Consultar los [documentos](https://renatovargas.github.io/pan-ecirc/materiales/documentos/){target="_blank"} y las [memorias de cálculo](https://renatovargas.github.io/pan-ecirc/materiales/calculos/){target="_blank"} en línea.
 
