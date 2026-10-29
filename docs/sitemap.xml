@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://renatovargas.github.io/pan-ecirc/slides/01-actividad-01/index.html</loc>
-    <lastmod>2026-10-25T19:20:20.189Z</lastmod>
+    <lastmod>2026-10-29T04:56:30.494Z</lastmod>
   </url>
   <url>
     <loc>https://renatovargas.github.io/pan-ecirc/materiales/presentaciones/index.html</loc>
@@ -14,59 +14,63 @@
   </url>
   <url>
     <loc>https://renatovargas.github.io/pan-ecirc/materiales/documentos/a1b-plan-de-trabajo/index.html</loc>
-    <lastmod>2026-10-22T20:28:10.469Z</lastmod>
+    <lastmod>2026-10-29T05:37:06.985Z</lastmod>
   </url>
   <url>
     <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/index.html</loc>
-    <lastmod>2026-10-23T18:08:36.055Z</lastmod>
+    <lastmod>2026-10-28T18:36:02.734Z</lastmod>
   </url>
   <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c07-inversion-y-estructura-empresarial/index.html</loc>
-    <lastmod>2026-10-22T20:38:24.331Z</lastmod>
-  </url>
-  <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c05-emisiones-ghg/index.html</loc>
-    <lastmod>2026-10-22T20:38:24.330Z</lastmod>
-  </url>
-  <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c03-empleo-sectorial/index.html</loc>
-    <lastmod>2026-10-22T20:38:24.330Z</lastmod>
-  </url>
-  <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c01-mapeo-sectores/index.html</loc>
-    <lastmod>2026-10-22T20:38:24.365Z</lastmod>
-  </url>
-  <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/about.html</loc>
-    <lastmod>2026-10-22T17:00:44.919Z</lastmod>
-  </url>
-  <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/index.html</loc>
-    <lastmod>2026-10-22T20:27:35.287Z</lastmod>
-  </url>
-  <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c02-cuentas-sectoriales/index.html</loc>
-    <lastmod>2026-10-22T20:38:24.330Z</lastmod>
-  </url>
-  <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c04-eslabonamientos/index.html</loc>
-    <lastmod>2026-10-22T20:38:24.330Z</lastmod>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c08-base-sectorial-integrada/index.html</loc>
+    <lastmod>2026-10-28T18:33:55.428Z</lastmod>
   </url>
   <url>
     <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c06-recursos-y-residuos/index.html</loc>
     <lastmod>2026-10-22T20:38:24.331Z</lastmod>
   </url>
   <url>
-    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c08-base-sectorial-integrada/index.html</loc>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c04-eslabonamientos/index.html</loc>
+    <lastmod>2026-10-28T20:13:54.352Z</lastmod>
+  </url>
+  <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c02-cuentas-sectoriales/index.html</loc>
+    <lastmod>2026-10-22T20:38:24.330Z</lastmod>
+  </url>
+  <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/index.html</loc>
+    <lastmod>2026-10-22T20:27:35.287Z</lastmod>
+  </url>
+  <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/about.html</loc>
+    <lastmod>2026-10-22T17:00:44.919Z</lastmod>
+  </url>
+  <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c01-mapeo-sectores/index.html</loc>
+    <lastmod>2026-10-22T20:38:24.365Z</lastmod>
+  </url>
+  <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c03-empleo-sectorial/index.html</loc>
+    <lastmod>2026-10-22T20:38:24.330Z</lastmod>
+  </url>
+  <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c05-emisiones-ghg/index.html</loc>
+    <lastmod>2026-10-22T20:38:24.330Z</lastmod>
+  </url>
+  <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c07-inversion-y-estructura-empresarial/index.html</loc>
     <lastmod>2026-10-22T20:38:24.331Z</lastmod>
   </url>
   <url>
+    <loc>https://renatovargas.github.io/pan-ecirc/materiales/calculos/c09-formacion-bruta-capital/index.html</loc>
+    <lastmod>2026-10-28T19:15:43.501Z</lastmod>
+  </url>
+  <url>
     <loc>https://renatovargas.github.io/pan-ecirc/materiales/documentos/a1a-metodologia/index.html</loc>
-    <lastmod>2026-10-22T20:28:10.359Z</lastmod>
+    <lastmod>2026-10-29T05:35:48.994Z</lastmod>
   </url>
   <url>
     <loc>https://renatovargas.github.io/pan-ecirc/materiales/documentos/a1c-sectores-economicos-priorizados/index.html</loc>
-    <lastmod>2026-10-23T18:38:05.529Z</lastmod>
+    <lastmod>2026-10-29T05:22:49.735Z</lastmod>
   </url>
   <url>
     <loc>https://renatovargas.github.io/pan-ecirc/materiales/index.html</loc>

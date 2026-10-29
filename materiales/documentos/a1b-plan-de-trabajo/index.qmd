@@ -24,10 +24,12 @@ format:
     number-sections: true
     css: ../estilos.css
   docx:
+    output-file: a1b-plan-de-trabajo.docx
     toc: true
     toc-depth: 3
     number-sections: true
     reference-doc: ../../../assets/reference.docx
+    fig-dpi: 150
 execute:
   echo: false
   warning: false
@@ -43,9 +45,9 @@ source("materiales/calculos/scripts/funciones_comunes.R")
 # Calendario de tareas (todas las fechas son de 2026)
 tareas <- tribble(
   ~actividad, ~tarea, ~inicio, ~fin,
-  "Actividad 1", "Producto 1 (desde el 14/09): plan, metodología y análisis", "2026-10-14", "2026-10-23",
-  "Actividad 2", "Fichas de instrumentos y lista corta", "2026-10-26", "2026-11-06",
-  "Actividad 2", "Solicitudes formales de información", "2026-10-26", "2026-11-13",
+  "Actividad 1", "Producto 1: plan, metodología y análisis", "2026-10-14", "2026-10-29",
+  "Actividad 2", "Fichas de instrumentos y lista corta", "2026-11-02", "2026-11-06",
+  "Actividad 2", "Solicitudes formales de información", "2026-11-02", "2026-11-13",
   "Actividad 2", "Entrevistas, primera ronda", "2026-11-02", "2026-11-13",
   "Actividad 2", "Factibilidad y efectos por sector", "2026-11-09", "2026-11-20",
   "Actividad 2", "Capacidades institucionales y sistema financiero", "2026-11-09", "2026-11-20",
@@ -56,8 +58,7 @@ tareas <- tribble(
   "Actividad 3", "Mesa técnica de validación", "2026-11-23", "2026-11-27",
   "Actividad 3", "Sistematización y redacción del Producto 3", "2026-11-30", "2026-12-04",
   "Revisión", "Revisión de CEPAL y MiAMBIENTE", "2026-12-07", "2026-12-14",
-  "Revisión", "Ajustes y versiones finales", "2026-12-14", "2026-12-18",
-  "Revisión", "Reserva de contingencia", "2026-12-21", "2026-12-31"
+  "Revisión", "Ajustes y versiones finales", "2026-12-14", "2026-12-18"
 ) |>
   mutate(
     inicio = as.Date(inicio),
@@ -68,7 +69,7 @@ tareas <- tribble(
 
 hitos <- tribble(
   ~fecha, ~hito,
-  "2026-10-23", "Entrega del Producto 1",
+  "2026-10-29", "Entrega del Producto 1",
   "2026-11-27", "Cierre de la mesa técnica",
   "2026-12-04", "Borradores de los Productos 2 y 3",
   "2026-12-18", "Entrega de versiones finales"
@@ -80,13 +81,13 @@ hitos <- tribble(
 
 Este documento presenta el plan de trabajo de la consultoría sobre instrumentos económicos para aumentar los flujos de recursos hacia la economía circular en Panamá. La consultoría atiende la solicitud de asistencia técnica del Ministerio de Ambiente (MiAMBIENTE) a la CEPAL para implementar la Ley 502 de 2025 [@panama2025Ley502], con apoyo del programa de cooperación CEPAL-BMZ/GIZ "Promoviendo la Economía Circular".
 
-El plan toma como punto de partida que el trabajo comenzó el 14 de septiembre de 2026 y que el Producto 1 (plan, metodología y análisis sectorial) se entrega el 22 y 23 de octubre. El resto del trabajo se organiza con un criterio central: el cierre de la consultoría no admite extensión del plazo y las instituciones públicas reducen su actividad desde alrededor del 20 de diciembre. Por eso el grueso del trabajo de las Actividades 2 y 3 se concentra en noviembre, los borradores de los Productos 2 y 3 se completan a más tardar en la primera semana de diciembre, y diciembre queda reservado para revisiones y ajustes con holgura antes del cierre institucional.
+El plan parte de que el Producto 1 (plan, metodología y análisis sectorial) se entrega el 29 de octubre de 2026 y de que el trabajo de las Actividades 2 y 3 comienza el lunes 2 de noviembre. Los borradores de los Productos 2 y 3 se completan en la primera semana de diciembre, y el resto de diciembre se destina a revisiones y ajustes, de modo que las versiones finales se entregan el 18 de diciembre.
 
 Los hitos principales son:
 
-- **23 de octubre.** Entrega del Producto 1.
-- **26 de octubre a 20 de noviembre.** Fichas de instrumentos, solicitudes de información, entrevistas y análisis de factibilidad, capacidades y sistema financiero.
-- **Semana del 23 al 27 de noviembre.** Mesa técnica de validación con actores del sector público, privado, académico y de la sociedad civil, y, de resultar necesario, el viaje a Ciudad de Panamá.
+- **29 de octubre.** Entrega del Producto 1.
+- **2 al 20 de noviembre.** Fichas de instrumentos, solicitudes de información, entrevistas y análisis de factibilidad, capacidades y sistema financiero.
+- **Semana del 23 al 27 de noviembre.** Mesa técnica de validación con actores del sector público, privado, académico y de la sociedad civil.
 - **4 de diciembre.** Borradores completos de los Productos 2 y 3.
 - **7 al 18 de diciembre.** Revisión de CEPAL y MiAMBIENTE, ajustes y entrega de las versiones finales.
 
@@ -120,16 +121,16 @@ Organizar la ejecución de las tres actividades de la consultoría de modo que l
 
 ## Objetivos específicos
 
-1. Fijar el calendario de las Actividades 2 y 3 a partir del Producto 1 ya entregado.
+1. Fijar el calendario de las Actividades 2 y 3 a partir de la entrega del Producto 1.
 2. Concentrar el trabajo con actores y la validación en las fechas de mayor disponibilidad institucional.
 3. Identificar las solicitudes de información que deben formalizarse de inmediato.
 4. Anticipar los riesgos de calendario y de datos, con medidas de mitigación.
 
 # Antecedentes
 
-## Alcance contractual
+## Alcance
 
-La consultoría produce tres productos, correspondientes a las tres actividades de los Términos de Referencia. El Producto 1 contiene el plan de trabajo, la metodología y el análisis de los sectores priorizados, y la identificación de instrumentos con experiencia internacional. El Producto 2 evalúa la factibilidad política y técnica de los instrumentos, las capacidades institucionales y el sistema financiero nacional. El Producto 3 es la Hoja de Ruta Nacional para el Financiamiento de la Economía Circular, que incluye al menos una mesa técnica de validación. Los informes deben presentarse en español, en formatos editables, con resumen ejecutivo, bibliografía y glosario de siglas, y deben entregarse con tiempo para la revisión de los supervisores.
+La consultoría produce tres productos, uno por cada actividad. El Producto 1 contiene el plan de trabajo, la metodología y el análisis de los sectores de política priorizados, y la propuesta de instrumentos con experiencia internacional. El Producto 2 evalúa la factibilidad política y técnica de los instrumentos, las capacidades institucionales y el sistema financiero nacional. El Producto 3 es la Hoja de Ruta Nacional para el Financiamiento de la Economía Circular, que incluye al menos una mesa técnica de validación.
 
 ## Condiciones informadas por la contraparte
 
@@ -137,7 +138,7 @@ En las reuniones de arranque con MiAMBIENTE se informaron condiciones que ordena
 
 - La reglamentación de la Ley 502 está en proceso, con un borrador inicial, y la meta es tenerla lista antes del cierre del año. La consultoría se ejecuta en esa ventana, de modo que sus insumos pueden alimentar el reglamento si llegan a tiempo.
 - El Consejo Nacional de Economía Circular, creado por la ley [@panama2025Ley502, art. 8], todavía no está integrado y su primera sesión se prevé para el próximo año. La interlocución de corto plazo es directamente con MiAMBIENTE.
-- Los sectores priorizados son los de la Hoja de Ruta de Economía Circular [@miambiente2024HojaRutaEC] y se mantienen en términos generales.
+- Los sectores de política son los de la Hoja de Ruta de Economía Circular [@miambiente2024HojaRutaEC] y se mantienen en términos generales.
 - La facilitación de datos no representa un problema si se solicita con las formalidades pertinentes. Conviene incorporar al Ministerio de Economía y Finanzas (MEF), en particular la Dirección de Crédito Público, para el análisis de fuentes de financiamiento y bonos temáticos. El MEF tiene además una consultoría paralela sobre administración sostenible, de la que podría obtenerse información.
 - El Ministerio de Comercio e Industrias (MICI) opera incentivos a los que pueden articularse los instrumentos de circularidad, entre ellos el sello "Hecho en Panamá".
 - Una nueva norma otorga al Ministerio competencia para preparar al sector y formalizar el reciclaje a nivel local; su identificación precisa está pendiente.
@@ -148,11 +149,9 @@ Panamá cuenta con una Taxonomía de Finanzas Sostenibles [@sbp2024TaxonomiaPana
 
 # Principios del plan
 
-1. **Concentración en noviembre.** El trabajo analítico y con actores se concentra entre el 26 de octubre y el 27 de noviembre. Diciembre se reserva a revisiones y ajustes.
-2. **Insumos tempranos para el reglamento.** Los contenidos con traducción reglamentaria directa se adelantan a mediados de noviembre, sin esperar los borradores completos.
-3. **Solicitudes de datos en la primera semana.** Los tiempos de respuesta de las instituciones condicionan el análisis, por lo que las solicitudes formales se envían entre el 26 y el 30 de octubre.
-4. **Participación a lo largo del proceso.** Las entrevistas comienzan en la semana del 2 de noviembre, y la mesa técnica funciona como validación final de un proceso de consulta que ya está en marcha.
-5. **Holgura antes del cierre institucional.** Las versiones finales se entregan el 18 de diciembre, antes de la reducción de actividad de las instituciones.
+1. **Insumos tempranos para el reglamento.** Los contenidos con traducción reglamentaria directa se adelantan a mediados de noviembre, sin esperar los borradores completos.
+2. **Solicitudes de datos en la primera semana.** Los tiempos de respuesta de las instituciones condicionan el análisis, por lo que las solicitudes formales se envían entre el 2 y el 6 de noviembre.
+3. **Participación a lo largo del proceso.** Las entrevistas comienzan en la semana del 2 de noviembre, y la mesa técnica funciona como validación final de un proceso de consulta que ya está en marcha.
 
 # Plan por actividad
 
@@ -164,9 +163,9 @@ La @tbl-tareas resume las tareas, sus resultados y los actores que intervienen. 
 
 tribble(
   ~Actividad, ~Tareas, ~Resultado, ~`Actores que intervienen`,
-  "Actividad 1 (cumplida)",
-  "Plan de trabajo, metodología, análisis sectorial con eslabonamientos e inventario de familias de instrumentos",
-  "Producto 1 entregado el 23 de octubre",
+  "Actividad 1",
+  "Plan de trabajo, metodología, análisis sectorial con eslabonamientos y propuesta de catorce instrumentos",
+  "Producto 1, que se entrega el 29 de octubre",
   "Consultor; supervisión de CEPAL; MiAMBIENTE",
   "Actividad 2",
   "Fichas normalizadas de instrumentos y lista corta; evaluación de factibilidad por criterio; análisis de efectos por sector; capacidades institucionales; análisis del sistema financiero",
@@ -177,18 +176,18 @@ tribble(
   "Producto 3: Hoja de Ruta Nacional para el Financiamiento de la Economía Circular y sistematización de la mesa técnica",
   "Consultor; MiAMBIENTE; MEF; MICI; sector privado; academia; sociedad civil",
   "Revisión",
-  "Comentarios de los supervisores y de MiAMBIENTE; ajustes; presentación de cada producto",
+  "Comentarios de CEPAL y de MiAMBIENTE; ajustes; presentación de cada producto",
   "Versiones finales y presentaciones",
   "Supervisión de CEPAL; MiAMBIENTE"
 ) |>
   tabla_ft_es(digitos = 0)
 ```
 
-*Fuente: elaboración propia con base en los Términos de Referencia de la consultoría.*
+*Fuente: elaboración propia.*
 
 ## Actividad 2: factibilidad y capacidades
 
-Entre el 26 de octubre y el 6 de noviembre se convierte el inventario de instrumentos del Producto 1 en fichas normalizadas y en una lista corta, a partir de los criterios de la metodología. Al mismo tiempo se envían las solicitudes de información y se programa la primera ronda de entrevistas con MiAMBIENTE, el MEF, el MICI y las superintendencias. Entre el 9 y el 20 de noviembre se evalúa la factibilidad de cada instrumento, se estima su efecto por sector con el modelo de precios de insumo-producto cuando los datos lo permiten, y se analizan las capacidades de gobierno y del sistema financiero. La redacción del Producto 2 comienza el 16 de noviembre y su borrador se completa el 3 de diciembre.
+Entre el 2 y el 6 de noviembre se convierten los catorce instrumentos propuestos en el Producto 1 en fichas normalizadas y en una lista corta, a partir de los criterios de la metodología. Al mismo tiempo se envían las solicitudes de información y se programa la primera ronda de entrevistas con MiAMBIENTE, el MEF, el MICI y las superintendencias. Entre el 9 y el 20 de noviembre se evalúa la factibilidad de cada instrumento, se estima su efecto por sector con el modelo de precios de insumo-producto cuando los datos lo permiten, y se analizan las capacidades de gobierno y del sistema financiero. La redacción del Producto 2 comienza el 16 de noviembre y su borrador se completa el 3 de diciembre.
 
 ## Actividad 3: Hoja de Ruta
 
@@ -237,31 +236,30 @@ ggplot(tareas) +
 
 tribble(
   ~Fecha, ~Hito, ~Entregable,
-  "22 y 23 de octubre", "Entrega del Producto 1", "Plan de trabajo, metodología y análisis sectorial, con las bases de datos y memorias de cálculo",
-  "26 al 30 de octubre", "Solicitudes formales de información", "Cartas a MEF, superintendencias, MICI, AAUD, INEC y otras entidades",
+  "29 de octubre", "Entrega del Producto 1", "Plan de trabajo, metodología y análisis sectorial, con las bases de datos y memorias de cálculo",
+  "2 al 6 de noviembre", "Solicitudes formales de información", "Cartas a MEF, superintendencias, MICI, AAUD, INEC y otras entidades",
   "Mediados de noviembre", "Insumos para el reglamento", "Documento breve con contenidos de traducción reglamentaria directa",
   "23 al 27 de noviembre", "Mesa técnica de validación", "Presentación de la propuesta y registro de aportes",
-  "3 y 4 de diciembre", "Borradores de los Productos 2 y 3", "Informes completos para revisión de los supervisores",
+  "3 y 4 de diciembre", "Borradores de los Productos 2 y 3", "Informes completos para revisión",
   "7 al 14 de diciembre", "Revisión", "Comentarios de CEPAL y MiAMBIENTE",
-  "18 de diciembre", "Versiones finales", "Productos 2 y 3 y presentaciones de cada producto",
-  "21 al 31 de diciembre", "Reserva de contingencia", "Solo para ajustes solicitados por CEPAL; sin consultas con instituciones"
+  "18 de diciembre", "Versiones finales", "Productos 2 y 3 y presentaciones de cada producto"
 ) |>
   tabla_ft_es(digitos = 0)
 ```
 
 *Fuente: elaboración propia.*
 
-Los feriados nacionales de noviembre reducen los días hábiles de varias semanas del cronograma. El calendario debe confirmarse con las contrapartes al programar entrevistas y la mesa técnica. La holgura de la segunda semana de diciembre absorbe un retraso de hasta una semana en cualquiera de los borradores sin comprometer la entrega final del 18 de diciembre.
+Los feriados nacionales de noviembre reducen los días hábiles de varias semanas del cronograma. El calendario debe confirmarse con las contrapartes al programar entrevistas y la mesa técnica.
 
 # Misión a Panamá y mesa técnica
 
-La consultoría contempla un viaje a Ciudad de Panamá, que de realizarse ocurriría en la última semana de noviembre, del 23 al 27. La visita se justifica si permite combinar en la misma semana la mesa técnica de validación con reuniones bilaterales con MiAMBIENTE, el MEF y las superintendencias. La CEPAL analiza caso a caso el financiamiento de los viajes, de modo que la decisión final se toma con los supervisores a más tardar el 6 de noviembre, y la mesa puede realizarse de forma híbrida si el viaje no procede.
+La consultoría contempla un viaje a Ciudad de Panamá en la última semana de noviembre, del 23 al 27. La visita se justifica si permite combinar en la misma semana la mesa técnica de validación con reuniones bilaterales con MiAMBIENTE, el MEF y las superintendencias. Si el viaje no procede, la mesa puede realizarse de forma híbrida.
 
 La mesa técnica reúne al sector público, el sector privado, la academia y la sociedad civil. Las redes y plataformas de economía circular que operan en el país ofrecen un canal para convocar a las organizaciones participantes, y MiAMBIENTE valida la lista de invitados. La agenda presenta los instrumentos de la lista corta, las condiciones habilitantes y la secuencia propuesta, y recoge comentarios por escrito. Los aportes se sistematizan en un documento que registra qué se recibió, qué se incorporó y por qué se descartó lo demás.
 
 # Gestión de datos y solicitudes de información
 
-Las solicitudes de información se formalizan entre el 26 y el 30 de octubre, para que las respuestas lleguen antes del análisis de factibilidad. El @tbl-datos resume las principales.
+Las solicitudes de información se formalizan entre el 2 y el 6 de noviembre, para que las respuestas lleguen antes del análisis de factibilidad. El @tbl-datos resume las principales.
 
 ```{r}
 #| label: tbl-datos
@@ -306,7 +304,7 @@ tribble(
   "Insumos adelantados a mediados de noviembre; interlocución directa con MiAMBIENTE",
   "Baja disponibilidad de actores a fines de noviembre y en diciembre",
   "Entrevistas y mesa técnica con poca participación",
-  "Primera ronda de entrevistas desde el 2 de noviembre; agenda de la mesa confirmada en octubre; respuestas escritas como alternativa",
+  "Primera ronda de entrevistas desde el 2 de noviembre; agenda de la mesa confirmada a comienzos de noviembre; respuestas escritas como alternativa",
   "Demora en la entrega de datos",
   "Análisis cuantitativo incompleto",
   "Solicitudes formales en la primera semana; tratamiento alternativo documentado para cada brecha",
@@ -316,10 +314,10 @@ tribble(
   "Consejo Nacional de Economía Circular no integrado",
   "Falta una instancia de validación formal",
   "La Hoja de Ruta se redacta como insumo para la primera agenda del Consejo",
-  "Feriados y cierre institucional",
+  "Feriados de noviembre",
   "Reducción de días hábiles",
-  "Holgura de la segunda semana de diciembre; entrega final el 18 de diciembre",
-  "Viaje no aprobado",
+  "Calendario confirmado con las contrapartes; holgura de la segunda semana de diciembre",
+  "Viaje a Panamá no viable",
   "La mesa técnica pierde interacción presencial",
   "Mesa híbrida; reuniones bilaterales virtuales"
 ) |>
@@ -330,7 +328,7 @@ tribble(
 
 # Coordinación y control de calidad
 
-La consultoría mantiene reuniones semanales de seguimiento con los supervisores de la CEPAL y un canal de coordinación con MiAMBIENTE. Se acuerdan con MiAMBIENTE los formatos y plazos de las solicitudes de datos. También se coordina con la consultoría paralela de sistema de información e indicadores, para que los indicadores de seguimiento de la Hoja de Ruta sean los mismos que alimenten la plataforma de la Ley 502.
+La consultoría mantiene reuniones semanales de seguimiento con la CEPAL y un canal de coordinación con MiAMBIENTE. Se acuerdan con MiAMBIENTE los formatos y plazos de las solicitudes de datos. También se coordina con la consultoría paralela de sistema de información e indicadores, para que los indicadores de seguimiento de la Hoja de Ruta sean los mismos que alimenten la plataforma de la Ley 502.
 
 Todas las cifras de los productos provienen de bases de datos con memorias de cálculo públicas, y cada informe se revisa contra esas memorias antes de su entrega. Las referencias se verifican contra la fuente, y lo que no pudo verificarse se marca así en el texto.
 
