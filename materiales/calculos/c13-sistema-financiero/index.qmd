@@ -1,0 +1,179 @@
+---
+title: "Memoria de cálculo 13: sistema financiero nacional"
+description: "Cartera de crédito por sector de política, mercado de bonos temáticos y mapa de actores del sistema financiero de Panamá"
+author: "Renato Vargas"
+date: "2026-11-23"
+lang: es
+categories:
+  - sistema financiero
+  - finanzas sostenibles
+  - economía circular
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Esta memoria arma tres bases sobre el sistema financiero nacional y su capacidad de llevar recursos hacia la economía circular:
+
+1. la cartera de crédito local del sistema bancario por sector económico, llevada a los sectores de política;
+2. las emisiones temáticas (verdes, sociales y sostenibles) vigentes en la Bolsa Latinoamericana de Valores (Latinex);
+3. un mapa de actores con su rol y su base legal.
+
+Las cifras de crédito provienen del Informe de Actividad Bancaria de septiembre de 2026 de la Superintendencia de Bancos [@sbp2026IAB092026, cuadros 3 y 5]. Las emisiones temáticas provienen de la tabla de emisiones sostenibles de Latinex [@latinex2026EmisionesSostenibles] y de la nota técnica de clima del Programa de Evaluación del Sector Financiero del Banco Mundial [@bm2023FSAPClimaPanama, tabla 3]. Los datos se transcribieron a archivos pequeños en `data/finanzas/`, con la fuente en cada fila.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+rm(list = ls())
+source("materiales/calculos/scripts/funciones_comunes.R")
+```
+
+# Cartera de crédito local por sector
+
+La Superintendencia de Bancos publica el saldo de la cartera local por sector económico. Esos sectores no coinciden con las actividades de las cuentas nacionales, pero varios se pueden asociar a un sector de política: la agricultura, la ganadería y la pesca con agricultura y alimentos, la industria con industrias y la construcción con ciudades y construcción. El crédito hipotecario, el de consumo, el comercio, las actividades financieras y el sector público quedan en el resto de la economía. La Superintendencia no publica una línea de hoteles y restaurantes, de modo que el turismo no puede separarse.
+
+```{r}
+#| label: cartera
+
+cartera <- read_csv("data/finanzas/sbp_cartera_local_sector_2025_2026.csv", show_col_types = FALSE)
+
+sector_sbp <- tribble(
+  ~sector, ~sector_principal,
+  "Agricultura", "Agricultura y alimentos",
+  "Ganadería", "Agricultura y alimentos",
+  "Pesca", "Agricultura y alimentos",
+  "Industria", "Industrias",
+  "Construcción", "Ciudades y construcción"
+)
+
+cartera_sector <- cartera |>
+  filter(nivel == "sector") |>
+  left_join(sector_sbp, by = "sector") |>
+  mutate(sector_principal = replace_na(sector_principal, "Resto de la economía")) |>
+  select(fecha, sector_sbp = sector, sector_principal, saldo_musd)
+
+total_cartera <- cartera |>
+  filter(nivel == "total") |>
+  select(fecha, total_musd = saldo_musd)
+
+# Variación anual por sector de la Superintendencia
+variacion_sbp <- cartera_sector |>
+  select(fecha, sector_sbp, saldo_musd) |>
+  pivot_wider(names_from = fecha, values_from = saldo_musd) |>
+  mutate(variacion_pct = 100 * (`2026-09-30` / `2025-09-30` - 1))
+
+variacion_sbp
+```
+
+Comparamos la participación de cada sector de política en el crédito con su participación en el valor agregado de 2024 (memoria 2). Un cociente menor que 1 indica que el sector recibe menos crédito bancario que lo que pesa en la producción.
+
+```{r}
+#| label: credito-vab
+
+vab_2024 <- leer_salida("cuentas_sector_2018_2024") |>
+  filter(anio == 2024) |>
+  transmute(sector_principal = as.character(sector_principal), participacion_vab)
+
+cartera_politica <- cartera_sector |>
+  filter(fecha == max(fecha)) |>
+  summarize(saldo_musd = sum(saldo_musd), .by = sector_principal) |>
+  mutate(participacion_credito = 100 * saldo_musd / sum(saldo_musd)) |>
+  left_join(vab_2024, by = "sector_principal") |>
+  mutate(
+    credito_sobre_vab = participacion_credito / participacion_vab,
+    sector_principal = factor(sector_principal, levels = sectores_politica)
+  ) |>
+  arrange(sector_principal)
+
+cartera_politica
+```
+
+Industrias recibe una proporción del crédito `r formato_es(cartera_politica$credito_sobre_vab[cartera_politica$sector_principal == "Industrias"], 1)` veces mayor que su peso en el valor agregado, mientras que agricultura y alimentos recibe `r formato_es(cartera_politica$credito_sobre_vab[cartera_politica$sector_principal == "Agricultura y alimentos"], 1)` veces y ciudades y construcción `r formato_es(cartera_politica$credito_sobre_vab[cartera_politica$sector_principal == "Ciudades y construcción"], 1)` veces su peso. El crédito local se concentra en hipotecas, consumo personal y comercio, que suman la mayor parte del saldo, y los saldos de industria y construcción cayeron entre septiembre de 2025 y septiembre de 2026.
+
+# Emisiones temáticas en Latinex
+
+```{r}
+#| label: tematicos
+
+tematicos <- read_csv("data/finanzas/latinex_emisiones_svs_vigentes_2026.csv", show_col_types = FALSE)
+
+resumen_tematicos <- tematicos |>
+  summarize(
+    series = n(),
+    emisores = n_distinct(emisor),
+    monto_musd = sum(monto_serie_usd, na.rm = TRUE) / 1e6,
+    .by = etiqueta
+  ) |>
+  arrange(desc(monto_musd))
+
+relacion_circular <- tematicos |>
+  mutate(relacion = case_when(
+    str_starts(relacion_economia_circular, "Directa") ~ "Directa",
+    str_starts(relacion_economia_circular, "Parcial") ~ "Parcial",
+    TRUE ~ "Ninguna explícita"
+  )) |>
+  summarize(series = n(), monto_musd = sum(monto_serie_usd, na.rm = TRUE) / 1e6, .by = relacion)
+
+resumen_tematicos
+relacion_circular
+```
+
+Las series temáticas vigentes suman `r formato_es(sum(resumen_tematicos$monto_musd), 1)` millones de dólares de `r n_distinct(tematicos$emisor)` emisores. La mayoría financia energía renovable, edificios y eficiencia energética. La única emisora cuyo negocio es directamente circular es una empresa de reciclaje de metales y residuos electrónicos, con `r relacion_circular$series[relacion_circular$relacion == "Directa"]` series vigentes por `r formato_es(relacion_circular$monto_musd[relacion_circular$relacion == "Directa"], 1)` millones de dólares, dentro de un programa de bonos verdes de 30 millones registrado en 2026 [@bgmetal2026SuplementoSerieI].
+
+# Mapa de actores
+
+Por último, registramos los actores del sistema financiero que intervienen o podrían intervenir en el financiamiento de la economía circular. Para cada uno anotamos su tipo (regulador, gobierno, banca pública o privada, inversionista institucional, multilateral), su rol y los instrumentos que ya maneja y que podrían orientarse a proyectos circulares.
+
+```{r}
+#| label: actores
+
+actores <- tribble(
+  ~actor, ~tipo, ~rol, ~instrumentos,
+  "Superintendencia de Bancos", "Regulador y supervisor", "Supervisa 64 bancos; coordina la Taxonomía de Finanzas Sostenibles", "Acuerdo 11-2022 de riesgo climático; guía de la taxonomía para bancos; reconocimiento de garantías (Acuerdo 8-2025)",
+  "Superintendencia del Mercado de Valores", "Regulador", "Registra ofertas públicas, incluidas las temáticas", "Guía de alineación de bonos temáticos con la taxonomía (2025)",
+  "Superintendencia de Seguros y Reaseguros", "Regulador", "Supervisa aseguradoras; integra el comité de la taxonomía", "Taxonomía de Finanzas Sostenibles",
+  "Ministerio de Economía y Finanzas", "Gobierno", "Deuda pública, fideicomisos con la banca multilateral y APP", "Marco de Financiamiento Sostenible (2024); Fondo de Garantías de Panamá",
+  "Ministerio de Ambiente", "Gobierno", "Comité de la taxonomía; reglamento de la Ley 502; plataforma de indicadores", "Criterios técnicos ambientales",
+  "AMPYME", "Gobierno", "Fomento de la micro, pequeña y mediana empresa", "Fondo de garantía de la Ley 33 de 2000",
+  "Banco Nacional de Panamá", "Banca pública", "Fiduciario de programas del BID y crédito agropecuario", "Fondo de Garantías de Panamá; préstamos para energía solar",
+  "Caja de Ahorros", "Banca pública", "Ahorro e hipotecas", "Crédito hipotecario y de consumo",
+  "Bancos privados", "Banca privada", "Crédito comercial, hipotecario y de consumo", "Bonos sostenibles; líneas verdes con BID Invest",
+  "Latinex", "Infraestructura de mercado", "Listado y custodia; segmento sostenible desde 2018", "Series verdes, sociales y sostenibles",
+  "Fondo de Ahorro de Panamá", "Fondo soberano", "Ahorro y estabilización", "Sin mandato de inversión doméstica",
+  "SIACAP y aseguradoras", "Inversionistas institucionales", "Ahorro previsional y reservas técnicas", "Deuda pública y depósitos bancarios",
+  "BID y BID Invest", "Multilateral", "Préstamos, garantías y cooperación técnica", "Fondo de Garantías de Panamá; líneas verdes; prefactibilidad de APP de residuos",
+  "Fondo Verde del Clima", "Fondo climático", "Financiamiento concesional y preparación", "Programa con instituciones financieras locales (FP149)"
+)
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(cartera_sector, "cartera_credito_sbp_2025_2026", hoja = "cartera")
+guardar_salida(cartera_politica, "cartera_credito_sector_politica_2026", hoja = "sector")
+guardar_salida(tematicos, "emisiones_tematicas_latinex_2026", hoja = "series")
+guardar_salida(resumen_tematicos, "emisiones_tematicas_resumen_2026", hoja = "resumen")
+guardar_salida(actores, "sistema_financiero_actores", hoja = "actores")
+```
+
+# Referencias
+
+::: {#refs}
+:::

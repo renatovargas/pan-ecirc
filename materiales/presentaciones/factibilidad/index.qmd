@@ -1,0 +1,22 @@
+---
+title: "Factibilidad de los instrumentos"
+subtitle: "Instrumentos económicos para la economía circular en Panamá"
+---
+
+::::{.slide-embed}
+<iframe class="slide-deck" src="../../../slides/02-factibilidad/index.html" title="Factibilidad de los instrumentos" loading="lazy"></iframe>
+::::
+
+::::{.slide-links}
+[⛶ Pantalla completa](../../../slides/02-factibilidad/index.html){target="_blank"}
+::::
+
+## Objetivos
+
+- Presentar la factibilidad política y técnica de los catorce instrumentos y su ruta legal.
+- Mostrar los efectos de los instrumentos sobre los precios de cada sector de política y de la canasta de los hogares.
+- Presentar las capacidades institucionales y el análisis del sistema financiero nacional.
+
+## Documento de referencia
+
+- [Factibilidad de los instrumentos y capacidades](../../documentos/a2-factibilidad-capacidades/index.qmd)

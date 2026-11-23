@@ -26,7 +26,7 @@ execute:
 
 # Introducción
 
-Los Términos de Referencia incluyen dos criterios de evaluación sectorial que las cuentas nacionales no cubren: el **uso de recursos** (agua, energía o gas, materiales) y el **potencial de recuperación y uso de materiales secundarios**. Esta memoria reúne las fuentes oficiales y de organismos internacionales disponibles para Panamá y las lleva a una forma comparable con los sectores de la Hoja de Ruta de Economía Circular.
+El análisis sectorial incluye dos criterios que las cuentas nacionales no cubren: el **uso de recursos** (agua, energía o gas, materiales) y el **potencial de recuperación y uso de materiales secundarios**. Esta memoria reúne las fuentes oficiales y de organismos internacionales disponibles para Panamá y las lleva a una forma comparable con los sectores de la Hoja de Ruta de Economía Circular.
 
 La calidad de la información es desigual y conviene decirlo de entrada:
 
@@ -147,7 +147,7 @@ energia_sector <- energia_flujos |>
   )
 ```
 
-Las pérdidas totales (transformación, transmisión y distribución) y el consumo propio de los productores de electricidad se asignan al sector de energía. Los sectores de recursos hídricos y de ciudades y construcción no aparecen en el balance con consumo identificable, y quedan ausentes de la tabla. Los transportes, el consumo residencial y el comercial quedan en "Resto de la economía".
+Las pérdidas totales (transformación, transmisión y distribución) y el consumo propio de los productores de electricidad se asignan al sector de energía. Los sectores de recursos hídricos y de ciudades y construcción no aparecen en el balance con consumo identificable, y quedan ausentes de la tabla. Los transportes, el consumo residencial y el comercial quedan en "Resto de la economía". El turismo tampoco tiene una fila propia: el consumo de hoteles y restaurantes está dentro de "comercial y servicios públicos" y el combustible de la aviación dentro de "transporte", sin desagregación publicada, por lo que el sector no tiene un indicador de energía en esta base.
 
 ```{r}
 #| label: tbl-energia-2023

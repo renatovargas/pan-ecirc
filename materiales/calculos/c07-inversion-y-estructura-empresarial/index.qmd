@@ -25,7 +25,7 @@ execute:
 
 # Introducción
 
-Los Términos de Referencia piden evaluar las **inversiones** de cada sector, con énfasis en la inversión privada, y la **concentración de mercado y las barreras de entrada y salida**. Panamá no publica en forma abierta ni la formación de capital por actividad ni índices de concentración por sector. Esta memoria construye aproximaciones con las fuentes que sí existen y deja constancia de sus límites:
+El análisis sectorial evalúa las **inversiones** de cada sector, con énfasis en la inversión privada, y la **concentración de mercado y las barreras de entrada y salida**. Panamá no publica en forma abierta ni la formación de capital por actividad ni índices de concentración por sector. Esta memoria construye aproximaciones con las fuentes que sí existen y deja constancia de sus límites:
 
 - **Inversión:** la inversión extranjera directa (IED) por sección de la Clasificación Industrial Internacional Uniforme (CIIU Rev. 4) para 2022 a 2024 [@inec2026ied]. Es un flujo y una posición de capital de no residentes, no la inversión total ni la privada nacional.
 - **Estructura empresarial:** el Directorio de Empresas y Locales de 2022 del INEC [@inec2022directorio] da el número de empresas por tamaño de ingresos y por clase de actividad, con el personal y los ingresos de cada clase.
@@ -64,7 +64,7 @@ distinct(ied, variable)
 
 ## Asignación a sectores
 
-Los cuadros del INEC agrupan la electricidad, el gas y el agua en una sola línea, que contiene tres de nuestros sectores (energía, recursos hídricos y residuos). No es posible separarlos, así que los tratamos como un grupo.
+Los cuadros del INEC agrupan la electricidad, el gas y el agua en una sola línea, que contiene tres de nuestros sectores (energía, recursos hídricos y residuos). No es posible separarlos, así que los tratamos como un grupo. Las líneas de hoteles y restaurantes y de artes, entretenimiento y creatividad corresponden a las actividades que la memoria 1 asigna a Turismo; el transporte aéreo está dentro de "transporte, almacenamiento y correo" y queda en el resto de la economía.
 
 ```{r}
 #| label: ied-asignacion
@@ -75,7 +75,9 @@ asignacion_ied <- tribble(
   "Explotación de minas y canteras", "Resto de la economía",
   "Industrias manufactureras", "Industrias",
   "Suministro de electridad, gas y agua", "Energía, recursos hídricos y residuos (conjunto)",
-  "Construcción", "Ciudades y construcción"
+  "Construcción", "Ciudades y construcción",
+  "Hoteles y restaurantes", "Turismo",
+  "Artes, entretenimiento y creatividad", "Turismo"
 )
 
 ied_grupo <- ied |>
@@ -162,7 +164,7 @@ directorio_clases <- leer_cuadro_inec(
 nrow(directorio_clases)
 ```
 
-Escogemos las clases con expresiones regulares sobre la etiqueta y las asignamos a un sector. Las clases de residuos incluyen la recolección y el tratamiento de desechos y el procesamiento y la recuperación de materiales; las de industrias, las de plástico, cemento y hormigón.
+Escogemos las clases con expresiones regulares sobre la etiqueta y las asignamos a un sector. Las clases de residuos incluyen la recolección y el tratamiento de desechos y el procesamiento y la recuperación de materiales; las de industrias, las de plástico, cemento y hormigón, y las de turismo, el alojamiento, los restaurantes y el transporte aéreo de pasajeros.
 
 ```{r}
 #| label: clases-clave
@@ -176,7 +178,10 @@ clases_clave <- tribble(
   "^Generación, transmisión y distribución de energía eléctrica", "Energía",
   "^Fabricación de productos de plástico", "Industrias",
   "^Fabricación de cemento, cal y yeso", "Industrias",
-  "^Fabricación de artículos de hormigón", "Industrias"
+  "^Fabricación de artículos de hormigón", "Industrias",
+  "^Actividades de alojamiento temporales", "Turismo",
+  "^Restaurantes", "Turismo",
+  "^Transporte de pasajeros por vía aérea", "Turismo"
 )
 
 directorio_clave <- clases_clave |>
@@ -217,7 +222,7 @@ directorio_clave |>
 
 ## Estructura de tamaño por sector
 
-Para comparar los sectores calculamos la proporción de empresas grandes y micro en la sección donde cada sector tiene su núcleo: agricultura (A), industrias (C), energía (D), agua, residuos y recursos hídricos (E) y construcción (F). Las secciones agrupan actividades que pertenecen a otros sectores de política: la sección C incluye la agroindustria de alimentos, y la E reúne agua y residuos. Es una caracterización a nivel de sección.
+Para comparar los sectores calculamos la proporción de empresas grandes y micro en la sección donde cada sector tiene su núcleo: agricultura (A), industrias (C), energía (D), agua, residuos y recursos hídricos (E), construcción (F) y turismo (I, hoteles y restaurantes). Las secciones agrupan actividades que pertenecen a otros sectores de política: la sección C incluye la agroindustria de alimentos, y la E reúne agua y residuos. Es una caracterización a nivel de sección.
 
 ```{r}
 #| label: estructura-sector
@@ -228,7 +233,8 @@ seccion_a_sector <- tribble(
   "C", "Industrias",
   "D", "Energía",
   "E", "Recursos hídricos y residuos",
-  "F", "Ciudades y construcción"
+  "F", "Ciudades y construcción",
+  "I", "Turismo"
 )
 
 estructura_sector <- directorio_seccion |>

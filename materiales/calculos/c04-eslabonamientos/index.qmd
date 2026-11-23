@@ -25,7 +25,7 @@ execute:
 
 # Introducción
 
-Los Términos de Referencia piden analizar los sectores económicos "tomando en cuenta los relevantes eslabonamientos productivos". Esta memoria cuantifica esos eslabonamientos con la matriz insumo-producto de Panamá de 2018 [@inec2024mip], que es la más reciente que publica el INEC, y con la metodología estándar de análisis insumo-producto [@millerblair2022].
+El análisis sectorial considera los eslabonamientos productivos de cada sector. Esta memoria cuantifica esos eslabonamientos con la matriz insumo-producto de Panamá de 2018 [@inec2024mip], que es la más reciente que publica el INEC, y con la metodología estándar de análisis insumo-producto [@millerblair2022].
 
 La matriz tiene 76 actividades y está expresada en miles de balboas a precios básicos. Usamos la matriz de producción doméstica (cuadro 2), que registra las compras intermedias de insumos de origen nacional, y la de importaciones (cuadro 3) para medir las fugas hacia el exterior. La metodología del INEC está documentada en un informe técnico [@inec2024metodologiamip].
 
@@ -36,7 +36,7 @@ Calculamos para cada actividad:
 - Los **multiplicadores** de valor agregado y de empleo.
 - La **fuga por importaciones** de insumos.
 
-Aplicamos el cálculo en dos niveles: las 76 actividades y los siete grupos de sectores de la memoria 1. Una advertencia sobre el alcance: la matriz es de 2018 y las memorias de empleo y de cuentas llegan a 2024. Las proporciones estructurales (coeficientes técnicos) se suponen estables, y las cifras de valor agregado y empleo por unidad de producción de 2018 no deben leerse como las de 2024.
+Aplicamos el cálculo en dos niveles: las 76 actividades y los ocho grupos de sectores (siete sectores de política y el resto de la economía) de la memoria 1. Una advertencia sobre el alcance: la matriz es de 2018 y las memorias de empleo y de cuentas llegan a 2024. Las proporciones estructurales (coeficientes técnicos) se suponen estables, y las cifras de valor agregado y empleo por unidad de producción de 2018 no deben leerse como las de 2024.
 
 ## Notación
 
@@ -211,12 +211,12 @@ indicadores |>
 
 # Flujos y enlaces entre sectores
 
-Agregamos las 76 actividades a los siete grupos de sectores para ver cómo se relacionan entre sí. La matriz de flujos agregada es la suma de los bloques de $\mathbf{Z}$.
+Agregamos las 76 actividades a los ocho grupos de sectores (siete sectores de política y el resto de la economía) para ver cómo se relacionan entre sí. La matriz de flujos agregada es la suma de los bloques de $\mathbf{Z}$.
 
 ```{r}
 #| label: flujos-sectores
 
-# Matriz de pertenencia: 76 actividades por 7 sectores
+# Matriz de pertenencia: 76 actividades por 8 grupos de sectores
 sector_de_actividad <- indicadores$sector_principal
 G <- sapply(sectores_politica, \(s) as.numeric(sector_de_actividad == s))
 
@@ -226,7 +226,7 @@ x_sector <- as.vector(t(G) %*% x) / 1000
 dimnames(Z_sector) <- list(sectores_politica, sectores_politica)
 
 A_sector <- Z_sector %*% diag(1 / x_sector)
-L_sector <- solve(diag(7) - A_sector)
+L_sector <- solve(diag(length(sectores_politica)) - A_sector)
 ```
 
 ```{r}

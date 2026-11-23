@@ -1,0 +1,236 @@
+---
+title: "Memoria de cálculo 14: Hoja de Ruta de financiamiento"
+description: "Diseño de los instrumentos con parámetros, montos estimados, responsables, plazos, fuentes de financiamiento, reformas normativas e indicadores de seguimiento"
+author: "Renato Vargas"
+date: "2026-11-23"
+lang: es
+categories:
+  - hoja de ruta
+  - financiamiento
+  - economía circular
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Los estudios previos propusieron catorce instrumentos para llevar recursos hacia la economía circular en Panamá y evaluaron su factibilidad [@vargas2026SectoresPriorizados; @vargas2026Factibilidad]. El paso siguiente es convertirlos en un plan de acción. Esta memoria arma las bases de la Hoja de Ruta Nacional para el Financiamiento de la Economía Circular. Su objetivo es dar a cada instrumento parámetros de diseño, montos estimados donde los datos lo permiten, un responsable, un vehículo legal y un año de entrada en vigor. Además ordena las fuentes de financiamiento, las reformas normativas por nivel jurídico y los indicadores de seguimiento. Los montos se calculan con las bases de las memorias anteriores y con parámetros internacionales documentados; cada cálculo indica su fuente.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+rm(list = ls())
+source("materiales/calculos/scripts/funciones_comunes.R")
+
+composicion <- leer_salida("residuos_composicion_2021")
+otros_res <- leer_salida("residuos_otros_indicadores")
+fichas <- leer_salida("fichas_instrumentos")
+ranking <- leer_salida("factibilidad_ranking_sensibilidad")
+precios_hogares <- leer_salida("incidencia_precios_hogares_mip2018")
+```
+
+# Montos de referencia
+
+## REP de envases
+
+El costo de cumplimiento del primer sistema colectivo de envases de Chile fue de 380.000 a 500.000 pesos chilenos por tonelada valorizada entre 2024 y 2026 [@resimple2023Garantias]. Con el tipo de cambio del estudio de impacto chileno, de 692 pesos por dólar [@mmaChile2020AGIESEnvases], equivale a entre 549 y 722 dólares por tonelada; como el peso chileno se ha depreciado desde entonces, el rango es una cota superior. Los materiales de envase (plástico, papel y cartón, vidrio y metal) suman 38 % de los residuos municipales de Panamá, una cota superior de los envases puestos en el mercado, porque incluye materiales que no son envases [@worldbank2026wwaste]. La trayectoria de metas sigue la chilena: comienza con metas bajas y llega a 45 % de valorización en plásticos domiciliarios en el año 12 [@mmaChile2020DS12Envases, art. 21]. Aquí se usa una meta media para todos los materiales de 10 % en el primer año, 25 % en el quinto y 45 % en el décimo.
+
+```{r}
+#| label: rep
+
+t_envases <- composicion |>
+  filter(material %in% c("Plástico", "Papel y cartón", "Vidrio", "Metal")) |>
+  summarize(t = sum(toneladas_anio)) |>
+  pull(t)
+
+costo_t <- c(minimo = 380000, maximo = 500000) / 692
+
+rep_trayectoria <- tibble(
+  anio = c(2028, 2032, 2037),
+  meta_valorizacion = c(0.10, 0.25, 0.45)
+) |>
+  mutate(
+    toneladas_valorizadas = t_envases * meta_valorizacion,
+    costo_min_musd = toneladas_valorizadas * costo_t["minimo"] / 1e6,
+    costo_max_musd = toneladas_valorizadas * costo_t["maximo"] / 1e6
+  )
+
+rep_trayectoria
+```
+
+## Tarifa de aseo a costo real
+
+En 2025 la Autoridad de Aseo recaudó B/.35,2 millones y gastó B/.60,6 millones, con una morosidad acumulada de B/.118,8 millones [@estrella2026AAUDMorosidad]. La brecha anual que una tarifa a costo real debe cerrar es la diferencia.
+
+```{r}
+#| label: aseo
+
+brecha_aseo <- 60.6 - 35.2
+brecha_aseo
+```
+
+## Tasa de disposición final de residuos de construcción
+
+```{r}
+#| label: rcd
+
+t_rcd <- otros_res |> filter(str_starts(indicador, "Construcción")) |> pull(valor)
+recaudo_rcd <- 10 * t_rcd / 1e6
+recaudo_rcd
+```
+
+Con B/.10 por tonelada, similar al costo de operación del relleno de Cerro Patacón en el contrato de 2023 [@tvn2023Ecolimpia], la tasa recaudaría unos B/.`r formato_es(recaudo_rcd, 1)` millones al año si todo el residuo de obra llegara a sitios autorizados.
+
+# Diseño de los instrumentos
+
+Con los montos anteriores armamos la ficha de diseño de cada instrumento. Para cada uno anotamos sus parámetros principales, la meta que debería alcanzar, el año en que entraría en vigor y el monto de referencia, y le unimos de la memoria 10 el paso al que pertenece, la norma legal necesaria, la institución responsable, la fuente de recursos y su puntaje de factibilidad. Los años de inicio siguen la lógica de los dos pasos: los instrumentos que solo requieren reglamentos o resoluciones empiezan en 2027, y los que dependen del registro de productores o de una ley nueva se escalonan entre 2028 y 2030.
+
+```{r}
+#| label: diseno
+
+diseno <- tribble(
+  ~id, ~parametros, ~meta, ~anio_inicio, ~monto,
+  1, "Registro en la plataforma de la Ley 502, alimentado por las declaraciones aduaneras por partida; flujos iniciales: envases, aparatos eléctricos y electrónicos, neumáticos, aceites y baterías",
+     "Productores e importadores de los flujos iniciales inscritos", 2027, "Costo administrativo",
+  2, "Registro de recicladores como gestores con requisitos graduales (Ley 276, art. 50-51); pago por tonelada desde la REP y la tasa; certificación de competencias",
+     "Recicladores registrados y con pago por tonelada en los municipios con mayor generación", 2027, "Pago por tonelada desde las contribuciones de la REP",
+  3, "Sistemas colectivos autorizados por la AAUD; metas de valorización de 10 % (año 1), 25 % (año 5) y 45 % (año 10); auditoría independiente",
+     "45 % de valorización de envases al décimo año", 2028,
+     paste0("Costo de cumplimiento de US$", formato_es(rep_trayectoria$costo_min_musd[1], 0), " a ", formato_es(rep_trayectoria$costo_max_musd[1], 0), " millones en el primer año"),
+  4, "Tarifa con recargos y bonificaciones según reciclabilidad, monomaterial y contenido reciclado nacional",
+     "Diferencia de tarifa suficiente entre envases reciclables y no reciclables", 2030, "Neutral en recaudación",
+  5, "Sistema de depósito para PET, aluminio y vidrio de bebidas, operado por los productores y autorizado por la AAUD; puntos de retorno en comercios, hoteles y restaurantes",
+     "90 % de recolección separada de botellas, en línea con el estándar europeo para 2029", 2029, "Autofinanciado con depósitos no reclamados y venta de material",
+  6, "Norma DGNTI de áridos reciclados y de PET reciclado de grado alimentario; contenido mínimo gradual en botellas",
+     "Contenido reciclado de 25 % en botellas PET y uso de áridos reciclados en la obra pública", 2029, "Sin costo fiscal",
+  7, "Tasa de gestión integral a costo real escalonada por nivel socioeconómico; pilotos de pago por generación en comercios, hoteles y restaurantes; tasa de disposición de B/.10 por tonelada de residuos de obra",
+     "Recaudación igual al costo del servicio", 2027,
+     paste0("Cierra una brecha de B/.", formato_es(brecha_aseo, 1), " millones al año; la tasa de obra recauda hasta B/.", formato_es(recaudo_rcd, 1), " millones"),
+  8, "Reglamento del MEF para los incentivos de la Ley 223 de 2021 y del art. 52 de la Ley 276, con lista de equipos elegibles y evaluación a los cinco años",
+     "Plantas de reciclaje y equipos acogidos", 2027, "Gasto tributario acotado por la lista de bienes elegibles",
+  9, "Fichas técnicas con criterios de economía circular en PanamaCompra para obra, papel, mobiliario y equipos; preferencia por material reciclado nacional",
+     "Criterios circulares en los pliegos de obra pública", 2027, "Neutral con costo del ciclo de vida",
+  10, "Segunda edición de la taxonomía con criterios de contribución sustancial a la economía circular en residuos, reciclaje, construcción y manufactura",
+     "Cartera bancaria alineada al objetivo circular reportada", 2028, "Costo bajo",
+  11, "Primera emisión soberana temática con proyectos de valorización de residuos y tratamiento de agua de la categoría circular del Marco de Financiamiento Sostenible",
+     "Una emisión con informe de asignación publicado", 2029, "Según la cartera de proyectos preparada",
+  12, "Ventana circular en el Fondo de Garantías de Panamá para recicladores, gestores y pymes, incluidas las turísticas, con cobertura adicional",
+     "Crédito garantizado a negocios circulares", 2027, "Ventana dentro del fondo existente de US$150 millones",
+  13, "Estructuración de la APP de residuos de Panamá y San Miguelito con pagos por desempeño y cláusulas de inclusión de recicladores",
+     "Capacidad de valorización contratada", 2029, "Capital privado pagado con la tasa de gestión",
+  14, "Formación de analistas de crédito y compradores públicos; certificación de recicladores; certificación de sostenibilidad turística; reporte trienal de indicadores",
+     "Primer reporte de indicadores de economía circular publicado", 2027, "Presupuesto y cooperación técnica"
+) |>
+  left_join(select(fichas, id, instrumento, paso, vehiculo_legal, responsable, fuente_recursos), by = "id") |>
+  left_join(select(ranking, id, puntaje_medio), by = "id") |>
+  relocate(instrumento, paso, .after = id)
+
+diseno |> select(instrumento, anio_inicio, monto)
+```
+
+# Fuentes de financiamiento
+
+Las fuentes de financiamiento se clasifican por su origen (nacional o internacional) y por su tipo (pública, privada, mixta, multilateral, concesional o donación). Para cada fuente se indica qué instrumentos financia y la norma o el programa en que se basa.
+
+```{r}
+#| label: fuentes
+
+fuentes <- tribble(
+  ~fuente, ~origen, ~tipo, ~instrumentos, ~base,
+  "Contribuciones de los productores a sistemas de REP", "Nacional", "Privado", "REP, ecomodulación, pago a recicladores", "Ley 276, art. 7.8; Ley 51, art. 6-A",
+  "Depósitos no reclamados y venta de material", "Nacional", "Privado", "Depósito y retorno", "Ley 51, art. 6-A num. 14",
+  "Tasa de gestión integral de residuos y Fondo de Aseo", "Nacional", "Público", "Tarifa a costo real, APP de residuos, recicladores", "Ley 276, art. 66 y 76",
+  "Tasa de disposición final de residuos de obra", "Nacional", "Público", "Infraestructura de valorización de residuos de obra", "Ley 276, art. 16 y 75",
+  "Presupuesto General del Estado", "Nacional", "Público", "Registro, compras públicas, formación", "Ley 276, art. 80",
+  "Gasto tributario", "Nacional", "Público", "Incentivos fiscales", "Ley 223 de 2021; Ley 276, art. 52",
+  "Bonos soberanos temáticos", "Nacional", "Público", "Infraestructura de residuos y agua", "Marco de Financiamiento Sostenible de 2024",
+  "Bonos temáticos corporativos en Latinex", "Nacional", "Privado", "Empresas de reciclaje y gestión", "Guía de bonos temáticos de la SMV (2025)",
+  "Crédito bancario con garantía parcial", "Nacional", "Mixto", "Pymes, recicladores y turismo", "Fondo de Garantías de Panamá; Acuerdo 8-2025 de la SBP",
+  "Banco Interamericano de Desarrollo y BID Invest", "Internacional", "Multilateral", "Garantías, APP de residuos, líneas verdes", "Contratos de préstamo",
+  "Fondo Verde del Clima", "Internacional", "Concesional", "Líneas para instituciones financieras locales", "Programa FP149",
+  "Cooperación técnica (CEPAL, GIZ y otras)", "Internacional", "Donación", "Diseño, formación e indicadores", "Convenios"
+)
+```
+
+# Reformas normativas
+
+Las reformas se ordenan por su nivel jurídico, porque cada nivel tiene un procedimiento y un plazo distinto. Una ley la aprueba la Asamblea Nacional, un decreto ejecutivo lo emite el Órgano Ejecutivo, una resolución la dicta la institución que tiene la facultad y un acuerdo municipal lo aprueba el concejo de cada municipio. Para cada reforma se indican el emisor y los instrumentos que habilita, identificados por su número en la memoria 10.
+
+```{r}
+#| label: reformas
+
+reformas <- tribble(
+  ~nivel, ~reforma, ~emisor, ~instrumentos,
+  "Ley", "Ley de responsabilidad extendida del productor con metas por flujo, sistemas colectivos, sanciones y régimen del depósito obligatorio", "Asamblea Nacional (iniciativa del Ejecutivo)", "3, 4, 5",
+  "Decreto ejecutivo", "Reglamento de la Ley 502: registro de productores, plataforma de indicadores e instalación del Consejo Nacional de Economía Circular", "Órgano Ejecutivo por medio de MiAMBIENTE", "1, 14",
+  "Decreto ejecutivo", "Reglamento de la Ley 276: gradualidad para recicladores, residuos de manejo especial y obligaciones de REP", "Órgano Ejecutivo", "2, 3, 7",
+  "Decreto ejecutivo", "Reglamento de los incentivos de la Ley 223 y del art. 52 de la Ley 276", "Órgano Ejecutivo por medio del MEF", "8",
+  "Decreto ejecutivo", "Reglamento del art. 53 de la Ley 276 sobre compras de material reciclado nacional", "Órgano Ejecutivo", "9",
+  "Resolución", "Normas de REP por flujo y autorización de sistemas de gestión y de depósito", "Junta Directiva de la AAUD", "3, 5",
+  "Resolución", "Pliego tarifario de la tasa de gestión integral a costo real, con consulta ciudadana", "Junta Directiva de la AAUD", "7",
+  "Resolución", "Fichas técnicas y pliegos con criterios de economía circular", "DGCP", "9",
+  "Resolución", "Normas técnicas de áridos reciclados y PET reciclado", "MICI (DGNTI)", "6",
+  "Acuerdo de superintendencia", "Segunda edición de la taxonomía y reporte de cartera alineada", "SBP, SMV y SSRP", "10",
+  "Resolución", "Ventana circular del Fondo de Garantías", "MEF y fiduciario", "12",
+  "Acuerdo municipal", "Tasas de aseo a costo real y separación obligatoria en municipios que prestan el servicio", "Concejos municipales", "2, 7"
+)
+```
+
+# Indicadores de seguimiento
+
+Los indicadores se alinean con la plataforma de indicadores que crea el artículo 11 de la Ley 502 [@panama2025Ley502, art. 11]. Las líneas de base salen de las memorias de cálculo.
+
+```{r}
+#| label: indicadores
+
+cobertura <- otros_res |> filter(str_detect(indicador, "Cobertura")) |> pull(valor)
+
+indicadores <- tribble(
+  ~indicador, ~tipo, ~linea_base, ~meta_2030, ~fuente,
+  "Productores e importadores inscritos en el registro", "Gestión", "Sin registro", "Todos los obligados de los flujos iniciales", "Plataforma de la Ley 502",
+  "Recicladores de base registrados como gestores", "Gestión", "6.085 segregadores (registro de 2010)", "Censo actualizado y registro abierto", "AAUD",
+  "Valorización de envases bajo REP (%)", "Resultado", "Sin medición", "25 %", "Sistemas de gestión autorizados",
+  "Tasa de retorno de envases con depósito (%)", "Resultado", "Sin sistema", "Sistema en operación", "Administrador del depósito",
+  "Recaudación de la tasa de aseo sobre el costo del servicio (%)", "Resultado", paste0(formato_es(100 * 35.2 / 60.6, 0), " % (2025)"), "100 %", "AAUD",
+  "Cobertura de recolección (% del peso)", "Resultado", paste0(formato_es(cobertura, 0), " %"), "Aumento sostenido", "AAUD y municipios",
+  "Residuos de obra dispuestos en sitios autorizados (t)", "Resultado", "Sin medición", "Registro de toneladas", "AAUD",
+  "Inversión acogida a incentivos de reciclaje (millones de B/.)", "Insumo", "Sin reporte", "Reporte anual del MEF", "MEF y MiAMBIENTE",
+  "Contratos públicos con criterios circulares (%)", "Gestión", "Sin medición", "Obra pública con criterios", "PanamaCompra",
+  "Cartera bancaria alineada al objetivo circular (millones de US$)", "Insumo", "Sin criterios", "Reporte anual de la SBP", "SBP",
+  "Emisiones temáticas con uso circular (millones de US$)", "Insumo", "Un programa corporativo de reciclaje", "Emisión soberana con categoría circular", "MEF y Latinex",
+  "Crédito garantizado a negocios circulares (millones de US$)", "Insumo", "Sin ventana", "Ventana en operación", "Fondo de Garantías",
+  "Establecimientos turísticos con certificación de sostenibilidad", "Resultado", "Sin programa nacional", "Programa en operación", "ATP",
+  "Reporte trienal de indicadores de economía circular", "Gestión", "Sin reporte", "Primer reporte publicado", "MiAMBIENTE"
+)
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(diseno, "hoja_ruta_instrumentos", hoja = "diseno")
+guardar_salida(rep_trayectoria, "hoja_ruta_rep_trayectoria", hoja = "rep")
+guardar_salida(fuentes, "hoja_ruta_fuentes_financiamiento", hoja = "fuentes")
+guardar_salida(reformas, "hoja_ruta_reformas", hoja = "reformas")
+guardar_salida(indicadores, "hoja_ruta_indicadores", hoja = "indicadores")
+```
+
+# Referencias
+
+::: {#refs}
+:::

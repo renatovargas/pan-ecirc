@@ -42,7 +42,7 @@ execute:
 # Funciones, constantes y formato compartidos
 source("materiales/calculos/scripts/funciones_comunes.R")
 
-seis <- sectores_politica[1:6]
+sectores_eval <- sectores_sin_resto
 
 # Bases fuente de verdad (data/outputs)
 si <- leer_salida("sectores_priorizados")
@@ -74,8 +74,8 @@ val <- function(indicador, sector) {
 }
 
 # Cifras de resumen
-part_vab_seis <- sum(cuentas$participacion_vab[cuentas$anio == 2024 & cuentas$sector_principal %in% seis])
-part_emp_seis <- sum(empleo$participacion_empleo[empleo$anio == 2024 & empleo$sector_principal %in% seis])
+part_vab_sect <- sum(cuentas$participacion_vab[cuentas$anio == 2024 & cuentas$sector_principal %in% sectores_eval])
+part_emp_sect <- sum(empleo$participacion_empleo[empleo$anio == 2024 & empleo$sector_principal %in% sectores_eval])
 vab_total <- cuentas |> summarize(v = sum(vab), .by = anio)
 vab_total_2024 <- vab_total$v[vab_total$anio == 2024]
 fbkf_total_2024 <- sum(fbkf_tipo$fbkf[fbkf_tipo$anio == 2024])
@@ -88,9 +88,9 @@ fbkf_tasa_total <- fbkf_tipo |>
   summarize(t = mean(100 * f / v)) |>
   pull(t)
 
-# Puntos porcentuales de la tasa nacional que aportan los seis sectores de política (método central)
-fbkf_pp_seis <- fbkf_sector |>
-  filter(str_starts(metodo, "Método 1"), sector_principal %in% seis, anio >= 2022) |>
+# Puntos porcentuales de la tasa nacional que aportan los siete sectores de política (método central)
+fbkf_pp_sect <- fbkf_sector |>
+  filter(str_starts(metodo, "Método 1"), sector_principal %in% sectores_eval, anio >= 2022) |>
   summarize(f = sum(fbkf), .by = anio) |>
   left_join(vab_total, by = "anio") |>
   summarize(pp = mean(100 * f / v)) |>
@@ -99,8 +99,8 @@ fbkf_pp_seis <- fbkf_sector |>
 # Lecturas de quien adquiere y de quien produce (promedio 2022-2024, memoria 9)
 fbkf_lect <- leer_salida("fbkf_lectura_viviendas") |>
   filter(anio >= 2022) |>
-  summarize(across(c(pp_seis_adquiere, part_seis_adquiere, pp_seis_construye,
-                     part_seis_construye, part_produccion_seis), mean))
+  summarize(across(c(pp_sectores_adquiere, part_sectores_adquiere, pp_sectores_construye,
+                     part_sectores_construye, part_produccion_sectores), mean))
 emis_total_2023 <- sum(emisiones_sector$emisiones_gg[emisiones_sector$anio == 2023])
 rsm_mt <- sum(composicion$toneladas_anio) / 1e6
 dmc_2022 <- dmc$dmc_millones_t[dmc$anio == 2022]
@@ -112,14 +112,14 @@ toneladas_2024 <- setNames(desechos_2024$t, desechos_2024$material)
 
 Este documento caracteriza, con las estadísticas oficiales disponibles, los sectores de la economía de Panamá que la política de economía circular ha priorizado, y propone instrumentos económicos que pueden promover la circularidad en los mismos. Ofrece un punto de partida común y una propuesta inicial para el diseño de política pública, la regulación y el financiamiento de la transición circular del país.
 
-La Hoja de Ruta de Economía Circular con enfoque de cambio climático desarrollada participativamente [@miambiente2024HojaRutaEC] establece seis sectores de política que incluye **(i) residuos, (ii) energía, (iii) recursos hídricos, (iv) industrias, (v) agricultura y alimentos**, así como **(vi) ciudades y construcción**. Dado que la La Ley 502 de 2025 [@panama2025Ley502] fija el marco legal de la transición, pero no establece sectores de política ni actividades económicas particulares, este estudio conecta esos seis grandes sectores de política con 80 actividades económicas de las cuentas nacionales para poder caracterizar, a través de estadísticas socioeconómicas, el estado de aquellas áreas de la economía en donde dicha ley operará. Para ello se evaluó el producto interno bruto, el empleo con desglose por género y condición laboral, el comercio exterior, la inversión, la estructura de mercado, las emisiones de gases de efecto invernadero, el uso de recursos, el potencial de recuperación de materiales y los eslabonamientos productivos.
+La Hoja de Ruta de Economía Circular con enfoque de cambio climático desarrollada participativamente [@miambiente2024HojaRutaEC] establece seis sectores de política que incluye **(i) residuos, (ii) energía, (iii) recursos hídricos, (iv) industrias, (v) agricultura y alimentos**, así como **(vi) ciudades y construcción**. A ellos se suma en este análisis **(vii) turismo**, por su peso en la economía panameña y por los flujos de residuos, agua y energía que generan el alojamiento, la provisión de alimentos y bebidas y las actividades recreativas; se delimita con las actividades características del turismo de la Cuenta Satélite de Turismo [@un2010CST2008, p. 27]. Dado que la Ley 502 de 2025 [@panama2025Ley502] fija el marco legal de la transición, pero no establece sectores de política ni actividades económicas particulares, este estudio conecta esos siete grandes sectores de política con 80 actividades económicas de las cuentas nacionales para poder caracterizar, a través de estadísticas socioeconómicas, el estado de aquellas áreas de la economía en donde dicha ley operará. Para ello se evaluó el producto interno bruto, el empleo con desglose por género y condición laboral, el comercio exterior, la inversión, la estructura de mercado, las emisiones de gases de efecto invernadero, el uso de recursos, el potencial de recuperación de materiales y los eslabonamientos productivos.
 
-- **Peso económico.** Los seis sectores de política generan `r formato_es(part_vab_seis, 1)` % del valor agregado y concentran `r formato_es(part_emp_seis, 1)` % de los puestos de trabajo de 2024. La construcción es el más grande por valor agregado (`r formato_es(val("Participación en el valor agregado", "Ciudades y construcción"), 1)` %), y agricultura y alimentos el más grande por empleo (`r formato_es(val("Participación en el empleo", "Agricultura y alimentos"), 1)` %). Residuos, recursos hídricos y energía son sectores de política pequeños en las cuentas nacionales: ninguno supera `r formato_es(max(val("Participación en el valor agregado", "Residuos"), val("Participación en el valor agregado", "Recursos hídricos"), val("Participación en el valor agregado", "Energía")), 1)` % del valor agregado. La energía crece `r formato_es(val("Crecimiento anual compuesto del valor agregado", "Energía"), 1)` % anual entre 2018 y 2024 a precios corrientes.
-- **Empleo e informalidad.** La informalidad estimada es alta en agricultura y alimentos (`r formato_es(val("Empleo informal (estimado)", "Agricultura y alimentos"), 1)` %), construcción (`r formato_es(val("Empleo informal (estimado)", "Ciudades y construcción"), 1)` %) e industrias (`r formato_es(val("Empleo informal (estimado)", "Industrias"), 1)` %). La participación de las mujeres es baja en construcción (`r formato_es(val("Mujeres en el empleo (estimado)", "Ciudades y construcción"), 1)` %) y en agricultura (`r formato_es(val("Mujeres en el empleo (estimado)", "Agricultura y alimentos"), 1)` %), y cercana a la mitad en industrias (`r formato_es(val("Mujeres en el empleo (estimado)", "Industrias"), 1)` %).
+- **Peso económico.** Los siete sectores de política generan `r formato_es(part_vab_sect, 1)` % del valor agregado y concentran `r formato_es(part_emp_sect, 1)` % de los puestos de trabajo de 2024. La construcción es el más grande por valor agregado (`r formato_es(val("Participación en el valor agregado", "Ciudades y construcción"), 1)` %), y agricultura y alimentos el más grande por empleo (`r formato_es(val("Participación en el empleo", "Agricultura y alimentos"), 1)` %). Residuos, recursos hídricos y energía son sectores de política pequeños en las cuentas nacionales: ninguno supera `r formato_es(max(val("Participación en el valor agregado", "Residuos"), val("Participación en el valor agregado", "Recursos hídricos"), val("Participación en el valor agregado", "Energía")), 1)` % del valor agregado. La energía crece `r formato_es(val("Crecimiento anual compuesto del valor agregado", "Energía"), 1)` % anual entre 2018 y 2024 a precios corrientes. El turismo aporta `r formato_es(val("Participación en el valor agregado", "Turismo"), 1)` % del valor agregado y `r formato_es(val("Participación en el empleo", "Turismo"), 1)` % de los puestos de trabajo, y es el único sector de política con un superávit comercial amplio, de `r formato_es(val("Saldo comercial", "Turismo"), 0)` millones de balboas, por el gasto de los visitantes no residentes y el transporte aéreo.
+- **Empleo e informalidad.** La informalidad estimada es alta en agricultura y alimentos (`r formato_es(val("Empleo informal (estimado)", "Agricultura y alimentos"), 1)` %), construcción (`r formato_es(val("Empleo informal (estimado)", "Ciudades y construcción"), 1)` %) e industrias (`r formato_es(val("Empleo informal (estimado)", "Industrias"), 1)` %). La participación de las mujeres es baja en construcción (`r formato_es(val("Mujeres en el empleo (estimado)", "Ciudades y construcción"), 1)` %) y en agricultura (`r formato_es(val("Mujeres en el empleo (estimado)", "Agricultura y alimentos"), 1)` %), y cercana a la mitad en industrias (`r formato_es(val("Mujeres en el empleo (estimado)", "Industrias"), 1)` %). El turismo es el único sector de política donde las mujeres son mayoría (`r formato_es(val("Mujeres en el empleo (estimado)", "Turismo"), 1)` %), con una informalidad estimada de `r formato_es(val("Empleo informal (estimado)", "Turismo"), 1)` %.
 - **Residuos.** El sector formal de residuos aportó `r formato_es(val("Valor agregado bruto", "Residuos"), 1)` millones de balboas de valor agregado en 2024, mientras que la generación de residuos sólidos municipales se estimó en `r formato_es(rsm_mt, 2)` millones de toneladas al año, de los cuáles casi dos tercios son tanto orgánicos y plásticos, así como de papel y cartón.
 - **Inversión.** La formación bruta de capital fijo fue de `r formato_es(fbkf_total_2024, 0)` millones de balboas en 2024 y `r formato_es(fbkf_part("Edificaciones residenciales") + fbkf_part("Edificaciones no residenciales") + fbkf_part("Obras de ingeniería civil"), 0)` % corresponde a construcción. Las cuentas nacionales la publican por producto; la inversión por sector se estimó con dos métodos de asignación y debe leerse como una aproximación de orden de magnitud.
 - **Emisiones.** Según la base datos de emisiones de gases efecto invernadero EDGAR, las emisiones, excluyendo uso de la tierra, fueron de `r formato_es(emis_total_2023 / 1000, 1)` millones de toneladas de CO₂ equivalente en 2023. Energía y agricultura concentran el `r formato_es(sum(emisiones_sector$participacion[emisiones_sector$anio == 2023 & emisiones_sector$sector_principal %in% c("Energía", "Agricultura y alimentos")]), 1)` % de ellas.
-- **Eslabonamientos.** A través de un análisis de insumo-producto que utiliza la matriz oficial de 2018 [@inec2024mip], se determinó que agricultura y alimentos tiene los encadenamientos más fuertes hacia atrás y hacia adelante entre los seis sectores de política. Es decir, que está vinculada a más actividades económicas directa e indirectamente a través de sus insumos. La electricidad, por su parte, es una actividad de impulso hacia adelante, es decir que sirve como insumo directo e indirecto de muchas actividades, mientras que el sector de residuos, aunque pequeño, genera `r formato_es(val("Multiplicador de empleo", "Residuos"), 1)` puestos de trabajo directa e indirectamente por cada millón de balboas de demanda final, lo que lo convierte en el segundo valor más alto después de agricultura y alimentos.
+- **Eslabonamientos.** A través de un análisis de insumo-producto que utiliza la matriz oficial de 2018 [@inec2024mip], se determinó que agricultura y alimentos tiene los encadenamientos más fuertes hacia atrás y hacia adelante entre los siete sectores de política, seguida por el turismo en el encadenamiento hacia atrás. Es decir, que está vinculada a más actividades económicas directa e indirectamente a través de sus insumos. La electricidad, por su parte, es una actividad de impulso hacia adelante, es decir que sirve como insumo directo e indirecto de muchas actividades, mientras que el sector de residuos, aunque pequeño, genera `r formato_es(val("Multiplicador de empleo", "Residuos"), 1)` puestos de trabajo directa e indirectamente por cada millón de balboas de demanda final, lo que lo convierte en el segundo valor más alto después de agricultura y alimentos.
 
 A través de este documento se propone un conjunto de catorce instrumentos, agrupados en seis familias y ordenados en dos pasos. La selección parte de lo que muestran los datos de cada sector de política, del mandato que la ley ya establece y de lo que otros países han hecho con instrumentos equivalentes. La sección de instrumentos describe cada uno con ejemplos y con su aplicación al caso de Panamá.
 
@@ -136,6 +136,8 @@ La quinta familia reúne dos instrumentos de promoción y facilitación de inver
 La sexta familia, de capacidades y conciencia ambiental, tiene un solo instrumento, **información, formación y certificación**, que sostiene a los demás mediante la capacitación de analistas de crédito y compradores públicos, la certificación de los recicladores y la publicación de indicadores que cierren las brechas de datos documentadas en este análisis.
 
 Los catorce instrumentos se ordenan en dos pasos. En el primer paso se sitúan nueve de ellos, que incluyen los habilitantes, los incentivos fiscales, la taxonomía, los bonos temáticos, el crédito verde, las compras públicas, las alianzas y la información y formación, porque no dependen de un registro operativo. En el segundo paso se agrupan los cinco que sí dependen de él, que son la responsabilidad extendida del productor, la ecomodulación, el depósito y retorno, el contenido reciclado y la tarifa de aseo con tasa de disposición final. La razón del orden es que la experiencia internacional muestra que los gravámenes, las tarifas y las metas pierden eficacia sin registros y sin fiscalización. Los instrumentos del segundo paso pueden prepararse en paralelo, pero entran en vigor cuando el registro esté funcionando.
+
+En el turismo, los instrumentos más pertinentes son los que llegan a muchos establecimientos pequeños: la tarifa de aseo comercial con pago por generación y separación de orgánicos en hoteles y restaurantes, la participación de estos como puntos de retorno del sistema de depósito, el crédito verde con garantías para equipos de compostaje, eficiencia y reúso de agua, y la certificación de prácticas sostenibles.
 
 [^memorias]: El procesamiento de los datos utilizados en este estudio se detalla en memorias de cálculo que están disponibles en <https://renatovargas.github.io/pan-ecirc/materiales/calculos/>.
 
@@ -216,7 +218,7 @@ El Ministerio de Ambiente solicitó el apoyo técnico de la CEPAL para implement
 
 Su propósito es caracterizar con datos los sectores de política donde coinciden la necesidad y la oportunidad de circularidad, y proponer a partir de ellos los instrumentos de política que merecen una evaluación más detallada por parte de representantes de las instituciones públicas, del sistema financiero, del sector privado, de la academia y de la sociedad civil. Para este fin se ha utilizado estadísticas oficiales.[^memorias]
 
-Para efectos de este documento, se entiende por sectores de política aquellos determinados por la Hoja de Ruta de Economía Circular con enfoque de cambio climático [@miambiente2024HojaRutaEC] y que incluye **(i) residuos, (ii) energía, (iii) recursos hídricos, (iv) industrias, (v) agricultura y alimentos**, así como **(vi) ciudades y construcción**. De manera complementaria, se analiza 80 actividades económicas individuales del sistema de cuentas nacionales que se han ordenado bajo dichos sectores de política y cuyo detalle se encuentra en el Anexo I. 
+Para efectos de este documento, se entiende por sectores de política aquellos determinados por la Hoja de Ruta de Economía Circular con enfoque de cambio climático [@miambiente2024HojaRutaEC] y que incluye **(i) residuos, (ii) energía, (iii) recursos hídricos, (iv) industrias, (v) agricultura y alimentos**, así como **(vi) ciudades y construcción**, a los que se agrega **(vii) turismo**. El turismo no figura entre los sectores de la Hoja de Ruta, pero genera más de la quinta parte de las exportaciones de bienes y servicios del país según las cuentas nacionales, como se muestra más adelante, y reúne actividades intensivas en residuos de alimentos, envases y plásticos de un solo uso, agua y energía. Para delimitarlo se usa la lista internacional de actividades características del turismo de la Cuenta Satélite de Turismo [@un2010CST2008, cuadro 3.1, p. 27], de modo que el sector sea comparable con las mediciones de turismo de otros países. De manera complementaria, se analiza 80 actividades económicas individuales del sistema de cuentas nacionales que se han ordenado bajo dichos sectores de política y cuyo detalle se encuentra en el Anexo I.
 
 # Objetivos y alcance
 
@@ -246,6 +248,10 @@ La Hoja de Ruta de Economía Circular con enfoque de cambio climático, elaborad
 
 Otros instrumentos son la Ley 33 de 2018, que establece la política Basura Cero [@panama2018Ley33], y la Ley 187 de 2020, que regula el reemplazo progresivo de los plásticos de un solo uso [@panama2020Ley187]. En el ámbito financiero, la Taxonomía de Finanzas Sostenibles de Panamá incluye la transición hacia una economía circular entre sus objetivos [@sbp2024TaxonomiaPanama], y el Marco de Financiamiento Sostenible de la República contempla una categoría de economía circular para bonos temáticos [@mef2024MarcoFinanciamientoSostenible].
 
+## Turismo y economía circular
+
+La política de turismo ya reconoce los problemas de residuos de los destinos. El Plan Maestro de Turismo Sostenible 2020-2025 de la Autoridad de Turismo de Panamá describe la gestión de residuos sólidos como inexistente o mala en destinos como Bocas del Toro, Taboga y Pedasí [@atp2020PlanMaestro, p. 56], y su actualización para 2025-2030 incluye la reducción de plásticos, el apoyo al programa Bandera Azul Ecológica y la medición de la huella de carbono de las empresas turísticas [@atp2025PlanMaestro]. El país recibió 3,0 millones de visitantes en 2025, con un gasto turístico preliminar de B/.9.685 millones [@atp2026AspectosEconomicos].
+
 ## Experiencia regional
 
 La CEPAL analizó nueve hojas de ruta de economía circular de América Latina y el Caribe, con 261 iniciativas [@cepal2022HojasRuta]. Los instrumentos económicos representan una cuarta parte de las iniciativas del eje de políticas y las estrategias de financiamiento solo el 7 %. La Comisión concluye que hay un amplio espacio para buscar fuentes y diseñar estrategias de financiamiento de la transición [@cepal2022HojasRuta, p. 26-27]. Asimismo, se determinó que el sector de residuos concentra el 31 % de las iniciativas regionales [@cepal2022HojasRuta, p. 30].
@@ -260,16 +266,16 @@ Se desarrolló un procesamiento de fuentes oficiales y algunas de carácter inte
 - **Recursos y ambiente.** Emisiones de la base de datos _Emissions Database for Global Atmospheric Research_ (EDGAR, por sus siglas en inglés) [@edgar2026ghg], balances de energía [@sne2026balances], extracciones de agua [@worldbank2026agua], residuos [@worldbank2026wwaste] y comercio de desechos [@uncomtrade2026].
 - **Inversión y estructura empresarial.** Inversión extranjera directa y directorio de empresas del INEC [@inec2026ied; @inec2022directorio].
 
-**Términos.** Una actividad económica es cada clase individual del Sistema de Cuentas Nacionales (SCN) y de la matriz insumo-producto. Un grupo de actividades económicas es cada una de las grandes secciones de la Clasificación Industrial Internacional Uniforme de todas las Actividades Económicas (CIIU), que se identifican con letras (por ejemplo, D es electricidad, gas y vapor, y E es agua y desechos). Un sector de política es cada uno de los seis sectores de la Hoja de Ruta, y reúne actividades económicas de uno o más grupos. Las actividades núcleo son aquellas cuyo producto principal es la gestión de residuos, el agua, la energía o la construcción, es decir, las que definen a cada sector de política; las actividades intensivas son las que generan residuos, usan materiales, agua o energía en volumen, o abastecen de insumos a un sector núcleo.
+**Términos.** Una actividad económica es cada clase individual del Sistema de Cuentas Nacionales (SCN) y de la matriz insumo-producto. Un grupo de actividades económicas es cada una de las grandes secciones de la Clasificación Industrial Internacional Uniforme de todas las Actividades Económicas (CIIU), que se identifican con letras (por ejemplo, D es electricidad, gas y vapor, y E es agua y desechos). Un sector de política es cada uno de los seis sectores de la Hoja de Ruta o el turismo, y reúne actividades económicas de uno o más grupos. Las actividades núcleo son aquellas cuyo producto principal es la gestión de residuos, el agua, la energía o la construcción, es decir, las que definen a cada sector de política; las actividades intensivas son las que generan residuos, usan materiales, agua o energía en volumen, o abastecen de insumos a un sector núcleo.
 
-**Asignación de actividades a sectores de política.**[^mapeo] Cada actividad tiene un único sector de política principal, de modo que los totales suman sin doble conteo. Los sectores de política secundarios y el tipo de vínculo se registran para el análisis de relaciones, pero no se suman, mientras que las actividades sin vínculo identificado en las fuentes de política se han consignado en el "Resto de la economía" para tener la perspectiva completa. El @tbl-sectores resume el resultado y la tabla completa con las 80 actividades y su evidencia figura en el Anexo I.
+**Asignación de actividades a sectores de política.**[^mapeo] Cada actividad tiene un único sector de política principal, de modo que los totales suman sin doble conteo. Los sectores de política secundarios y el tipo de vínculo se registran para el análisis de relaciones, pero no se suman, mientras que las actividades sin vínculo identificado en las fuentes de política se han consignado en el "Resto de la economía" para tener la perspectiva completa. El turismo reúne las cuatro actividades de las cuentas nacionales que corresponden por completo a una categoría característica del turismo y tienen un código propio en la matriz insumo-producto: el alojamiento, la provisión de alimentos y bebidas, el transporte aéreo y las actividades artísticas, de entretenimiento y recreativas. Las actividades que atienden a visitantes pero cuya producción es sobre todo de otro tipo, como el transporte terrestre y por agua, los aeropuertos, las agencias de viajes (incluidas en los servicios administrativos) y el comercio al por menor, quedan en el resto de la economía con el turismo como sector secundario, para no duplicar valores. El @tbl-sectores resume el resultado y la tabla completa con las 80 actividades y su evidencia figura en el Anexo I.
 
 ```{r}
 #| label: tbl-sectores
 #| tbl-cap: "Sectores de política y actividades del Sistema de Cuentas Nacionales"
 
 mapeo |>
-  filter(sector_principal %in% seis) |>
+  filter(sector_principal %in% sectores_eval) |>
   summarize(
     `Actividades` = n(),
     `Actividades principales` = paste(
@@ -281,7 +287,7 @@ mapeo |>
   tabla_ft_es(digitos = 0, anchos_cm = c(3.81, 2, 11.59))
 ```
 
-*Fuente: elaboración propia con base en la Hoja de Ruta [@miambiente2024HojaRutaEC] y en las cuentas nacionales [@inec2026cou].*
+*Fuente: elaboración propia con base en la Hoja de Ruta [@miambiente2024HojaRutaEC], la Cuenta Satélite de Turismo [@un2010CST2008] y las cuentas nacionales [@inec2026cou].*
 
 **Calidad de los indicadores.** Cada indicador tiene un identificador de calidad: alta si es un dato oficial desagregable al sector de política; media si requiere un supuesto de asignación; baja si solo existe para un conjunto de sectores de política o un grupo de actividades más amplio. La sección de limitaciones detalla los casos.
 
@@ -289,18 +295,18 @@ mapeo |>
 
 ## Producto y valor agregado
 
-El valor agregado bruto de una actividad es el resultado de restar a la producción el consumo intermedio. Para ejemplificar, el equivalente en la contabilidad empresarial sería la ganancia que queda después de quitar a las ventas los costos (exceptuando en este caso el costo de sueldos y salarios). La suma de esas ganancias o valores agregados a nivel de actividades económicas (más impuestos, menos subveniciones) es el Producto Interno Bruto. Este es repartido en la economía como pago a los factores entre salarios, utilidades e impuestos. Desde esa perspectiva, los seis sectores de política suman `r formato_es(part_vab_seis, 1)` % del valor agregado bruto de 2024, que fue de `r formato_es(vab_total_2024, 1)` millones de balboas. Ciudades y construcción es el mayor, con `r formato_es(val("Valor agregado bruto", "Ciudades y construcción"), 1)` millones de balboas, y le siguen agricultura y alimentos (`r formato_es(val("Valor agregado bruto", "Agricultura y alimentos"), 1)`), industrias (`r formato_es(val("Valor agregado bruto", "Industrias"), 1)`) y energía (`r formato_es(val("Valor agregado bruto", "Energía"), 1)`). Residuos y recursos hídricos son pequeños.
+El valor agregado bruto de una actividad es el resultado de restar a la producción el consumo intermedio. Para ejemplificar, el equivalente en la contabilidad empresarial sería la ganancia que queda después de quitar a las ventas los costos (exceptuando en este caso el costo de sueldos y salarios). La suma de esas ganancias o valores agregados a nivel de actividades económicas (más impuestos, menos subveniciones) es el Producto Interno Bruto. Este es repartido en la economía como pago a los factores entre salarios, utilidades e impuestos. Desde esa perspectiva, los siete sectores de política suman `r formato_es(part_vab_sect, 1)` % del valor agregado bruto de 2024, que fue de `r formato_es(vab_total_2024, 1)` millones de balboas. Ciudades y construcción es el mayor, con `r formato_es(val("Valor agregado bruto", "Ciudades y construcción"), 1)` millones de balboas, y le siguen agricultura y alimentos (`r formato_es(val("Valor agregado bruto", "Agricultura y alimentos"), 1)`), turismo (`r formato_es(val("Valor agregado bruto", "Turismo"), 1)`), industrias (`r formato_es(val("Valor agregado bruto", "Industrias"), 1)`) y energía (`r formato_es(val("Valor agregado bruto", "Energía"), 1)`). Residuos y recursos hídricos son pequeños.
 
 La tasa anual compuesta es el ritmo constante de crecimiento que llevaría el valor de 2018 al de 2024. Entre 2018 y 2024 el valor agregado a precios corrientes de energía y de agricultura y alimentos creció por encima del 6 % anual, y el de industrias cayó `r formato_es(abs(val("Crecimiento anual compuesto del valor agregado", "Industrias")), 1)` % anual. Las tasas mezclan variaciones de precios y de cantidades. El valor agregado total pasó de `r formato_es(vab_total$v[vab_total$anio == 2019], 0)` millones de balboas en 2019 a `r formato_es(vab_total$v[vab_total$anio == 2020], 0)` en 2020, el año de la pandemia, y la cifra de 2024 es provisional.
 
-El contraste entre el peso económico y el peso en el empleo es el rasgo más visible (@tbl-estructura y @fig-vab-empleo). La participación de agricultura y alimentos en el empleo (`r formato_es(val("Participación en el empleo", "Agricultura y alimentos"), 1)` %) es más de cuatro veces su participación en el valor agregado (`r formato_es(val("Participación en el valor agregado", "Agricultura y alimentos"), 1)` %), lo que indica una baja productividad media por puesto. En construcción ocurre lo contrario, pues su participación en el valor agregado es el doble de su participación en el empleo. Estos desbalances importan para los instrumentos, porque una política que eleve costos en un sector de política intensivo en empleo y de baja productividad tendrá efectos distributivos distintos de una que se aplique en un sector de política intensivo en capital.
+El contraste entre el peso económico y el peso en el empleo es el rasgo más visible (@tbl-estructura y @fig-vab-empleo). La participación de agricultura y alimentos en el empleo (`r formato_es(val("Participación en el empleo", "Agricultura y alimentos"), 1)` %) es más de cuatro veces su participación en el valor agregado (`r formato_es(val("Participación en el valor agregado", "Agricultura y alimentos"), 1)` %), lo que indica una baja productividad media por puesto. En construcción ocurre lo contrario, pues su participación en el valor agregado es el doble de su participación en el empleo. El turismo está en una posición intermedia, con `r formato_es(val("Participación en el empleo", "Turismo"), 1)` % del empleo y `r formato_es(val("Participación en el valor agregado", "Turismo"), 1)` % del valor agregado, y su valor agregado de 2024 apenas supera el de 2018 (`r formato_es(val("Crecimiento anual compuesto del valor agregado", "Turismo"), 1)` % anual), porque el sector tardó en recuperarse de la caída de 2020. Estos desbalances importan para los instrumentos, porque una política que eleve costos en un sector de política intensivo en empleo y de baja productividad tendrá efectos distributivos distintos de una que se aplique en un sector de política intensivo en capital.
 
 ```{r}
 #| label: tbl-estructura
 #| tbl-cap: "Valor agregado y empleo por sector de política, 2024"
 
 cuentas |>
-  filter(anio == 2024, sector_principal %in% seis) |>
+  filter(anio == 2024, sector_principal %in% sectores_eval) |>
   select(sector_principal, vab, participacion_vab) |>
   left_join(
     crecimiento |> select(sector_principal, tcac_vab_2018_2024),
@@ -325,12 +331,12 @@ cuentas |>
 
 ```{r}
 #| label: fig-vab-empleo
-#| fig-cap: "Participación en el valor agregado y en el empleo de los seis sectores de política, 2024 (porcentaje del total nacional)"
+#| fig-cap: "Participación en el valor agregado y en el empleo de los siete sectores de política, 2024 (porcentaje del total nacional)"
 #| fig-width: 7
 #| fig-height: 3.6
 
 cuentas |>
-  filter(anio == 2024, sector_principal %in% seis) |>
+  filter(anio == 2024, sector_principal %in% sectores_eval) |>
   select(sector_principal, vab = participacion_vab) |>
   left_join(
     empleo |> filter(anio == 2024) |> select(sector_principal, empleo = participacion_empleo),
@@ -348,7 +354,7 @@ cuentas |>
 
 El empleo se mide en puestos de trabajo de la matriz de empleo de las cuentas nacionales, que cubre 2018 a 2024. Esa fuente no distingue sexo ni formalidad. Para estimar ambos se aplicó a cada actividad el perfil de su grupo de actividades de la Encuesta de Mercado Laboral. La estimación supone que todas las actividades de un grupo tienen la misma proporción de mujeres y la misma tasa de informalidad que el grupo completo. Es una imputación proporcional, útil para comparar sectores de política pero no para describir una actividad individual.
 
-Las estimaciones mostradas en el @tbl-genero explican que los sectores de política con más empleo (agricultura y alimentos, construcción, industrias) son también los de mayor informalidad estimada, por encima del 60 %. Además, la participación de las mujeres es baja en construcción y en agricultura, y de alrededor del `r formato_es(val("Mujeres en el empleo (estimado)", "Industrias"), 0)` % en industrias, lo que importa para los instrumentos que involucren capacitación, formalización o acceso a financiamiento. Finalmente, la remuneración media por asalariado es la más alta en energía y la más baja en agricultura y alimentos.
+Las estimaciones mostradas en el @tbl-genero explican que los sectores de política con más empleo (agricultura y alimentos, construcción, industrias) son también los de mayor informalidad estimada, por encima del 60 %. Además, la participación de las mujeres es baja en construcción y en agricultura, y de alrededor del `r formato_es(val("Mujeres en el empleo (estimado)", "Industrias"), 0)` % en industrias, lo que importa para los instrumentos que involucren capacitación, formalización o acceso a financiamiento. El turismo es el único sector de política donde las mujeres son mayoría, con `r formato_es(val("Mujeres en el empleo (estimado)", "Turismo"), 1)` % de los puestos, y su informalidad estimada (`r formato_es(val("Empleo informal (estimado)", "Turismo"), 1)` %) es comparable a la de industrias, de modo que los instrumentos que afecten a hoteles y restaurantes tienen un efecto directo sobre el empleo femenino. Finalmente, la remuneración media por asalariado es la más alta en energía y la más baja en agricultura y alimentos.
 
 En cuanto a los sectores de política pequeños, los puestos de las cuentas nacionales en electricidad (grupo D) y en agua y desechos (grupo E) equivalen a 0,3 y 0,5 veces los ocupados de la encuesta, de modo que el empleo de estos sectores de política puede ser de dos a tres veces mayor que el que muestra el @tbl-genero. Además, la encuesta no tiene una categoría para los recicladores de base, y las fuentes consultadas no los cuantifican con datos recientes. El registro de 2010 identifica 6.085 segregadores urbanos [@res-bid-eval2010, p. 143], y la Ley 33 de 2018 y la Ley 502 reconocen su inclusión [@panama2018Ley33; @panama2025Ley502, art. 10].
 
@@ -357,12 +363,12 @@ En cuanto a los sectores de política pequeños, los puestos de las cuentas naci
 #| tbl-cap: "Empleo por género, informalidad y remuneración, 2024 (estimaciones por imputación del grupo de actividades)"
 
 empleo_perfil |>
-  filter(sector_principal %in% seis) |>
+  filter(sector_principal %in% sectores_eval) |>
   left_join(
     empleo |> filter(anio == 2024) |> select(sector_principal, remuneracion_media),
     by = "sector_principal"
   ) |>
-  arrange(match(sector_principal, seis)) |>
+  arrange(match(sector_principal, sectores_eval)) |>
   transmute(
     `Sector de política` = sector_principal,
     Puestos = puestos,
@@ -379,7 +385,7 @@ empleo_perfil |>
 
 Las cuentas nacionales registran el comercio por producto. Para llevarlo a las actividades se asignó cada producto a la actividad que lo produce en el país, y los productos con menos de la mitad de oferta nacional (reexportaciones, como los combustibles de bunker) se agruparon aparte. Por eso los resultados por sector de política muestran indicios de orientación exportadora y ofrecen una aproximación gruesa de la competitividad.
 
-Como muestra el @tbl-comercio, industrias y agricultura y alimentos tienen saldos comerciales negativos (`r formato_es(val("Saldo comercial", "Industrias"), 0)` y `r formato_es(val("Saldo comercial", "Agricultura y alimentos"), 0)` millones de balboas, respectivamente) y exportan `r formato_es(val("Exportaciones sobre producción", "Industrias"), 0)` % y `r formato_es(val("Exportaciones sobre producción", "Agricultura y alimentos"), 0)` % de su producción. Las exportaciones totales del país se concentran en servicios y reexportaciones, que están en "Resto de la economía". Para la economía circular esto sugiere que los instrumentos sobre bienes dependen más de la importación que de la producción nacional, un rasgo importante para el diseño de la REP, pues los obligados serán en buena parte importadores.
+Como muestra el @tbl-comercio, industrias y agricultura y alimentos tienen saldos comerciales negativos (`r formato_es(val("Saldo comercial", "Industrias"), 0)` y `r formato_es(val("Saldo comercial", "Agricultura y alimentos"), 0)` millones de balboas, respectivamente) y exportan `r formato_es(val("Exportaciones sobre producción", "Industrias"), 0)` % y `r formato_es(val("Exportaciones sobre producción", "Agricultura y alimentos"), 0)` % de su producción. El turismo es la excepción entre los sectores de política, con exportaciones de `r formato_es(val("Exportaciones", "Turismo"), 0)` millones de balboas en 2024, equivalentes a `r formato_es(100 * val("Exportaciones", "Turismo") / sum(cuentas$exportaciones[cuentas$anio == 2024]), 0)` % de las exportaciones del país. La mayor parte es el gasto de los visitantes no residentes en Panamá, que las cuentas nacionales registran como compras directas sin asignarlo a una actividad y que aquí se atribuye al turismo, y el resto es sobre todo transporte aéreo. Las demás exportaciones del país se concentran en servicios y reexportaciones, que están en "Resto de la economía". Para la economía circular esto sugiere que los instrumentos sobre bienes dependen más de la importación que de la producción nacional, un rasgo importante para el diseño de la REP, pues los obligados serán en buena parte importadores.
 
 ```{r}
 #| label: tbl-comercio
@@ -387,7 +393,7 @@ Como muestra el @tbl-comercio, industrias y agricultura y alimentos tienen saldo
 
 si |>
   filter(
-    sector_principal %in% seis,
+    sector_principal %in% sectores_eval,
     indicador %in% c("Exportaciones", "Importaciones", "Saldo comercial", "Exportaciones sobre producción")
   ) |>
   select(sector_principal, indicador, valor) |>
@@ -402,7 +408,7 @@ si |>
   tabla_ft_es(digitos = 1, enteros = c("Exportaciones", "Importaciones", "Saldo comercial"))
 ```
 
-*Fuente: elaboración propia con datos del INEC [@inec2026cou]. Los productos de residuos, agua y construcción no tienen comercio registrado en las cuentas nacionales, y el valor cero indica esa ausencia.*
+*Fuente: elaboración propia con datos del INEC [@inec2026cou]. Los productos de residuos, agua y construcción no tienen comercio registrado en las cuentas nacionales, y el valor cero indica esa ausencia. En turismo, las exportaciones incluyen el gasto de los visitantes no residentes, que no tiene producción asociada, por lo que el cociente de exportaciones sobre producción supera 100 %; las importaciones incluyen el ajuste de compras directas de las cuentas nacionales, que tiene signo negativo.*
 
 Como referencia del comercio de materiales recuperables, en 2024 Panamá exportó unas `r formato_es(toneladas_2024[["Metal"]] / 1000, 0)` mil toneladas de desperdicios de metales, `r formato_es(toneladas_2024[["Papel y cartón"]] / 1000, 0)` mil toneladas de papel y cartón para reciclar y `r formato_es(toneladas_2024[["Plástico"]] / 1000, 1)` mil toneladas de desechos de plástico [@uncomtrade2026]. Esas cifras muestran la recuperación que sale por el comercio exterior, mientras que el reciclaje interno queda fuera de esa medición.
 
@@ -410,7 +416,7 @@ Como referencia del comercio de materiales recuperables, en 2024 Panamá export�
 
 Las cuentas nacionales publican la formación bruta de capital fijo (FBKF) por producto, es decir, por tipo de bien de capital, y no por la actividad que invierte. Con los cuadros de oferta y utilización se determinó qué sectores producen los bienes en que se invierte y, seguidamente, se estimó qué actividades invierten, repartiendo la FBKF de cada producto con reglas explícitas y con dos métodos para mostrar la sensibilidad de la asignación.^[Memoria de cálculo disponible en https://renatovargas.github.io/pan-ecirc/materiales/calculos/c09-formacion-bruta-capital/]
 
-La FBKF fue de `r formato_es(fbkf_total_2024, 0)` millones de balboas en 2024, equivalente a `r formato_es(100 * fbkf_total_2024 / vab_total_2024, 1)` % del valor agregado. La construcción concentra la mayor parte, pues las edificaciones residenciales son el `r formato_es(fbkf_part("Edificaciones residenciales"), 1)` % de la FBKF, las obras de ingeniería civil el `r formato_es(fbkf_part("Obras de ingeniería civil"), 1)` %, las edificaciones no residenciales el `r formato_es(fbkf_part("Edificaciones no residenciales"), 1)` % y la maquinaria, el equipo y otros bienes el `r formato_es(fbkf_part("Maquinaria, equipo y otros bienes"), 1)` %. Como muestra el @tbl-fbkf-sector, el sector de ciudades y construcción produce el `r formato_es(fbkf_origen_part("Ciudades y construcción"), 1)` % de los bienes de capital, y el `r formato_es(fbkf_origen_part("Bienes importados"), 1)` % corresponde a bienes que el país importa, principalmente maquinaria y equipos de transporte. En el promedio de 2022 a 2024, la tasa de inversión de toda la economía fue de `r formato_es(fbkf_tasa_total, 1)` % del valor agregado, y los seis sectores de política aportan `r formato_es(fbkf_pp_seis, 1)` puntos porcentuales de esa tasa, es decir, `r formato_es(100 * fbkf_pp_seis / fbkf_tasa_total, 1)` % de la inversión estimada. El resto corresponde a las demás actividades.
+La FBKF fue de `r formato_es(fbkf_total_2024, 0)` millones de balboas en 2024, equivalente a `r formato_es(100 * fbkf_total_2024 / vab_total_2024, 1)` % del valor agregado. La construcción concentra la mayor parte, pues las edificaciones residenciales son el `r formato_es(fbkf_part("Edificaciones residenciales"), 1)` % de la FBKF, las obras de ingeniería civil el `r formato_es(fbkf_part("Obras de ingeniería civil"), 1)` %, las edificaciones no residenciales el `r formato_es(fbkf_part("Edificaciones no residenciales"), 1)` % y la maquinaria, el equipo y otros bienes el `r formato_es(fbkf_part("Maquinaria, equipo y otros bienes"), 1)` %. Como muestra el @tbl-fbkf-sector, el sector de ciudades y construcción produce el `r formato_es(fbkf_origen_part("Ciudades y construcción"), 1)` % de los bienes de capital, y el `r formato_es(fbkf_origen_part("Bienes importados"), 1)` % corresponde a bienes que el país importa, principalmente maquinaria y equipos de transporte. En el promedio de 2022 a 2024, la tasa de inversión de toda la economía fue de `r formato_es(fbkf_tasa_total, 1)` % del valor agregado, y los siete sectores de política aportan `r formato_es(fbkf_pp_sect, 1)` puntos porcentuales de esa tasa, es decir, `r formato_es(100 * fbkf_pp_sect / fbkf_tasa_total, 1)` % de la inversión estimada. El resto corresponde a las demás actividades.
 
 ```{r}
 #| label: tbl-fbkf-sector
@@ -427,7 +433,7 @@ fbkf_origen |>
       pivot_wider(names_from = indicador, values_from = valor),
     by = "sector_origen"
   ) |>
-  mutate(orden = match(sector_origen, c(seis, "Resto de la economía", "Bienes importados"))) |>
+  mutate(orden = match(sector_origen, c(sectores_eval, "Resto de la economía", "Bienes importados"))) |>
   arrange(orden) |>
   transmute(
     `Sector de política` = sector_origen,
@@ -444,29 +450,29 @@ fbkf_origen |>
   tabla_ft_es(digitos = 1, enteros = c("Bienes de capital que produce", "FBKF estimada que realiza")) |>
   colformat_double(j = "FBKF estimada que realiza", digits = 0, big.mark = ".", decimal.mark = ",", na_str = "n. a.") |>
   colformat_double(j = "Tasa de inversión (%)", digits = 1, big.mark = ".", decimal.mark = ",", na_str = "n. a.") |>
-  bold(i = 9, part = "body") |>
+  (\(ft) bold(ft, i = nrow_part(ft, "body"), part = "body"))() |>
   hline_top(border = officer::fp_border(width = 0.75), part = "body") |>
-  border(i = 8, border.bottom = officer::fp_border(width = 0.75), part = "body")
+  (\(ft) border(ft, i = nrow_part(ft, "body") - 1, border.bottom = officer::fp_border(width = 0.75), part = "body"))()
 ```
 
 *Fuente: elaboración propia con datos del INEC [@inec2026cou; @inec2026empleo]. Nota: La columna de bienes que produce es un dato directo. Un cero indica que el sector no fabrica bienes de capital; "n. a." indica que no aplica, porque los bienes importados no corresponden a un sector que invierta. El total de las dos primeras columnas es la FBKF nacional. La FBKF estimada que realiza usa un método de asignación por tipo de bien. La tasa de inversión es el promedio 2022-2024 de la FBKF central sobre el valor agregado del sector. La FBKF estimada de "Resto de la economía" incluye las viviendas.*
 
 Las edificaciones residenciales se asignan a la actividad de alquiler de viviendas, que incluye el alquiler imputado de las viviendas ocupadas por sus dueños, y por eso la inversión estimada del resto de la economía es tan alta. Con el valor central, agricultura y alimentos (`r formato_es(val("FBKF estimada, valor central", "Agricultura y alimentos"), 0)` millones de balboas), industrias (`r formato_es(val("FBKF estimada, valor central", "Industrias"), 0)`) y energía (`r formato_es(val("FBKF estimada, valor central", "Energía"), 0)`) tienen una inversión del mismo orden de magnitud, y residuos es el sector con la menor inversión estimada (`r formato_es(val("FBKF estimada, valor central", "Residuos"), 0)` millones de balboas). El método de asignación importa: en construcción la estimación va de `r formato_es(val("FBKF estimada, mínimo de los dos métodos", "Ciudades y construcción"), 0)` a `r formato_es(val("FBKF estimada, máximo de los dos métodos", "Ciudades y construcción"), 0)` millones de balboas, y en energía de `r formato_es(val("FBKF estimada, mínimo de los dos métodos", "Energía"), 0)` a `r formato_es(val("FBKF estimada, máximo de los dos métodos", "Energía"), 0)`. Las cifras por sector deben leerse como órdenes de magnitud. El desglose por tipo de bien no distingue la inversión pública de la privada.
 
-**Dos lecturas de la inversión en edificaciones.** La FBKF registra la adquisición de un activo, de modo que estrictamente la inversión corresponde a quien lo posee. Una constructora que edifica viviendas para venderlas produce el bien, y la inversión es del comprador. Según la convención de las cuentas nacionales, quien posee la vivienda, sea para alquilarla o porque la habita su dueño (alquiler imputado), figura en las actividades inmobiliarias. Las viviendas que los hogares construyen para sí mismos aparecen como producción de construcción de edificios para uso final propio, y su propietario sigue siendo el hogar. Por eso las edificaciones residenciales se asignan a la actividad de alquiler de viviendas, que está fuera de los seis sectores de política.
+**Dos lecturas de la inversión en edificaciones.** La FBKF registra la adquisición de un activo, de modo que estrictamente la inversión corresponde a quien lo posee. Una constructora que edifica viviendas para venderlas produce el bien, y la inversión es del comprador. Según la convención de las cuentas nacionales, quien posee la vivienda, sea para alquilarla o porque la habita su dueño (alquiler imputado), figura en las actividades inmobiliarias. Las viviendas que los hogares construyen para sí mismos aparecen como producción de construcción de edificios para uso final propio, y su propietario sigue siendo el hogar. Por eso las edificaciones residenciales se asignan a la actividad de alquiler de viviendas, que está fuera de los siete sectores de política.
 
-Para los fines de este documento conviene mirar también la lectura de producción. Los flujos de materiales y de residuos de obra pasan por la actividad que construye, sin importar quién sea el dueño final, y la construcción es el sector de política cuyo papel en la circularidad se vincula con esos flujos. Desde esa lectura, los seis sectores de política producen el `r formato_es(fbkf_lect$part_produccion_seis, 0)` % de los bienes de capital (columna «Bienes de capital que produce» del @tbl-fbkf-sector). Si solo las viviendas se atribuyeran a quien las construye y el resto de la asignación no cambiara, el aporte de los seis a la tasa de inversión pasaría de `r formato_es(fbkf_lect$pp_seis_adquiere, 1)` a `r formato_es(fbkf_lect$pp_seis_construye, 1)` puntos porcentuales, y su participación en la FBKF, de `r formato_es(fbkf_lect$part_seis_adquiere, 0)` % a `r formato_es(fbkf_lect$part_seis_construye, 0)` %. Estrictamente, la inversión de los seis sectores es la primera cifra, mientras que el segundo escenario dimensiona el peso de los sectores de política en la actividad que genera los bienes de capital.
+Para los fines de este documento conviene mirar también la lectura de producción. Los flujos de materiales y de residuos de obra pasan por la actividad que construye, sin importar quién sea el dueño final, y la construcción es el sector de política cuyo papel en la circularidad se vincula con esos flujos. Desde esa lectura, los siete sectores de política producen el `r formato_es(fbkf_lect$part_produccion_sectores, 0)` % de los bienes de capital (columna «Bienes de capital que produce» del @tbl-fbkf-sector). Si solo las viviendas se atribuyeran a quien las construye y el resto de la asignación no cambiara, el aporte de los siete a la tasa de inversión pasaría de `r formato_es(fbkf_lect$pp_sectores_adquiere, 1)` a `r formato_es(fbkf_lect$pp_sectores_construye, 1)` puntos porcentuales, y su participación en la FBKF, de `r formato_es(fbkf_lect$part_sectores_adquiere, 0)` % a `r formato_es(fbkf_lect$part_sectores_construye, 0)` %. Estrictamente, la inversión de los siete sectores es la primera cifra, mientras que el segundo escenario dimensiona el peso de los sectores de política en la actividad que genera los bienes de capital.
 
 Como complemento, la inversión extranjera directa (IED) por grupo de actividades del INEC combina electricidad, gas y agua en una sola línea.
 
-Según el @tbl-inversion, la IED acumulada de 2022 a 2024 en el grupo de energía, agua y residuos fue de `r formato_es(val("IED, flujo acumulado 2022-2024", "Energía"), 0)` millones de balboas, la mayor entre los seis sectores de política. En industrias fue de `r formato_es(val("IED, flujo acumulado 2022-2024", "Industrias"), 0)`, en construcción de `r formato_es(val("IED, flujo acumulado 2022-2024", "Ciudades y construcción"), 0)` y en agricultura de `r formato_es(val("IED, flujo acumulado 2022-2024", "Agricultura y alimentos"), 0)`. La inversión privada nacional no está cubierta por esta cifra.
+Según el @tbl-inversion, la IED acumulada de 2022 a 2024 en el grupo de energía, agua y residuos fue de `r formato_es(val("IED, flujo acumulado 2022-2024", "Energía"), 0)` millones de balboas, la mayor entre los siete sectores de política. En industrias fue de `r formato_es(val("IED, flujo acumulado 2022-2024", "Industrias"), 0)`, en construcción de `r formato_es(val("IED, flujo acumulado 2022-2024", "Ciudades y construcción"), 0)`, en agricultura de `r formato_es(val("IED, flujo acumulado 2022-2024", "Agricultura y alimentos"), 0)` y en turismo de `r formato_es(val("IED, flujo acumulado 2022-2024", "Turismo"), 0)`. El turismo tiene, sin embargo, una posición acumulada de `r formato_es(val("IED, posición al cierre", "Turismo"), 0)` millones de balboas en hoteles, restaurantes y actividades recreativas, lo que indica una presencia extranjera consolidada aunque los flujos recientes sean pequeños. La inversión privada nacional no está cubierta por esta cifra.
 
 ```{r}
 #| label: tbl-inversion
 #| tbl-cap: "Inversión extranjera directa por sector de política (millones de balboas)"
 
 si |>
-  filter(indicador %in% c("IED, flujo acumulado 2022-2024", "IED, posición al cierre"), sector_principal %in% seis) |>
+  filter(indicador %in% c("IED, flujo acumulado 2022-2024", "IED, posición al cierre"), sector_principal %in% sectores_eval) |>
   select(sector_principal, indicador, valor) |>
   pivot_wider(names_from = indicador, values_from = valor) |>
   # La fuente reúne energía, recursos hídricos y residuos en una sola línea; se muestra una vez
@@ -474,7 +480,7 @@ si |>
   mutate(sector_principal = if_else(
     sector_principal == "Residuos", "Energía, recursos hídricos y residuos (conjunto)", as.character(sector_principal)
   )) |>
-  arrange(match(sector_principal, c("Energía, recursos hídricos y residuos (conjunto)", seis))) |>
+  arrange(match(sector_principal, c("Energía, recursos hídricos y residuos (conjunto)", sectores_eval))) |>
   transmute(
     `Sector de política` = sector_principal,
     `Flujo acumulado 2022-2024` = `IED, flujo acumulado 2022-2024`,
@@ -483,9 +489,9 @@ si |>
   tabla_ft_es(digitos = 1, enteros = c("Flujo acumulado 2022-2024", "Posición al cierre de 2024"))
 ```
 
-*Fuente: elaboración propia con datos del INEC [@inec2026ied]. La fuente publica una sola línea para electricidad, gas y agua, que reúne tres sectores de política; por eso se muestra como un grupo y no puede separarse. Cifras preliminares.*
+*Fuente: elaboración propia con datos del INEC [@inec2026ied]. La fuente publica una sola línea para electricidad, gas y agua, que reúne tres sectores de política; por eso se muestra como un grupo y no puede separarse. La fila de turismo suma las líneas de hoteles y restaurantes y de artes, entretenimiento y creatividad; el transporte aéreo está dentro de la línea de transporte, que no se asigna. Cifras preliminares.*
 
-Respecto de la estructura de mercado, el Directorio de Empresas de 2022 del INEC permite comparar el tamaño de las empresas en el grupo de actividades donde cada sector de política tiene su núcleo [@inec2022directorio]. Las empresas grandes, con ingresos superiores a 2,5 millones de balboas, son `r formato_es(val("Empresas grandes en la sección", "Energía"), 0)` % en electricidad, gas y vapor, frente a menos de `r formato_es(ceiling(max(val("Empresas grandes en la sección", "Industrias"), val("Empresas grandes en la sección", "Agricultura y alimentos"), val("Empresas grandes en la sección", "Ciudades y construcción"))), 0)` % en industrias, agricultura y construcción (@tbl-estructura-emp).
+Respecto de la estructura de mercado, el Directorio de Empresas de 2022 del INEC permite comparar el tamaño de las empresas en el grupo de actividades donde cada sector de política tiene su núcleo [@inec2022directorio]. Las empresas grandes, con ingresos superiores a 2,5 millones de balboas, son `r formato_es(val("Empresas grandes en la sección", "Energía"), 0)` % en electricidad, gas y vapor, frente a menos de `r formato_es(ceiling(max(val("Empresas grandes en la sección", "Industrias"), val("Empresas grandes en la sección", "Agricultura y alimentos"), val("Empresas grandes en la sección", "Ciudades y construcción"))), 0)` % en industrias, agricultura y construcción (@tbl-estructura-emp). En el otro extremo, el grupo de hoteles y restaurantes, núcleo del turismo, reúne `r formato_es(val("Empresas en la sección CIIU principal", "Turismo"), 0)` empresas, de las cuales `r formato_es(estructura_emp$pct_micro[estructura_emp$grupo_sector == "Turismo"], 0)` % son microempresas y apenas `r formato_es(val("Empresas grandes en la sección", "Turismo"), 1)` % son grandes, la estructura más atomizada de todos los grupos analizados.
 
 ```{r}
 #| label: tbl-estructura-emp
@@ -506,7 +512,7 @@ estructura_emp |>
 
 *Fuente: elaboración propia con datos del Directorio de Empresas y Locales 2022 [@inec2022directorio]. Tamaño según ingresos anuales con los umbrales de la Ley 8 de 2000 [@ampyme2017politica]. Cada grupo reúne actividades de varios sectores de política.*
 
-Las clases de actividad económica más relacionadas con cada sector de política (@tbl-clases) muestran mercados con pocos oferentes en varias de ellas. Por ejemplo, 13 empresas fabrican cemento, cal y yeso, 49 fabrican productos de plástico y 120 operan en generación, transmisión y distribución eléctrica. En residuos, la recolección de desechos no peligrosos tiene 31 empresas con un promedio de `r formato_es(empresas_clave$personal_por_empresa[str_detect(empresas_clave$etiqueta, "^Recolección de desechos no")], 0)` empleados, y el procesamiento y la recuperación de materiales tiene 77 empresas con menos de cuatro empleados en promedio. Los conteos sugieren concentración en algunas clases y atomización en la recuperación de materiales, pero no son participaciones de mercado.
+Las clases de actividad económica más relacionadas con cada sector de política (@tbl-clases) muestran mercados con pocos oferentes en varias de ellas. Por ejemplo, 13 empresas fabrican cemento, cal y yeso, 49 fabrican productos de plástico y 120 operan en generación, transmisión y distribución eléctrica. En residuos, la recolección de desechos no peligrosos tiene 31 empresas con un promedio de `r formato_es(empresas_clave$personal_por_empresa[str_detect(empresas_clave$etiqueta, "^Recolección de desechos no")], 0)` empleados, y el procesamiento y la recuperación de materiales tiene 77 empresas con menos de cuatro empleados en promedio. En turismo ocurre lo contrario a la concentración, pues `r formato_es(empresas_clave$empresas[str_detect(empresas_clave$etiqueta, "^Restaurantes")], 0)` restaurantes y `r formato_es(empresas_clave$empresas[str_detect(empresas_clave$etiqueta, "^Actividades de alojamiento")], 0)` establecimientos de alojamiento operan con pocos empleados cada uno, mientras que el transporte aéreo de pasajeros tiene `r formato_es(empresas_clave$empresas[str_detect(empresas_clave$etiqueta, "^Transporte de pasajeros")], 0)` empresas. Los conteos sugieren concentración en algunas clases y atomización en la recuperación de materiales, pero no son participaciones de mercado.
 
 ```{r}
 #| label: tbl-clases
@@ -555,7 +561,7 @@ emisiones_sector |>
   tabla_ft_es(digitos = 1, enteros = "Emisiones (Gg CO2e)")
 ```
 
-*Fuente: elaboración propia con datos de EDGAR [@edgar2026ghg]. Recursos hídricos y construcción no tienen una categoría propia del IPCC; sus emisiones están en residuos (aguas residuales) e industrias (cemento y combustión). La intensidad se calcula solo donde el sector de emisiones y el sector económico coinciden.*
+*Fuente: elaboración propia con datos de EDGAR [@edgar2026ghg]. Recursos hídricos y construcción no tienen una categoría propia del IPCC; sus emisiones están en residuos (aguas residuales) e industrias (cemento y combustión). Al turismo se asigna solo la aviación civil nacional; el consumo de combustibles de hoteles y restaurantes está en la categoría comercial y residencial, que no se puede separar. La intensidad se calcula solo donde el sector de emisiones y el sector económico coinciden.*
 
 ```{r}
 #| label: fig-emisiones
@@ -567,6 +573,7 @@ emisiones_sector |>
   filter(anio >= 2018) |>
   ggplot(aes(x = anio, y = emisiones_gg, color = sector_principal)) +
   geom_line() +
+  scale_color_manual(values = colores_sector) +
   scale_y_continuous(labels = \(x) formato_es(x, 0)) +
   labs(x = NULL, y = "Gg de CO2 equivalente") +
   tema_grafico()
@@ -574,22 +581,22 @@ emisiones_sector |>
 
 ## Energía, agua y materiales
 
-El Balance Energético Nacional registra el consumo final por sector de consumo [@sne2026balances]. La intensidad energética es el mismo cociente aplicado al consumo de energía. Entre los sectores de política con dato, industrias es el de mayor intensidad energética, con `r formato_es(val("Intensidad energética", "Industrias"), 2)` miles de barriles equivalentes de petróleo por millón de balboas de valor agregado. La asignación del balance a los sectores de política es parcial: construcción y recursos hídricos no aparecen con consumo propio. Para el agua solo se dispone de la extracción nacional por tipo de uso, de la cual el 62,7 % corresponde al uso doméstico y el 36,8 % a la agricultura [@worldbank2026agua]. Los dos indicadores se presentan juntos en el @tbl-energia-agua, con las celdas vacías donde la fuente no asigna consumo.
+El Balance Energético Nacional registra el consumo final por sector de consumo [@sne2026balances]. La intensidad energética es el mismo cociente aplicado al consumo de energía. Entre los sectores de política con dato, industrias es el de mayor intensidad energética, con `r formato_es(val("Intensidad energética", "Industrias"), 2)` miles de barriles equivalentes de petróleo por millón de balboas de valor agregado. La asignación del balance a los sectores de política es parcial: construcción, recursos hídricos y turismo no aparecen con consumo propio, porque el consumo de hoteles y restaurantes está dentro del sector comercial y el combustible de la aviación dentro del transporte. Para el agua solo se dispone de la extracción nacional por tipo de uso, de la cual el 62,7 % corresponde al uso doméstico y el 36,8 % a la agricultura [@worldbank2026agua]. Los dos indicadores se presentan juntos en el @tbl-energia-agua, con las celdas vacías donde la fuente no asigna consumo.
 
 ```{r}
 #| label: tbl-energia-agua
 #| tbl-cap: "Uso de energía (2023) y de agua (2022) por sector de política"
 
 energia_t <- si |>
-  filter(indicador %in% c("Consumo de energía", "Intensidad energética"), sector_principal %in% seis) |>
+  filter(indicador %in% c("Consumo de energía", "Intensidad energética"), sector_principal %in% sectores_eval) |>
   select(sector_principal, indicador, valor) |>
   pivot_wider(names_from = indicador, values_from = valor)
 
 agua_t <- si |>
-  filter(indicador == "Extracción de agua", sector_principal %in% seis) |>
+  filter(indicador == "Extracción de agua", sector_principal %in% sectores_eval) |>
   select(sector_principal, `Extracción de agua` = valor)
 
-tibble(sector_principal = factor(seis, levels = sectores_politica)) |>
+tibble(sector_principal = factor(sectores_eval, levels = sectores_politica)) |>
   left_join(energia_t, by = "sector_principal") |>
   left_join(agua_t, by = "sector_principal") |>
   transmute(
@@ -667,14 +674,14 @@ La matriz permite también estimar multiplicadores. El multiplicador de valor ag
 
 La matriz de 76 actividades es algo más agregada que las cuentas nacionales, que tienen 80 actividades, pues reúne en una sola la pesca y la acuicultura, el comercio de zona franca, al por mayor y al por menor, y dos actividades de apoyo al transporte por agua. Cada actividad de las cuentas nacionales se asoció con una de la matriz, y las que se agregan pertenecen siempre al mismo sector de política, de modo que los resultados por sector de política no dependen de esa diferencia.
 
-Por sector de política (@tbl-enlaces), agricultura y alimentos tiene los valores más altos de enlace hacia atrás y hacia adelante, y el multiplicador de empleo más alto de los seis sectores de política. Le sigue industrias en el enlace hacia atrás y energía en el enlace hacia adelante.
+Por sector de política (@tbl-enlaces), agricultura y alimentos tiene los valores más altos de enlace hacia atrás y hacia adelante, y el multiplicador de empleo más alto de los siete sectores de política. Le siguen el turismo y las industrias en el enlace hacia atrás, con valores casi iguales, y energía en el enlace hacia adelante. El encadenamiento hacia atrás del turismo refleja sus compras nacionales: en los restaurantes, las carnes procesadas, el comercio, las bebidas y la pesca son los principales insumos, y en los hoteles, la electricidad, el comercio y los servicios financieros [@inec2024mip]. Un instrumento que cambie las prácticas de compra o de manejo de residuos de hoteles y restaurantes se transmite así a la agroindustria y al comercio; su multiplicador de empleo es de `r formato_es(val("Multiplicador de empleo", "Turismo"), 1)` puestos por millón de balboas de demanda final.
 
 ```{r}
 #| label: tbl-enlaces
 #| tbl-cap: "Eslabonamientos por sector de política, matriz insumo-producto de Panamá, 2018"
 
 enlaces_sector |>
-  filter(sector_principal %in% seis) |>
+  filter(sector_principal %in% sectores_eval) |>
   transmute(
     `Sector de política` = sector_principal,
     `Enlace hacia atrás` = enlace_atras,
@@ -689,7 +696,7 @@ enlaces_sector |>
 
 La @fig-enlaces ubica a cada una de las 76 actividades según sus dos índices. La clasificación de las 76 actividades arroja `r sum(enlaces_act$clasificacion == "Clave")` actividades clave (ambos índices superiores a 1, de las cuáles solamente una pertenece a los sectores prioritarios), `r sum(enlaces_act$clasificacion == "Arrastre (hacia atrás)")` de arrastre, `r sum(enlaces_act$clasificacion == "Impulso (hacia adelante)")` de impulso y `r sum(enlaces_act$clasificacion == "Independiente")` independientes.
 
-El @tbl-actividades reúne las actividades núcleo (electricidad, agua, recogida de desechos y construcción) y algunas actividades intensivas de industrias. Entre ellas, la electricidad es una actividad de impulso hacia adelante, con un índice de `r formato_es(enlaces_act$indice_adelante[enlaces_act$cod_mip == "AE38"], 2)`: es un insumo de muchas actividades. La recogida y el tratamiento de desechos se clasifica como independiente, con encadenamientos cercanos al promedio y un multiplicador de empleo de `r formato_es(enlaces_act$mult_empleo[enlaces_act$cod_mip == "AE40"], 1)` puestos por millón de balboas de demanda final. Sus principales compradores intermedios son la administración pública, la salud y la enseñanza, lo que refleja que la recolección es un servicio que presta en buena parte la administración local. Sus principales proveedores son los servicios financieros, la reparación de maquinaria y el comercio.
+El @tbl-actividades reúne las actividades núcleo (electricidad, agua, recogida de desechos y construcción) y algunas actividades intensivas de industrias y del turismo. Entre ellas, la electricidad es una actividad de impulso hacia adelante, con un índice de `r formato_es(enlaces_act$indice_adelante[enlaces_act$cod_mip == "AE38"], 2)`: es un insumo de muchas actividades. La recogida y el tratamiento de desechos se clasifica como independiente, con encadenamientos cercanos al promedio y un multiplicador de empleo de `r formato_es(enlaces_act$mult_empleo[enlaces_act$cod_mip == "AE40"], 1)` puestos por millón de balboas de demanda final. Sus principales compradores intermedios son la administración pública, la salud y la enseñanza, lo que refleja que la recolección es un servicio que presta en buena parte la administración local. Sus principales proveedores son los servicios financieros, la reparación de maquinaria y el comercio.
 
 ```{r}
 #| label: fig-enlaces
@@ -704,6 +711,7 @@ enlaces_act |>
   geom_hline(yintercept = 1, linetype = "dashed") +
   geom_vline(xintercept = 1, linetype = "dashed") +
   geom_point() +
+  scale_color_manual(values = colores_sector) +
   ggrepel::geom_text_repel(
     data = actividades_clave,
     aes(label = cod_mip), size = 3, show.legend = FALSE
@@ -720,7 +728,7 @@ enlaces_act |>
 #| tbl-cap: "Eslabonamientos de actividades seleccionadas, matriz insumo-producto de Panamá, 2018"
 
 enlaces_act |>
-  filter(cod_mip %in% c("AE38", "AE39", "AE40", "AE41", "AE42", "AE43", "AE31", "AE32", "AE23", "AE27")) |>
+  filter(cod_mip %in% c("AE38", "AE39", "AE40", "AE41", "AE42", "AE43", "AE31", "AE32", "AE23", "AE27", "AE54", "AE55")) |>
   transmute(
     Actividad = actividad_mip,
     `Sector de política` = sector_principal,
@@ -736,13 +744,13 @@ enlaces_act |>
 
 # Síntesis por sector de política
 
-Para ofrecer una lectura comparativa se construyó una matriz de relevancia en la que cada sector de política recibe un puntaje de 1 a 5 en seis indicadores. Para cada indicador se ordenan los seis sectores de política de menor a mayor valor de manera que el que tiene el valor más bajo recibe 1, el que tiene el más alto recibe 5, y los demás reciben valores intermedios en proporción a su lugar en el orden. El puntaje medio es el promedio de los puntajes de cada sector de política. Se usan los ordenamientos y no los valores originales para que indicadores con unidades distintas (balboas, puestos, toneladas) puedan compararse y para que un valor extremo no domine el resultado. Los pesos son iguales. Un puntaje alto indica más peso económico, de empleo, de comercio, de emisiones o de encadenamientos, y no necesariamente mayor potencial circular o mayor viabilidad.
+Para ofrecer una lectura comparativa se construyó una matriz de relevancia en la que cada sector de política recibe un puntaje de 1 a 5 en seis indicadores. Para cada indicador se ordenan los siete sectores de política de menor a mayor valor de manera que el que tiene el valor más bajo recibe 1, el que tiene el más alto recibe 5, y los demás reciben valores intermedios en proporción a su lugar en el orden. El puntaje medio es el promedio de los puntajes de cada sector de política. Se usan los ordenamientos y no los valores originales para que indicadores con unidades distintas (balboas, puestos, toneladas) puedan compararse y para que un valor extremo no domine el resultado. Los pesos son iguales. Un puntaje alto indica más peso económico, de empleo, de comercio, de emisiones o de encadenamientos, y no necesariamente mayor potencial circular o mayor viabilidad.
 
-El resultado (@tbl-matriz) ordena a agricultura y alimentos, industrias y construcción por encima de energía, recursos hídricos y residuos.
+El resultado (@tbl-matriz) ordena a agricultura y alimentos en primer lugar, seguida por el turismo, que destaca por sus exportaciones, su empleo y su encadenamiento hacia atrás, y luego por construcción e industrias, por encima de energía, recursos hídricos y residuos.
 
 ```{r}
 #| label: tbl-matriz
-#| tbl-cap: "Matriz de relevancia sectorial (puntaje de 1 a 5 según el lugar entre los seis sectores de política)"
+#| tbl-cap: "Matriz de relevancia sectorial (puntaje de 1 a 5 según el lugar entre los siete sectores de política)"
 
 matriz_ancha |>
   transmute(
@@ -758,7 +766,7 @@ matriz_ancha |>
   tabla_ft_es(digitos = 1, anchos_cm = c(3.81, rep(1.94, 7)))
 ```
 
-*Fuente: elaboración propia con base en los indicadores de los cuadros anteriores. Una celda vacía indica que el sector de política no tiene el indicador (las emisiones de recursos hídricos y construcción están en otras categorías).*
+*Fuente: elaboración propia con base en los indicadores de los cuadros anteriores. Una celda vacía indica que el sector de política no tiene el indicador (las emisiones de recursos hídricos y construcción están en otras categorías, y las del turismo solo son separables para la aviación nacional, por lo que no se puntúan).*
 
 Para la economía circular, el sector de residuos tiene un papel que sus indicadores económicos no reflejan pues gestiona los flujos de material, tiene la mayor intensidad de emisiones, su empleo formal es pequeño frente a una población recicladora mayormente informal y su cadena de recuperación se extiende a las industrias, la construcción y los alimentos. Por eso la síntesis se organiza también en torno a flujos de material y no solo a actividades.
 
@@ -768,12 +776,13 @@ Para la economía circular, el sector de residuos tiene un papel que sus indicad
 - **Energía.** Crece rápido, paga los salarios más altos, emplea directamente a pocas personas y tiene la estructura de empresas más concentrada, con casi cuatro de cada diez empresas grandes. Es el principal emisor entre los sectores de política con categoría propia.
 - **Recursos hídricos.** Es el sector de política más pequeño después de residuos por valor agregado, con una extracción dominada por el uso doméstico. Sus emisiones están en la categoría de aguas residuales, dentro de residuos.
 - **Residuos.** Es pequeño en las cuentas nacionales, intensivo en empleo y en emisiones, y con una cadena de recuperación atomizada en microempresas. Es el sector de política donde la formalización y la trazabilidad son prerrequisitos de cualquier tarifa o impuesto.
+- **Turismo.** Es el principal exportador entre los sectores de política, el único con mayoría de mujeres en el empleo y el de estructura empresarial más atomizada, con ocho de cada diez empresas de hoteles y restaurantes en la categoría de microempresa. Sus flujos de material relevantes son los residuos de alimentos, los envases de bebidas y los plásticos de un solo uso que generan hoteles y restaurantes, y su encadenamiento hacia atrás lo conecta con la agroindustria y el comercio.
 
 # Instrumentos de política pública que pueden promover la circularidad en Panamá
 
 Esta sección propone un conjunto de instrumentos de política pública, principalmente económicos, que pueden promover la circularidad en los sectores de política priorizados. La propuesta parte de tres elementos que incluyen lo que los datos de las secciones anteriores indican sobre cada sector de política, el mandato legal que ya existe en Panamá, y la experiencia de otros países con instrumentos equivalentes. Los instrumentos se agrupan, según la Ley 502 y la literatura internacional, en normativos y regulatorios, tributarios y tarifarios, financieros, de promoción y facilitación de inversiones, y de capacidades y conciencia ambiental. Se añade un subgrupo de instrumentos habilitantes que consiste en registro, trazabilidad y formalización, porque la experiencia revisada indica que los demás dependen de ella.
 
-Los instrumentos se seleccionaron con cuatro criterios: respaldo en el marco legal panameño o en la Hoja de Ruta, correspondencia con un rasgo de la economía panameña que documenta el análisis de las secciones anteriores, experiencia internacional documentada en una fuente primaria, y cobertura conjunta de las familias de instrumentos y de los seis sectores de política. La evidencia de cada instrumento lleva su grado de verificación, y lo que no pudo leerse en la fuente no se usa como base de una afirmación.
+Los instrumentos se seleccionaron con cuatro criterios: respaldo en el marco legal panameño o en la Hoja de Ruta, correspondencia con un rasgo de la economía panameña que documenta el análisis de las secciones anteriores, experiencia internacional documentada en una fuente primaria, y cobertura conjunta de las familias de instrumentos y de los siete sectores de política. La evidencia de cada instrumento lleva su grado de verificación, y lo que no pudo leerse en la fuente no se usa como base de una afirmación.
 
 Los catorce instrumentos son una selección y no un inventario exhaustivo de lo que registra la literatura. Quedaron fuera los instrumentos que no cumplen con esos criterios. Las prohibiciones de plásticos de un solo uso y los impuestos a las bolsas plásticas tienen evidencia internacional amplia, pero Panamá ya regula los plásticos de un solo uso [@panama2020Ley187], de modo que no representan una propuesta nueva. Los subsidios directos a sustitutos o a la reparación, como el que reembolsa un tercio del precio de ciertos insumos en Andalucía, tienen un único ejemplo revisado, con evidencia solo descriptiva y sin un respaldo en el marco legal ni en los datos del análisis sectorial [@giz2026InstrumentosFinancieros]. Los instrumentos de investigación, desarrollo e innovación quedan cubiertos de manera general por los de capacidades, y no se encontró una brecha específica de Panamá que justifique tratarlos aparte. Las normas de ecodiseño y el derecho a la reparación tampoco tienen antecedentes como obligaciones en Panamá. La Ley 502 incorpora la capacidad de reparación como parte del principio de diseño para la circularidad y ordena programas de formación en ecodiseño y servicios de reparación [@panama2025Ley502, arts. 3 y 5], pero no impone requisitos de diseño a los productos. La Ley 45 de 2007 obliga al proveedor a reparar o reemplazar el bien durante la garantía y a informar si no hay repuestos o servicio técnico en el país, y solo exige asegurar el suministro de repuestos, por diez años, a los distribuidores de vehículos [@panama2007Ley45, arts. 36, 46 y 47]. No se identificó una norma ni un proyecto de ley sobre ecodiseño de aplicación general o sobre un derecho a la reparación.
 
@@ -781,7 +790,7 @@ La clasificación sigue el ejemplo de la Unión Europea, cuya Directiva marco de
 
 ## Lecciones del análisis para el diseño
 
-Seis rasgos de la economía panameña, documentados en este análisis, condicionan qué instrumentos son pertinentes y en qué orden.
+Siete rasgos de la economía panameña, documentados en este análisis, condicionan qué instrumentos son pertinentes y en qué orden.
 
 1. **Los residuos son el nudo de la transición y su sector formal es muy pequeño.** El país genera `r formato_es(rsm_mt, 2)` millones de toneladas de residuos municipales al año, el servicio recolecta el `r formato_es(otros_res$valor[str_detect(otros_res$indicador, "Cobertura")], 0)` % del peso, y el sector de residuos aporta menos del 0,2 % del valor agregado con la mayor intensidad de emisiones entre los sectores de política con categoría propia. La recuperación de materiales se reparte entre 77 empresas con menos de cuatro empleados en promedio, y el único conteo disponible de segregadores urbanos (6.085 personas en 2010) es antiguo [@res-bid-eval2010, p. 143]. Esto señala que el financiamiento del servicio y la formalización de quienes recuperan materiales deberían ser prioridad antes de establecer cualquier meta de reciclaje.
 2. **Los obligados de una REP serán sobre todo importadores.** Industrias y agricultura y alimentos tienen saldos comerciales negativos, y los aparatos electrónicos son un ejemplo extremo, pues el país genera 54 millones de kilogramos de residuos electrónicos al año y documenta 0,1 millones recolectados y reciclados formalmente [@res-gem2024, p. 132]. Un instrumento que recaiga sobre quien pone el producto en el mercado necesita un registro de importadores por partida arancelaria, con apoyo de la aduana.
@@ -789,6 +798,7 @@ Seis rasgos de la economía panameña, documentados en este análisis, condicion
 4. **Los flujos de material de mayor volumen tienen destinos conocidos.** Los orgánicos (entre 33 % y 44,5 % de los residuos municipales, según la fuente), el plástico y el papel y cartón (31 % entre ambos) y los residuos de construcción y demolición (más de un millón de toneladas al año) suman las mayores cantidades. Los metales ya se comercian: Panamá exportó unas `r formato_es(toneladas_2024[["Metal"]] / 1000, 0)` mil toneladas de desperdicios metálicos en 2024. La demanda de material secundario existe para el metal y parece más débil para el plástico, el papel y el vidrio, donde las exportaciones de desechos no superan el 10 % de lo que se genera.
 5. **La construcción y el cemento concentran una oportunidad de demanda.** Construcción es el mayor sector de política por valor agregado (`r formato_es(val("Participación en el valor agregado", "Ciudades y construcción"), 1)` %) y se abastece de una industria de cemento con 13 empresas. Esta combinación permite que una norma de contenido reciclado o una regla de compras públicas cree demanda de áridos y bloques recuperados con pocos interlocutores.
 6. **Energía y agua son pequeñas en valor agregado, pero atraen inversión y tienen marcos de financiamiento.** El grupo de electricidad, gas y agua recibió la mayor inversión extranjera directa de 2022 a 2024, y casi cuatro de cada diez empresas de electricidad son grandes. El Marco de Financiamiento Sostenible de la República ya incluye categorías de economía circular y de tratamiento sostenible de agua [@mef2024MarcoFinanciamientoSostenible, p. 22-24], mientras que la Hoja de Ruta señala pérdidas de cerca del 40 % del agua producida [@pnud2024RevBiblioEC, p. 56-57].
+7. **El turismo es un exportador de servicios con una base empresarial atomizada.** Genera `r formato_es(100 * val("Exportaciones", "Turismo") / sum(cuentas$exportaciones[cuentas$anio == 2024]), 0)` % de las exportaciones del país, emplea a más mujeres que hombres y `r formato_es(estructura_emp$pct_micro[estructura_emp$grupo_sector == "Turismo"], 0)` % de las empresas de hoteles y restaurantes son microempresas. Los instrumentos que lo involucren deben llegar a muchos establecimientos pequeños, por lo que conviene apoyarse en reglas simples, en el sistema de aseo comercial y en el crédito y la certificación, más que en obligaciones de reporte complejas. Su encadenamiento hacia atrás hace que un cambio en las compras de hoteles y restaurantes se transmita a la agroindustria y al comercio.
 
 ## Una implementación en dos pasos
 
@@ -878,7 +888,7 @@ El consumidor paga un depósito al comprar una bebida envasada y lo recupera al 
 
 **Ejemplos.** En los países europeos con sistemas plenamente operativos, la recogida supera el 85 % y la basura dispersa se reduce entre 40 % y 60 % [@sidorczuk2025DepositReturn, p. 1 y 7]. Ecuador creó en 2011 un impuesto redimible de USD 0,02 por botella plástica no retornable en el que la recolección llegó a 81 % el primer año y superó el 100 % después, lo que indica ingreso de botellas desde países vecinos, y en 2012-2014 se devolvieron USD 96,3 millones frente a USD 83,6 millones recaudados [@pinos2018InstrumentosEcuador, p. 129-130].
 
-**Sectores de política.** Residuos, bebidas, comercio y ciudades.
+**Sectores de política.** Residuos, bebidas, comercio, turismo y ciudades. Hoteles, restaurantes y lugares de recreación venden bebidas envasadas y pueden operar como puntos de retorno.
 
 **Condiciones y riesgos.** El sistema requiere un monto de depósito suficiente para que devolver el envase compense al consumidor, y una red de retorno que haga conveniente la devolución. También necesita control del ingreso de envases por las fronteras y una regla que defina a quién corresponden los depósitos no reclamados y en qué se usan. La experiencia ecuatoriana indica que sin control aduanero el sistema pierde recursos, pues se devolvieron más envases de los que se habían vendido en el país.
 
@@ -890,7 +900,7 @@ Dos instrumentos complementarios en los que (i) La tarifa de aseo a costo real c
 
 **Ejemplos.** Veinte Estados de la Unión Europea aplican pago por generación y 22 aplican impuesto al vertido, con un promedio de entre 39 y 46 euros por tonelada [@eea2023EconomicInstruments]. Los cinco Estados europeos con mayor reciclaje combinan estos instrumentos con recogida de biorresiduos, y la Agencia Europea de Medio Ambiente advierte que ningún instrumento aislado logra tasas altas de reciclaje [@eea2023EconomicInstruments]. El Banco Mundial señala que la gestión básica cuesta al menos USD 35 por tonelada en países de ingreso bajo, que absorbe más del 10 % de los presupuestos municipales en ingreso medio, y que los esquemas por volumen requieren planificación coordinada y fuerte control [@bm2018WhatAWaste, p. 101]. La Ley 33 de 2018 ya manda crear incentivos económicos y fiscales a la recuperación de materiales [@panama2018Ley33, arts. 25-27].
 
-**Sectores de política.** Residuos y ciudades y construcción.
+**Sectores de política.** Residuos, turismo y el sector de ciudades y construcción. Hoteles y restaurantes generan residuos orgánicos y envases en sus propios establecimientos, donde la separación en la fuente y el cobro por cantidad son verificables.
 
 **Condiciones y riesgos.** La tarifa a costo real y el pago por generación necesitan un catastro de usuarios para saber a quién cobrar, y recolección selectiva disponible para que el usuario pueda separar sus residuos. La tasa de disposición final requiere rellenos controlados que ofrezcan una alternativa al vertido ilegal, además de fiscalización para hacerla cumplir. Como estos cargos encarecen el servicio, también hace falta proteger a los hogares vulnerables, de modo que el aumento de la tarifa no recaiga sobre quienes menos pueden pagarla.
 
@@ -902,7 +912,7 @@ Beneficios tributarios, consistentes de exoneración de aranceles y del impuesto
 
 **Ejemplos.** Colombia exime del impuesto al valor agregado la importación de maquinaria no producida en el país destinada a reciclar basuras o desperdicios y a depurar aguas residuales, y otorga un descuento de 25 % del impuesto de renta por inversiones en control y mejoramiento ambiental [@colombia1989EstatutoTributario, arts. 255 y 428]. El Programa de las Naciones Unidas para el Medio Ambiente recomienda igualar el trato tributario entre material virgen y reciclado [@unepfi2023CircularFinanceLAC, p. 71].
 
-**Sectores de política.** Industrias, residuos y recursos hídricos. La energía ya cuenta con su régimen.
+**Sectores de política.** Industrias, residuos, recursos hídricos y turismo (equipos de compostaje, tratamiento y reúso de agua en hoteles). La energía ya cuenta con su régimen.
 
 **Condiciones y riesgos.** Los incentivos implican un costo fiscal, un gasto tributario que debe estimarse antes de aprobarlos y revisarse periódicamente. Requieren una lista de bienes elegibles bien definida y certificada, para evitar que se beneficien equipos ajenos a la circularidad, y un plazo con evaluación que permita retirarlos si no cumplen su propósito. No se encontraron evaluaciones verificadas del efecto de estos incentivos en la región, por lo que conviene que el diseño incluya su propia evaluación.
 
@@ -940,7 +950,7 @@ Líneas de crédito de largo plazo y bajo costo, garantías parciales que reduce
 
 **Ejemplos.** Bancóldex y la Corporación de Fomento de la Producción de Chile ofrecen préstamos de largo plazo, con plazos de hasta 15 años, y Chile cuenta con una línea de crédito verde [@unepfi2023CircularFinanceLAC, p. 32, 38 y 48]. Un fondo de inversión de impacto en Asia opera con una garantía de cartera de 50 % de la agencia de cooperación de Estados Unidos [@unepfi2023CircularFinanceLAC, p. 31]. El Programa de las Naciones Unidas para el Medio Ambiente considera las finanzas combinadas la vía más prometedora para reducir el riesgo y atraer capital privado [@unepfi2023CircularFinanceLAC, p. 76].
 
-**Sectores de política.** Industrias, residuos y agricultura y alimentos. La recuperación de materiales es un campo de microempresas, y la informalidad estimada supera el 60 % en industrias y el 85 % en agricultura y alimentos.
+**Sectores de política.** Industrias, residuos, turismo y agricultura y alimentos. La recuperación de materiales es un campo de microempresas, la informalidad estimada supera el 60 % en industrias y en turismo y el 85 % en agricultura y alimentos, y ocho de cada diez empresas de hoteles y restaurantes son microempresas.
 
 **Condiciones y riesgos.** La línea requiere criterios de elegibilidad comunes con la taxonomía, para que el financiamiento y la clasificación verde usen el mismo lenguaje, y capacitación de los analistas de crédito, que deben evaluar negocios que la banca percibe como de alto riesgo. Requiere además la formalización previa de los beneficiarios, dado que buena parte de ellos opera en la informalidad. Como no existe un fondo público de capital enfocado en economía circular en la región y los mercados de capital de riesgo son incipientes [@unepfi2023CircularFinanceLAC, p. 38-44], las garantías y los recursos concesionales tendrían que cubrir ese vacío.
 
@@ -980,7 +990,7 @@ Programas de formación técnica, asistencia a empresas, campañas de informaci�
 
 **Ejemplos.** El Programa de las Naciones Unidas para el Medio Ambiente recomienda capacitar al sector financiero para evaluar proyectos circulares [@unepfi2023CircularFinanceLAC, p. 74-76]. La Agencia Europea de Medio Ambiente observa que los instrumentos dirigidos a los ciudadanos requieren campañas de información para ser eficaces [@eea2023EconomicInstruments].
 
-**Sectores de política.** Transversal, con prioridad en residuos y en las micro y pequeñas empresas de industrias y agricultura.
+**Sectores de política.** Transversal, con prioridad en residuos, en las micro y pequeñas empresas de industrias y agricultura y en el turismo, donde la certificación de prácticas sostenibles de hoteles y operadores es una herramienta de diferenciación ante los visitantes.
 
 **Condiciones y riesgos.** Estos instrumentos requieren financiamiento sostenido, pues los programas de formación y las campañas pierden efecto si se interrumpen. Por sí solos no cambian el comportamiento de productores y consumidores, de modo que funcionan como complemento de los instrumentos que modifican costos e incentivos.
 
@@ -1011,7 +1021,7 @@ tribble(
   "Importación de insumos más alta en industrias (17 % de la producción)",
   "Segundo",
   "Depósito y retorno de envases de bebidas",
-  "Residuos, bebidas, comercio",
+  "Residuos, bebidas, comercio, turismo",
   "Plástico, vidrio y metal suman cerca de un cuarto de los residuos",
   "Segundo",
   "Contenido reciclado y normas para el material secundario",
@@ -1019,11 +1029,11 @@ tribble(
   "Más de un millón de t de residuos de obra; cemento con 13 empresas",
   "Segundo",
   "Tarifa de aseo a costo real, pago por generación y tasa de disposición final",
-  "Residuos, ciudades y construcción",
+  "Residuos, turismo, ciudades y construcción",
   "Cobertura de recolección de 64 % del peso; más de 57 vertederos",
   "Segundo",
   "Incentivos fiscales a la inversión circular",
-  "Industrias, residuos, recursos hídricos",
+  "Industrias, residuos, recursos hídricos, turismo",
   "Precedente de la Ley 37 de 2013; mandato de la Ley 33 de 2018",
   "Primero",
   "Compras públicas circulares",
@@ -1039,15 +1049,15 @@ tribble(
   "Categorías de economía circular y agua en el marco; pérdidas de agua cercanas al 40 %",
   "Primero",
   "Crédito verde, garantías y financiamiento combinado",
-  "Industrias, residuos, agricultura",
-  "Pymes cerca del 96 % de las empresas; informalidad de 64 % a 89 %",
+  "Industrias, residuos, agricultura, turismo",
+  "Pymes cerca del 96 % de las empresas; informalidad de 61 % a 89 %; 81 % de microempresas en hoteles y restaurantes",
   "Primero",
   "Alianzas público-privadas y mecanismos de promoción existentes",
   "Residuos, agricultura, industrias",
   "Infraestructura municipal con baja inversión; incentivos del Ministerio de Comercio e Industrias",
   "Primero",
   "Información, formación y certificación",
-  "Transversal",
+  "Transversal, con énfasis en turismo",
   "Brechas de información documentadas en este análisis",
   "Primero"
 ) |>
@@ -1056,7 +1066,7 @@ tribble(
 
 *Fuente: elaboración propia con base en los datos de este documento y en las fuentes citadas en cada instrumento.*
 
-Desde la perspectiva de cada sector de política (@tbl-paquetes), los instrumentos que dependen del registro se concentran en residuos e industrias, mientras que energía y recursos hídricos se apoyan sobre todo en instrumentos financieros y en los incentivos existentes.
+Desde la perspectiva de cada sector de política (@tbl-paquetes), los instrumentos que dependen del registro se concentran en residuos e industrias, mientras que energía y recursos hídricos se apoyan sobre todo en instrumentos financieros y en los incentivos existentes, y el turismo combina tarifas que llegan a muchos establecimientos pequeños con crédito y certificación.
 
 ```{r}
 #| label: tbl-paquetes
@@ -1081,7 +1091,10 @@ tribble(
   "Es pequeña en valor agregado, concentrada en pocas empresas grandes y con un régimen de incentivos ya vigente",
   "Recursos hídricos",
   "Bonos temáticos para tratamiento y reducción de pérdidas; incentivos a equipos de depuración y reúso",
-  "Es el sector de política más pequeño, con pérdidas cercanas al 40 % y acceso a una categoría propia del marco soberano"
+  "Es el sector de política más pequeño, con pérdidas cercanas al 40 % y acceso a una categoría propia del marco soberano",
+  "Turismo",
+  "Tarifa de aseo comercial con pago por generación y separación de orgánicos; puntos de retorno del depósito; crédito verde y garantías para compostaje, eficiencia y reúso de agua; certificación de prácticas sostenibles",
+  "Es el principal exportador entre los sectores de política, con mayoría de mujeres en el empleo y una base de microempresas; sus residuos de alimentos y envases se generan en establecimientos identificables"
 ) |>
   tabla_ft_es(digitos = 0, anchos_cm = c(3.81, 6.79, 6.79))
 ```
@@ -1090,7 +1103,7 @@ tribble(
 
 ## Alcance de la propuesta
 
-La propuesta es un punto de partida. Cada instrumento debe someterse a una evaluación de su factibilidad política, técnica, institucional y financiera, a una estimación de su efecto por sector de política y de su costo fiscal, y a un diseño detallado de montos, metas, responsables y plazos antes de recomendarse. Varias piezas dependen de decisiones que aún no se han tomado, como el contenido del reglamento de la Ley 502 y la integración del Consejo Nacional de Economía Circular. La evidencia internacional sobre el efecto de los instrumentos es más sólida para las bolsas plásticas, los sistemas de depósito y el impuesto al vertido que para la REP, la ecomodulación y el contenido reciclado, y se ha expuesto en cada caso con su grado de verificación.
+La propuesta es el punto de partida de dos análisis complementarios. El primero evalúa la factibilidad política, técnica, institucional y financiera de cada instrumento, estima su efecto por sector de política y examina las capacidades institucionales y el sistema financiero nacional. El segundo diseña los instrumentos, con montos, metas, responsables, plazos, fuentes de financiamiento, reformas e indicadores, en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular. La evidencia internacional sobre el efecto de los instrumentos es más sólida para las bolsas plásticas, los sistemas de depósito y el impuesto al vertido que para la REP, la ecomodulación y el contenido reciclado, y se ha expuesto en cada caso con su grado de verificación.
 
 # Limitaciones y brechas de información
 
@@ -1104,51 +1117,52 @@ tribble(
   ~Criterio, ~Brecha, ~Tratamiento,
   "Empleo por género e informalidad",
   "Las cuentas nacionales no distinguen sexo ni formalidad. La encuesta solo cruza ambos por grupo de actividades.",
-  "Imputación proporcional por grupo. Solicitar al INEC microdatos de la Encuesta de Mercado Laboral por división.",
+  "Imputación proporcional por grupo de actividades, adecuada para comparar sectores de política.",
   "Empleo de energía, agua y residuos",
   "Los puestos de las cuentas nacionales son una fracción de los ocupados de la encuesta en los grupos D y E.",
-  "Se reportan ambas cifras. Solicitar al INEC la conciliación.",
+  "Se reportan ambas cifras y se usa la de las cuentas nacionales para comparar sectores.",
   "Recicladores de base",
   "No hay registro ni cuantificación reciente.",
-  "Cualitativo. Incluir en las consultas con actores y en la agenda de formalización.",
+  "Tratamiento cualitativo con el último registro disponible; el registro de recicladores es uno de los instrumentos propuestos.",
   "Inversión",
   "La formación bruta de capital fijo se publica por producto y no por actividad que invierte, y no distingue inversión pública y privada. La inversión extranjera directa agrupa energía, agua y residuos.",
   "Estimación por actividad con dos métodos de asignación y rango.",
   "Concentración y barreras",
   "No hay cuotas de mercado ni índices de concentración. Los estudios sectoriales de competencia no son públicos.",
-  "Conteo de empresas y tamaño. Solicitar estudios a la autoridad de competencia.",
+  "Conteo de empresas y estructura por tamaño como aproximación.",
   "Agua y materiales",
   "El agua solo existe por tipo de uso a nivel nacional y los materiales como un indicador agregado.",
-  "Caracterización nacional. Solicitar a MiAMBIENTE las concesiones de agua por uso.",
+  "Caracterización nacional por tipo de uso.",
   "Residuos",
   "No hay serie anual de generación, composición ni tasas de reciclaje oficiales. Las fuentes difieren en la proporción de orgánicos.",
   "Fuente única y registro de la diferencia. Plataforma de indicadores de la Ley 502.",
   "Emisiones",
   "EDGAR no incluye el uso de la tierra y difiere del inventario nacional.",
-  "Contraste con el inventario nacional. Solicitar las tablas del inventario por categoría.",
+  "Contraste con el inventario nacional por sector del IPCC.",
   "Año base",
   "Los eslabonamientos son de 2018 y las cuentas llegan a 2024.",
-  "Se supone que los coeficientes técnicos son estables. Solicitar la actualización de la matriz."
+  "Se supone que los coeficientes técnicos son estables."
 ) |>
   tabla_ft_es(digitos = 0, anchos_cm = c(5.06, 6.17, 6.17))
 ```
 
 *Fuente: elaboración propia.*
 
-Además, las estadísticas por producto (comercio exterior) se asignaron a actividades con un supuesto de actividad principal, y el consumo de energía y agua por sector de política solo tiene cobertura parcial. La clasificación de los sectores de política en actividades es un trabajo propio de este análisis que debe validarse con MiAMBIENTE y el Ministerio de Comercio e Industrias, y la tabla de equivalencias se entrega editable para ese fin.
+Además, las estadísticas por producto (comercio exterior) se asignaron a actividades con un supuesto de actividad principal, y el consumo de energía y agua por sector de política solo tiene cobertura parcial. La clasificación de los sectores de política en actividades es un trabajo propio de este análisis; la tabla de equivalencias se publica con la evidencia de cada asignación, de modo que cualquier usuario pueda revisarla y reproducir los resultados.
 
 # Conclusiones y pasos siguientes
 
-La evidencia disponible permite caracterizar los seis sectores de política con indicadores comparables en producto, empleo, comercio, emisiones y eslabonamientos, y con aproximaciones parciales en inversión, estructura de mercado, recursos y recuperación de materiales. Los hallazgos principales para el diseño de instrumentos son:
+La evidencia disponible permite caracterizar los siete sectores de política con indicadores comparables en producto, empleo, comercio, emisiones y eslabonamientos, y con aproximaciones parciales en inversión, estructura de mercado, recursos y recuperación de materiales. Los hallazgos principales para el diseño de instrumentos son:
 
 1. Los sectores de política con más empleo (agricultura y alimentos, construcción, industrias) tienen alta informalidad, de modo que la formalización es una condición previa para los instrumentos de recaudación o de incentivo.
 2. El sector de residuos es pequeño en las cuentas nacionales, pero concentra la mayor intensidad de emisiones y el papel de gestor de los flujos de material. Su empleo informal y su cadena atomizada de recuperación no se miden bien con las estadísticas.
 3. Los saldos comerciales negativos de industrias y de agricultura y alimentos sugieren que los obligados de la REP serán en buena parte importadores, lo que subraya la necesidad de registros de importadores y productores.
-4. Los eslabonamientos más altos están en agricultura y alimentos e industrias, por lo que los instrumentos aplicados en esos sectores de política tendrán efectos de arrastre sobre proveedores nacionales.
-5. La información faltante es un hallazgo en sí misma: la plataforma de indicadores que ordena la Ley 502 debería cerrar las brechas de residuos, recicladores e inversión.
-6. Los instrumentos propuestos se ordenan en dos pasos: primero las condiciones habilitantes (registro de productores e importadores, formalización de recicladores, información) y los instrumentos de financiamiento y compras públicas; después la responsabilidad extendida del productor con ecomodulación, el depósito y retorno, las tarifas y el contenido reciclado, que dependen de ese registro.
+4. Los eslabonamientos hacia atrás más altos están en agricultura y alimentos, turismo e industrias, por lo que los instrumentos aplicados en esos sectores de política tendrán efectos de arrastre sobre proveedores nacionales.
+5. El turismo es el principal exportador entre los sectores de política, emplea mayoritariamente a mujeres y opera con una base de microempresas, de modo que los instrumentos que lo involucren deben ser simples de cumplir y combinarse con crédito y certificación.
+6. La información faltante es un hallazgo en sí misma: la plataforma de indicadores que ordena la Ley 502 debería cerrar las brechas de residuos, recicladores e inversión.
+7. Los instrumentos propuestos se ordenan en dos pasos: primero las condiciones habilitantes (registro de productores e importadores, formalización de recicladores, información) y los instrumentos de financiamiento y compras públicas; después la responsabilidad extendida del productor con ecomodulación, el depósito y retorno, las tarifas y el contenido reciclado, que dependen de ese registro.
 
-Los instrumentos propuestos requieren ahora una evaluación de su factibilidad política, técnica, institucional y financiera, una estimación de su efecto por sector de política, y un diseño detallado.
+La evaluación de factibilidad de estos instrumentos y su diseño detallado se desarrollan en los documentos de factibilidad y capacidades y de Hoja de Ruta Nacional para el Financiamiento de la Economía Circular.
 
 
 # Referencias {.unnumbered}
@@ -1158,9 +1172,9 @@ Los instrumentos propuestos requieren ahora una evaluación de su factibilidad p
 
 # Anexo I. Mapeo detallado de actividades a sectores de política {.unnumbered}
 
-El @tbl-anexo-mapeo lista las 80 actividades económicas del Sistema de Cuentas Nacionales con su código en la matriz insumo-producto, su sector de política principal y secundarios, el tipo de vínculo, el origen del vínculo (`Fuente` si el documento de política menciona la actividad; `Inferido` si se deduce del flujo de materiales) y la evidencia. HR: Hoja de Ruta [@miambiente2024HojaRutaEC]; RB: revisión bibliográfica [@pnud2024RevBiblioEC]; las páginas son las impresas.
+El @tbl-anexo-mapeo lista las 80 actividades económicas del Sistema de Cuentas Nacionales con su código en la matriz insumo-producto, su sector de política principal y secundarios, el tipo de vínculo, el origen del vínculo (`Fuente` si el documento de política menciona la actividad; `Inferido` si se deduce del flujo de materiales) y la evidencia. HR: Hoja de Ruta [@miambiente2024HojaRutaEC]; RB: revisión bibliográfica [@pnud2024RevBiblioEC]; CST: Cuenta Satélite de Turismo [@un2010CST2008]; las páginas son las impresas.
 
-Las cuentas nacionales tienen 80 actividades y la matriz insumo-producto, 76, porque la matriz reúne en una sola la pesca y la acuicultura (AE14), el comercio de zona franca, al por mayor y al por menor (AE44), y dos actividades de apoyo al transporte por agua (AE52). Por eso esos tres códigos de la matriz se repiten en dos o tres renglones. Para los eslabonamientos no hizo falta agregar nada en las cuentas nacionales: cada actividad se asoció con su código de la matriz y las que se reúnen pertenecen al mismo sector de política. Las cuentas y el empleo conservan las 80 actividades.
+Las cuentas nacionales tienen 80 actividades y la matriz insumo-producto, 76, porque la matriz reúne en una sola la pesca y la acuicultura (AE14), el comercio de zona franca, al por mayor y al por menor (AE44), y dos actividades de apoyo al transporte por agua (AE52). Por eso esos tres códigos de la matriz se repiten en dos o tres renglones. Para los eslabonamientos no hizo falta agregar nada en las cuentas nacionales: cada actividad se asoció con su código de la matriz y las que se reúnen pertenecen al mismo sector de política. Por la misma razón, las actividades de turismo son las que tienen un código propio en la matriz, y el comercio al por menor, que la matriz reúne con el comercio al por mayor y de zona franca, queda en el resto de la economía con el turismo como sector secundario. Las cuentas y el empleo conservan las 80 actividades.
 
 ```{r}
 #| label: tbl-anexo-mapeo

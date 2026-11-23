@@ -1,0 +1,183 @@
+---
+title: "Economía circular en Panamá: factibilidad de los instrumentos"
+subtitle: "Factibilidad política y técnica, efectos por sector, capacidades institucionales y sistema financiero"
+author:
+  - name: "Renato Vargas"
+    affiliations:
+      - name: "Consultor para la CEPAL"
+lang: es
+bibliography: refs.bib
+csl: ../../assets/apa-es.csl
+format:
+  revealjs:
+    theme: [simple, ../pstyles.scss]
+    slide-number: c/t
+    footer: "Economía circular en Panamá: factibilidad de los instrumentos"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: preparacion
+
+source("materiales/calculos/scripts/funciones_comunes.R")
+
+fichas <- leer_salida("fichas_instrumentos")
+factibilidad <- leer_salida("factibilidad_instrumentos")
+ranking <- leer_salida("factibilidad_ranking_sensibilidad")
+precios_sector <- leer_salida("incidencia_precios_sector_mip2018")
+precios_hogares <- leer_salida("incidencia_precios_hogares_mip2018")
+capacidades <- leer_salida("capacidades_institucionales")
+indice_inst <- leer_salida("capacidades_indice_institucion")
+cartera <- leer_salida("cartera_credito_sbp_2025_2026")
+cartera_pol <- leer_salida("cartera_credito_sector_politica_2026")
+tematicos <- leer_salida("emisiones_tematicas_latinex_2026")
+
+tabla_slide <- function(x, tamano = 16, ...) tabla_ft_es(x, tamano = tamano, ...)
+hog <- function(esc) precios_hogares$variacion_canasta_pct[precios_hogares$escenario == esc]
+pm <- function(i) ranking$puntaje_medio[ranking$id == i]
+cvab <- function(s) cartera_pol$credito_sobre_vab[cartera_pol$sector_principal == s]
+monto_tem <- sum(tematicos$monto_serie_usd, na.rm = TRUE) / 1e6
+monto_circ <- sum(tematicos$monto_serie_usd[str_starts(tematicos$relacion_economia_circular, "Directa")], na.rm = TRUE) / 1e6
+```
+
+## Contenido {.theme-content}
+
+1.  **Factibilidad.** Qué tan aplicables son los catorce instrumentos y por qué vía legal.
+2.  **Efectos por sector.** Cuánto suben los precios cuando un instrumento opera como cargo.
+3.  **Capacidades institucionales.** Quién tiene la función legal de aplicarlos.
+4.  **Sistema financiero.** Por dónde pueden llegar los recursos.
+
+[Documento completo](https://renatovargas.github.io/pan-ecirc/materiales/documentos/a2-factibilidad-capacidades/){target="_blank"}
+
+## Punto de partida
+
+- El análisis sectorial propuso catorce instrumentos en dos pasos para siete sectores de política: los seis de la Hoja de Ruta y el turismo.
+- La Ley 276 de 2021 ya hace de la AAUD la autoridad de la REP y del depósito y retorno [@panama2021Ley276, art. 74].
+- La Ley 276 crea una tasa de gestión que debe cubrir el costo total del servicio, y la Ley 223 de 2021 exonera a las plantas de reciclaje [@panama2021Ley223].
+- Lo que falta son reglamentos: los de las leyes 33, 276 y 502 no se han publicado.
+
+# Factibilidad {.theme-content}
+
+Siete criterios, escala de 1 a 5, pesos iguales y prueba de sensibilidad.
+
+## Los instrumentos del primer paso son los más factibles
+
+```{r}
+ranking |>
+  left_join(select(fichas, id, paso), by = "id") |>
+  transmute(`#` = posicion, Instrumento = instrumento, Paso = paso, Puntaje = puntaje_medio,
+            `Top 5 con pesos al azar (%)` = pct_top5) |>
+  tabla_slide(tamano = 12, digitos = 1, enteros = "#")
+```
+
+::: aside
+Siete criterios con pesos iguales; sensibilidad con 10.000 pesos al azar. Memoria [C10](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c10-fichas-instrumentos/){target="_blank"}.
+:::
+
+## El impacto y la facilidad no coinciden
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.6
+
+factibilidad |>
+  mutate(instrumento = factor(instrumento, levels = rev(ranking$instrumento))) |>
+  ggplot(aes(x = criterio, y = instrumento, fill = puntaje)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = puntaje), size = 4) +
+  scale_fill_gradient(low = "#F2F2F2", high = "#2E8B57", limits = c(1, 5)) +
+  scale_y_discrete(labels = \(x) str_wrap(x, 50)) +
+  scale_x_discrete(labels = \(x) str_wrap(x, 12)) +
+  labs(x = NULL, y = NULL) +
+  tema_grafico() +
+  theme(legend.position = "none", text = element_text(size = 13))
+```
+
+## Doce de catorce pueden iniciar sin ley nueva
+
+- **Decreto ejecutivo:** registro de productores (reglamento de la Ley 502), recicladores (reglamento de la Ley 276), incentivos vigentes (reglamento del MEF).
+- **Resolución:** REP por flujo y autorización del depósito (AAUD), tarifa a costo real (AAUD, con consulta ciudadana), pliegos circulares (DGCP), normas técnicas (MICI).
+- **Acuerdo de superintendencia:** criterios circulares en la taxonomía.
+- **Ley:** REP con metas y sanciones propias y depósito obligatorio; la recomienda la Hoja de Ruta de plásticos de 2026 [@miambiente2026ResDM0351].
+
+::: aside
+Todo tributo requiere ley; las tasas por servicio las fija quien lo presta [@panama2004Constitucion, art. 52; @panama2021Ley276, art. 75].
+:::
+
+# Efectos por sector {.theme-content}
+
+Modelo de precios con la matriz insumo-producto de 2018 y traslado completo.
+
+## Los cargos tienen efectos pequeños en el agregado
+
+```{r}
+precios_sector |>
+  mutate(instrumento = recode(escenario,
+    rep_envases = "REP (1 %)", deposito = "Depósito (1 %)",
+    aseo = "Aseo (+72 %)", tasa_rcd = "Obra (B/.10/t)")) |>
+  select(sector_principal, instrumento, variacion_pct) |>
+  pivot_wider(names_from = instrumento, values_from = variacion_pct) |>
+  rename(`Sector de política` = sector_principal) |>
+  tabla_slide(tamano = 14, digitos = 3)
+```
+
+::: aside
+Canasta de los hogares: REP `r formato_es(hog("rep_envases"), 2)` %, aseo `r formato_es(hog("aseo"), 2)` %, depósito `r formato_es(hog("deposito"), 3)` %. Cotas superiores: sin cambios de comportamiento. Memoria [C11](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c11-modelo-precios/){target="_blank"}.
+:::
+
+# Capacidades institucionales {.theme-content}
+
+Seis funciones por institución, con su base legal.
+
+## La AAUD tiene todas las piezas, pero no las finanzas
+
+:::: {.columns}
+::: {.column width="55%"}
+```{r}
+indice_inst |>
+  head(10) |>
+  rename(Institución = institucion, `Índice de capacidad legal (%)` = indice) |>
+  tabla_slide(tamano = 14, digitos = 0)
+```
+:::
+::: {.column width="45%" .smaller}
+- La AAUD regula, registra, recauda, controla y monitorea por ley.
+- En 2025 recaudó B/.35,2 millones y gastó B/.60,6 millones; su morosidad es de B/.118,8 millones [@estrella2026AAUDMorosidad].
+- Aduana, MICI y ACODECO ya controlan la ley de plásticos.
+- El Consejo de Economía Circular no incluye al MEF ni a la aduana.
+:::
+::::
+
+# Sistema financiero {.theme-content}
+
+Crédito, taxonomía y mercado de valores.
+
+## La banca es grande, pero no financia lo circular
+
+- La cartera local es de `r formato_es(sum(cartera$saldo_musd[cartera$fecha == max(cartera$fecha)]), 0)` millones de dólares, concentrada en hipotecas, consumo y comercio [@sbp2026IAB092026].
+- Agricultura y alimentos recibe `r formato_es(cvab("Agricultura y alimentos"), 1)` veces y la construcción `r formato_es(cvab("Ciudades y construcción"), 1)` veces su peso en el valor agregado.
+- La taxonomía tiene el objetivo circular, pero sin criterios: las operaciones circulares se marcan como contingentes [@sbp2025GuiaTFSBancos].
+- De `r formato_es(monto_tem, 0)` millones de dólares en bonos temáticos vigentes, `r formato_es(monto_circ, 0)` millones financian a una empresa de reciclaje [@latinex2026EmisionesSostenibles].
+
+## Cinco palancas inmediatas
+
+- Segunda edición de la taxonomía con criterios circulares.
+- Ventana circular en el Fondo de Garantías de Panamá, reconocido como mitigante de riesgo [@sbp2025Acuerdo8].
+- Categoría circular del marco soberano para residuos y agua [@mef2024MarcoFinanciamientoSostenible].
+- APP de residuos de Panamá y San Miguelito como proyecto ancla [@bid2024TdRResiduosAPP].
+- Bonos verdes de empresas de reciclaje en la bolsa local.
+
+## Conclusiones {.theme-content}
+
+- Las facultades legales existen; faltan los reglamentos.
+- El registro de productores e importadores es la pieza que habilita a los demás.
+- Los efectos de precio son pequeños y protegibles con tarifas escalonadas.
+- El turismo gana sobre todo con crédito con garantía, certificación y tarifa por generación.
+
+## Referencias
+
+::: {#refs}
+:::

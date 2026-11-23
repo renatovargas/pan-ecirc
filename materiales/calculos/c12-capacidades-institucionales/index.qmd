@@ -1,0 +1,222 @@
+---
+title: "Memoria de cálculo 12: capacidades institucionales"
+description: "Matriz de funciones por institución, con su base legal, para implementar, regular, controlar y dar seguimiento a los instrumentos de economía circular"
+author: "Renato Vargas"
+date: "2026-11-23"
+lang: es
+categories:
+  - capacidades institucionales
+  - economía circular
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Un instrumento económico solo funciona si alguna institución tiene la autoridad legal para aplicarlo. Alguien debe dictar las normas, llevar el registro de los obligados, cobrar y administrar los recursos, vigilar el cumplimiento y sancionar a quien incumple, medir y reportar los resultados y, en el caso de los instrumentos financieros, otorgar el financiamiento. Esta memoria revisa las leyes de creación de quince instituciones panameñas, y las leyes de residuos, contrataciones y finanzas, para establecer cuáles de esas seis funciones tiene cada institución. El resultado es una matriz de instituciones por funciones en la que cada celda lleva una valoración y la norma que la sustenta. Las valoraciones son tres.
+
+- **Sí:** la ley asigna la función de manera expresa y para un objeto aplicable a los instrumentos.
+- **Parcial:** la función existe, pero con un objeto más general o limitado, o depende de un reglamento.
+- **No:** no se localizó una base legal para la función.
+
+Las normas se leyeron en su texto publicado en la Gaceta Oficial o en la base Legispan de la Asamblea Nacional. Las principales son la Ley 502 de 2025 [@panama2025Ley502], la Ley 276 de 2021 de gestión integral de residuos [@panama2021Ley276], la Ley 51 de 2010 que crea la Autoridad de Aseo Urbano y Domiciliario [@panama2010Ley51], la Ley 33 de 2018 [@panama2018Ley33], la Ley 187 de 2020 y su reglamento [@panama2020Ley187; @panama2022DE9], la Ley 8 de 2015 que crea el Ministerio de Ambiente [@panama2015Ley8], la Ley 97 de 1998 del Ministerio de Economía y Finanzas [@panama1998Ley97], el texto único de la Ley 22 de 2006 de contrataciones públicas [@panama2006Ley22TU], la Ley 45 de 2007 de protección al consumidor [@panama2007Ley45], la Ley 93 de 2019 de asociaciones público-privadas [@panama2019Ley93], las leyes 8 y 33 de 2000 sobre la micro, pequeña y mediana empresa [@panama2000Ley8AMPYME; @panama2000Ley33MIPYME], la Ley 44 de 2006 de recursos acuáticos [@panama2006Ley44], la Ley 32 de 1984 de la Contraloría [@panama1984Ley32], el Decreto Ley 4 de 2008 de la Autoridad de Turismo [@panama2008DL4ATP] y, para el sistema financiero, la Taxonomía de Finanzas Sostenibles [@sbp2024TaxonomiaPanama], el Acuerdo 11-2022 de la Superintendencia de Bancos [@sbp2022Acuerdo11], la guía de bonos temáticos de la Superintendencia del Mercado de Valores [@smv2025GuiaBonosTematicos] y el Marco de Financiamiento Sostenible [@mef2024MarcoFinanciamientoSostenible].
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+rm(list = ls())
+source("materiales/calculos/scripts/funciones_comunes.R")
+```
+
+# Matriz de funciones
+
+Escribimos la matriz en formato largo: una fila por institución y función, con la valoración y la base legal.
+
+```{r}
+#| label: matriz
+
+funciones <- c("Regular", "Registrar", "Recaudar y administrar fondos", "Controlar y sancionar",
+               "Monitorear y reportar", "Financiar")
+
+capacidades <- tribble(
+  ~institucion, ~funcion, ~valoracion, ~base_legal,
+  # Ministerio de Ambiente
+  "MiAMBIENTE", "Regular", "Sí", "Ley 502, art. 13 (reglamenta la ley); Ley 187, art. 20; Ley 8 de 2015, art. 2",
+  "MiAMBIENTE", "Registrar", "Parcial", "Ley 502, art. 11 (plataforma de indicadores en el SINIA); no crea un registro de productores",
+  "MiAMBIENTE", "Recaudar y administrar fondos", "Parcial", "Ley 8 de 2015, art. 2.18, 4 y 9 (fondos de destino específico, sin objeto de economía circular)",
+  "MiAMBIENTE", "Controlar y sancionar", "Parcial", "Ley 8 de 2015, art. 2.20; Ley 187, art. 15.4; sin régimen sancionador de economía circular",
+  "MiAMBIENTE", "Monitorear y reportar", "Sí", "Ley 502, art. 11 (reporte trienal); Ley 187, art. 14",
+  "MiAMBIENTE", "Financiar", "Parcial", "Fondos ambientales de la Ley General de Ambiente",
+  # Ministerio de Economía y Finanzas
+  "MEF", "Regular", "Parcial", "Ley 97 de 1998, art. 2 (política fiscal); Ley 276, art. 52 (regula los incentivos al aprovechamiento)",
+  "MEF", "Registrar", "No", "Sin función de registro de productores",
+  "MEF", "Recaudar y administrar fondos", "Sí", "Ley 97 de 1998, art. 2 (Tesoro y recaudación por la DGI)",
+  "MEF", "Controlar y sancionar", "Sí", "Ley 97 de 1998, art. 2 (fiscalización tributaria)",
+  "MEF", "Monitorear y reportar", "Sí", "Ley 97 de 1998, art. 2 (presupuesto y estadísticas fiscales)",
+  "MEF", "Financiar", "Sí", "Ley 97 de 1998, art. 2 (crédito público); Marco de Financiamiento Sostenible de 2024",
+  # Ministerio de Comercio e Industrias
+  "MICI", "Regular", "Parcial", "Ley 502, art. 4 y 5 (innovación y formación); Decreto Ejecutivo 9 de 2022, art. 8 (normas técnicas)",
+  "MICI", "Registrar", "Parcial", "Decreto Ejecutivo 9 de 2022, art. 13",
+  "MICI", "Recaudar y administrar fondos", "No", "Sin base localizada",
+  "MICI", "Controlar y sancionar", "Parcial", "Decreto Ejecutivo 9 de 2022, art. 8 (certificación técnica)",
+  "MICI", "Monitorear y reportar", "Parcial", "Decreto Ejecutivo 9 de 2022, art. 13",
+  "MICI", "Financiar", "Parcial", "Ley 502, art. 4 (estrategias de inversión en innovación circular)",
+  # Autoridad de Aseo Urbano y Domiciliario
+  "AAUD", "Regular", "Sí", "Ley 276, art. 9 y 74 (propone normas de REP con aprobación de su Junta Directiva); Ley 51, art. 6",
+  "AAUD", "Registrar", "Sí", "Ley 276, art. 22, 54-58 (registro de gestores y sistema de información); Ley 33, art. 19-21",
+  "AAUD", "Recaudar y administrar fondos", "Sí", "Ley 276, art. 66 y 75 (Tasa de Gestión Integral de Residuos); Ley 51, art. 8-10 y 19-21 (Fondo de Aseo, cobro en la factura eléctrica)",
+  "AAUD", "Controlar y sancionar", "Sí", "Ley 276, art. 71-74 (autoriza sistemas de REP y de depósito, multas hasta B/.1.000.000); Ley 51, art. 22-26",
+  "AAUD", "Monitorear y reportar", "Sí", "Ley 276, art. 22-23 (Sistema de Información sobre la Gestión Integral de Residuos)",
+  "AAUD", "Financiar", "Parcial", "Ley 51, art. 6.2, 7 y 13.7; Ley 276, art. 14 (proyectos de APP)",
+  # Autoridad Nacional de Aduanas
+  "Aduanas", "Regular", "Parcial", "Decreto Ejecutivo 9 de 2022, art. 6",
+  "Aduanas", "Registrar", "Parcial", "Sistema Integrado de Gestión Aduanera (declaraciones por partida arancelaria)",
+  "Aduanas", "Recaudar y administrar fondos", "Parcial", "Cobro de aranceles e impuestos a la importación",
+  "Aduanas", "Controlar y sancionar", "Sí", "Ley 187, art. 15.1; Decreto Ejecutivo 9 de 2022, art. 6-7",
+  "Aduanas", "Monitorear y reportar", "Sí", "Decreto Ejecutivo 9 de 2022, art. 10",
+  "Aduanas", "Financiar", "No", "Sin base localizada",
+  # Municipios
+  "Municipios", "Regular", "Sí", "Ley 276, art. 16 (separación obligatoria por decreto alcaldicio); Ley 33, art. 8 y 15",
+  "Municipios", "Registrar", "Parcial", "Ley 33, art. 33",
+  "Municipios", "Recaudar y administrar fondos", "Sí", "Ley 276, art. 16.9 (tasas cuando el municipio presta el servicio)",
+  "Municipios", "Controlar y sancionar", "Sí", "Ley 33, art. 35-38",
+  "Municipios", "Monitorear y reportar", "Parcial", "Ley 33, art. 17",
+  "Municipios", "Financiar", "Parcial", "Ley 93 de 2019, art. 6 (APP municipales)",
+  # Superintendencia de Bancos
+  "SBP", "Regular", "Parcial", "Acuerdo 11-2022 (riesgo climático y ambiental)",
+  "SBP", "Registrar", "No", "Sin base localizada",
+  "SBP", "Recaudar y administrar fondos", "No", "Sin base localizada",
+  "SBP", "Controlar y sancionar", "Parcial", "Supervisión prudencial de la banca",
+  "SBP", "Monitorear y reportar", "Parcial", "Taxonomía de Finanzas Sostenibles, p. 2 (comité de supervisión)",
+  "SBP", "Financiar", "No", "Sin base localizada",
+  # Superintendencia del Mercado de Valores
+  "SMV", "Regular", "Parcial", "Guía de bonos temáticos de 2025",
+  "SMV", "Registrar", "Sí", "Registro de emisiones (guía de bonos temáticos, p. 7-9)",
+  "SMV", "Recaudar y administrar fondos", "No", "Sin base localizada",
+  "SMV", "Controlar y sancionar", "Parcial", "Supervisión de emisores",
+  "SMV", "Monitorear y reportar", "Parcial", "Reportes de uso de fondos (guía de bonos temáticos, p. 9)",
+  "SMV", "Financiar", "No", "Sin base localizada",
+  # AMPYME
+  "AMPYME", "Regular", "Parcial", "Ley 8 de 2000, art. 7.18",
+  "AMPYME", "Registrar", "Sí", "Ley 33 de 2000, art. 11 (registro empresarial)",
+  "AMPYME", "Recaudar y administrar fondos", "Sí", "Ley 33 de 2000, art. 22-25 (Fondo de Garantía)",
+  "AMPYME", "Controlar y sancionar", "No", "Sin base localizada",
+  "AMPYME", "Monitorear y reportar", "Sí", "Ley 8 de 2000, art. 7.15",
+  "AMPYME", "Financiar", "Sí", "Ley 8 de 2000, art. 7.8 y 7.10; Ley 33 de 2000, art. 22",
+  # Autoridad de Turismo de Panamá
+  "ATP", "Regular", "Parcial", "Decreto Ley 4 de 2008 (rectoría del turismo)",
+  "ATP", "Registrar", "Parcial", "Registro de empresas turísticas acogidas a incentivos",
+  "ATP", "Recaudar y administrar fondos", "Sí", "Decreto Ley 4 de 2008, art. 5.11, 5.12 y 6 (tasas y contribuciones con jurisdicción coactiva)",
+  "ATP", "Controlar y sancionar", "Parcial", "Decreto Ley 4 de 2008, art. 5.12 (jurisdicción coactiva)",
+  "ATP", "Monitorear y reportar", "Sí", "Estadísticas de visitantes y gasto turístico",
+  "ATP", "Financiar", "Parcial", "Incentivos de la Ley 80 de 2012",
+  # Dirección General de Contrataciones Públicas
+  "DGCP", "Regular", "Sí", "Ley 22 de 2006, art. 14, 15 y 40 (criterios de economía circular, modificado por la Ley 502, art. 12)",
+  "DGCP", "Registrar", "Sí", "Ley 22 de 2006, art. 15.4 (registro de proponentes)",
+  "DGCP", "Recaudar y administrar fondos", "No", "Sin base localizada",
+  "DGCP", "Controlar y sancionar", "Sí", "Ley 22 de 2006, art. 15.13-14",
+  "DGCP", "Monitorear y reportar", "Sí", "Ley 22 de 2006, art. 15.6 (PanamaCompra)",
+  "DGCP", "Financiar", "No", "Sin base localizada",
+  # ACODECO
+  "ACODECO", "Regular", "Parcial", "Ley 45 de 2007, art. 86.7",
+  "ACODECO", "Registrar", "No", "Sin base localizada",
+  "ACODECO", "Recaudar y administrar fondos", "Parcial", "Ley 45 de 2007, art. 86.17 (multas)",
+  "ACODECO", "Controlar y sancionar", "Sí", "Ley 45 de 2007, art. 86.3; Ley 187, art. 15.2; Decreto Ejecutivo 9 de 2022, art. 11-20",
+  "ACODECO", "Monitorear y reportar", "Parcial", "Ley 45 de 2007, art. 86.11",
+  "ACODECO", "Financiar", "No", "Sin base localizada",
+  # Ministerio de Salud
+  "MINSA", "Regular", "Sí", "Ley 276, art. 8 (rectoría en residuos peligrosos, no peligrosos y de manejo especial)",
+  "MINSA", "Registrar", "No", "Sin base localizada",
+  "MINSA", "Recaudar y administrar fondos", "No", "Sin base localizada",
+  "MINSA", "Controlar y sancionar", "Sí", "Ley 187, art. 15.3; Ley 51, art. 6.5",
+  "MINSA", "Monitorear y reportar", "Parcial", "Ley 276, art. 8",
+  "MINSA", "Financiar", "No", "Sin base localizada",
+  # Secretaría Nacional de APP
+  "Secretaría de APP", "Regular", "Parcial", "Ley 93 de 2019, art. 12.2 y 12.4",
+  "Secretaría de APP", "Registrar", "Sí", "Ley 93 de 2019, art. 12.17",
+  "Secretaría de APP", "Recaudar y administrar fondos", "No", "Sin base localizada",
+  "Secretaría de APP", "Controlar y sancionar", "Parcial", "Ley 93 de 2019, art. 12.10 y 12.12",
+  "Secretaría de APP", "Monitorear y reportar", "Sí", "Ley 93 de 2019, art. 12.16",
+  "Secretaría de APP", "Financiar", "Parcial", "Ley 93 de 2019, art. 5 y 12.2",
+  # Contraloría
+  "Contraloría", "Regular", "Parcial", "Ley 32 de 1984, art. 1 (sistemas contables)",
+  "Contraloría", "Registrar", "Sí", "Ley 32 de 1984, art. 11.1 (contabilidad pública)",
+  "Contraloría", "Recaudar y administrar fondos", "No", "Sin base localizada",
+  "Contraloría", "Controlar y sancionar", "Sí", "Ley 32 de 1984, art. 11.2; Ley 51, art. 19",
+  "Contraloría", "Monitorear y reportar", "Sí", "Ley 32 de 1984, art. 1 (estadística nacional por medio del INEC)",
+  "Contraloría", "Financiar", "No", "Sin base localizada"
+) |>
+  mutate(
+    funcion = factor(funcion, levels = funciones),
+    puntos = c("Sí" = 2, "Parcial" = 1, "No" = 0)[valoracion]
+  )
+
+# Cada institución tiene las seis funciones
+stopifnot(all(count(capacidades, institucion)$n == 6))
+n_distinct(capacidades$institucion)
+```
+
+# Lectura por institución y por función
+
+El índice de capacidad legal de una institución es la proporción de los puntos posibles (dos por función) que alcanza. Para cada función se cuenta cuántas instituciones la tienen de manera expresa.
+
+```{r}
+#| label: indices
+
+indice_institucion <- capacidades |>
+  summarize(indice = 100 * sum(puntos) / (2 * n()), .by = institucion) |>
+  arrange(desc(indice))
+
+cobertura_funcion <- capacidades |>
+  summarize(
+    instituciones_si = sum(valoracion == "Sí"),
+    instituciones_parcial = sum(valoracion == "Parcial"),
+    .by = funcion
+  )
+
+indice_institucion
+cobertura_funcion
+```
+
+```{r}
+#| label: tbl-matriz
+#| tbl-cap: "Matriz de funciones por institución"
+
+capacidades |>
+  select(institucion, funcion, valoracion) |>
+  pivot_wider(names_from = funcion, values_from = valoracion) |>
+  left_join(indice_institucion, by = "institucion") |>
+  arrange(desc(indice)) |>
+  rename(Institución = institucion, `Índice (%)` = indice) |>
+  tabla_ft(digitos = 0)
+```
+
+La lectura es clara. La Autoridad de Aseo Urbano y Domiciliario es la única institución con las cinco primeras funciones de manera expresa para residuos: fija la tasa, cobra en la factura eléctrica, administra un fondo propio, registra y autoriza gestores, sanciona y, desde la Ley 276 de 2021, autoriza los sistemas de depósito y retorno y los sistemas de gestión asociados a la REP [@panama2021Ley276, art. 74]. El Ministerio de Ambiente tiene la reglamentación de la Ley 502 y la plataforma de indicadores, pero no un registro de productores ni un régimen sancionador propio de economía circular. La aduana, la Autoridad de Protección al Consumidor y el Ministerio de Comercio e Industrias ya operan una cadena de control de importaciones y comercio para la Ley 187 que puede extenderse a los productos de la REP. En el sistema financiero, las superintendencias regulan y supervisan, pero solo el Ministerio de Economía y Finanzas y la AMPYME tienen funciones de financiamiento, la segunda con un fondo de garantía.
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(capacidades, "capacidades_institucionales", hoja = "matriz")
+guardar_salida(indice_institucion, "capacidades_indice_institucion", hoja = "indice")
+```
+
+# Referencias
+
+::: {#refs}
+:::

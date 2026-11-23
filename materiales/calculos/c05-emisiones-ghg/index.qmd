@@ -25,7 +25,7 @@ execute:
 
 # Introducción
 
-Esta memoria extrae de la base global EDGAR las emisiones de gases de efecto invernadero (GEI) de Panamá y las asigna a los seis sectores de la Hoja de Ruta de Economía Circular. Responde al criterio de emisiones de los Términos de Referencia de la consultoría.
+Esta memoria extrae de la base global EDGAR las emisiones de gases de efecto invernadero (GEI) de Panamá y las asigna a los siete sectores de política: los seis de la Hoja de Ruta de Economía Circular y el turismo. Responde al criterio de emisiones del análisis sectorial.
 
 EDGAR (Emissions Database for Global Atmospheric Research) es una base del Centro Común de Investigación de la Comisión Europea que estima las emisiones de cada país con la metodología del Grupo Intergubernamental de Expertos sobre el Cambio Climático (IPCC) [@edgar2026ghg]. Usamos la versión que agrega todos los gases en toneladas equivalentes de dióxido de carbono con los potenciales de calentamiento a 100 años del Quinto Informe de Evaluación (AR5), por categoría de las directrices de 2006 del IPCC [@ipcc2006directrices].
 
@@ -119,7 +119,7 @@ asignacion_ipcc <- tribble(
   "1.A.1.a",  "Energía", "Generación de electricidad y calor",
   "1.A.1.bc", "Energía", "Refinación y combustibles sólidos",
   "1.A.2",    "Industrias", "Combustión en industria manufacturera y construcción; no se puede separar la construcción",
-  "1.A.3.a",  "Resto de la economía", "Aviación civil",
+  "1.A.3.a",  "Turismo", "Aviación civil nacional; el transporte aéreo es una actividad característica del turismo",
   "1.A.3.b",  "Resto de la economía", "Transporte por carretera",
   "1.A.3.e",  "Resto de la economía", "Otro transporte",
   "1.A.4",    "Resto de la economía", "Comercial, residencial y agropecuario; no se puede separar",
@@ -187,7 +187,7 @@ emisiones_sector |>
 
 # Intensidad de emisiones por valor agregado
 
-Combinamos las emisiones con el valor agregado de la memoria 2 para calcular toneladas de CO₂ equivalente por balboa de valor agregado. El cálculo solo es informativo para los sectores donde el sector de emisiones y el sector económico coinciden razonablemente: energía, residuos, industrias, y agricultura y alimentos. Para recursos hídricos y construcción no se calcula, porque sus emisiones están en categorías de otros sectores.
+Combinamos las emisiones con el valor agregado de la memoria 2 para calcular toneladas de CO₂ equivalente por balboa de valor agregado. El cálculo solo es informativo para los sectores donde el sector de emisiones y el sector económico coinciden razonablemente: energía, residuos, industrias, y agricultura y alimentos. Para recursos hídricos, construcción y turismo no se calcula, porque buena parte de sus emisiones está en categorías de otros sectores: en turismo, el consumo de combustibles y electricidad de hoteles y restaurantes está dentro de la categoría comercial y residencial (1.A.4), que no se puede separar, y al sector solo se asigna la aviación civil nacional.
 
 ```{r}
 #| label: intensidad

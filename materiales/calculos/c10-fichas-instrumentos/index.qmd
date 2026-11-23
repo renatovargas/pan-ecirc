@@ -1,0 +1,420 @@
+---
+title: "Memoria de cálculo 10: fichas y factibilidad de los instrumentos"
+description: "Ficha normalizada de los catorce instrumentos propuestos y evaluación de su factibilidad con siete criterios, con análisis de sensibilidad de los pesos"
+author: "Renato Vargas"
+date: "2026-11-23"
+lang: es
+categories:
+  - instrumentos económicos
+  - factibilidad
+  - economía circular
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+El estudio de los sectores económicos priorizados propuso catorce instrumentos de política para llevar recursos hacia la economía circular en Panamá, desde un registro de productores e importadores hasta la responsabilidad extendida del productor (REP) y el crédito con garantías [@vargas2026SectoresPriorizados]. Antes de recomendar su aplicación hace falta describir cada instrumento con el mismo nivel de detalle y evaluar si es factible en las condiciones del país. Esta memoria hace ambas cosas y para ello construye dos bases de datos.
+
+La primera base, `fichas_instrumentos`, describe cada instrumento con los mismos campos, de modo que puedan compararse entre sí. Los campos indican qué problema atiende el instrumento, en qué sectores de política actúa, cuál es su mecanismo, qué norma legal mínima se necesita para aplicarlo, qué institución sería responsable, de dónde saldrían los recursos, qué experiencia internacional lo respalda, con qué indicadores se mediría y cuáles son sus riesgos.
+
+La segunda base, `factibilidad_instrumentos`, califica cada instrumento de 1 a 5 en siete criterios. Cada calificación lleva una justificación escrita y una bandera de confianza (alta, media o baja) que indica qué tan sólida es la evidencia en que se apoya. Los siete criterios son los siguientes.
+
+1. **Impacto potencial** en la circularidad de los flujos de material.
+2. **Factibilidad técnica**: información, infraestructura y capacidad de medición.
+3. **Factibilidad institucional**: existencia de una institución con la función legal y los medios.
+4. **Factibilidad política y regulatoria**: vehículo legal necesario, gancho legal vigente y señales de apoyo o resistencia.
+5. **Factibilidad financiera**: costo fiscal y fuente sostenible de recursos.
+6. **Tiempo de implementación**: 5 si puede iniciar de inmediato, 1 si requiere varios años de preparación.
+7. **Equidad y competitividad**: efectos sobre hogares de menores ingresos, pequeñas empresas, empleo y competencia.
+
+La ruta legal de cada instrumento sigue la revisión de la Constitución y de las leyes 502 de 2025, 276 de 2021, 33 de 2018, 51 de 2010, 187 de 2020, 223 de 2021 y 518 de 2026, entre otras [@panama2004Constitucion; @panama2025Ley502; @panama2021Ley276; @panama2018Ley33; @panama2010Ley51; @panama2020Ley187; @panama2021Ley223; @panama2026Ley518]. La regla constitucional central es que todo tributo requiere una ley, y que las leyes tributarias solo pueden proponerlas una comisión permanente o el Ejecutivo con autorización del Consejo de Gabinete [@panama2004Constitucion, arts. 52, 159 y 165]. Las tasas por un servicio, en cambio, las fija quien presta el servicio, sea la Autoridad de Aseo Urbano y Domiciliario o el municipio [@panama2021Ley276, arts. 16 y 75].
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+rm(list = ls())
+source("materiales/calculos/scripts/funciones_comunes.R")
+set.seed(20261123)
+```
+
+# Fichas de los instrumentos
+
+Escribimos las fichas en una tabla con una fila por instrumento. Los campos de texto son breves, porque su propósito es permitir la comparación; la discusión completa de cada instrumento está en los documentos de análisis sectorial y de factibilidad.
+
+```{r}
+#| label: fichas
+
+fichas <- tribble(
+  ~id, ~instrumento, ~familia, ~paso, ~problema, ~sectores, ~mecanismo, ~vehiculo_legal, ~gancho_legal, ~responsable, ~fuente_recursos, ~experiencia, ~indicadores, ~riesgos,
+  1, "Registro de productores e importadores y trazabilidad", "Habilitante", "Primero",
+  "Información: no se sabe qué productos y materiales se ponen en el mercado",
+  "Residuos; Industrias; Agricultura y alimentos; Turismo",
+  "Obligación de declarar cantidades y materiales por partida arancelaria",
+  "Decreto ejecutivo reglamentario de la Ley 502 o de la Ley 276, y resolución de la AAUD por flujo",
+  "Ley 502, art. 11; Ley 276, art. 22-23 y 54; Ley 51, art. 6-A",
+  "MiAMBIENTE y AAUD, con datos de Aduanas y del MICI",
+  "Presupuesto de las instituciones; costo bajo",
+  "Unión Europea (Directiva 2008/98, art. 8 bis); Chile (Ley 20.920)",
+  "Productores inscritos; toneladas declaradas por flujo",
+  "Subdeclaración sin auditoría; carga para importadores pequeños",
+  2, "Formalización e inclusión de recicladores de base", "Habilitante", "Primero",
+  "Capacidad e informalidad: cadena de recuperación atomizada y sin registro",
+  "Residuos",
+  "Registro, organización y pago por tonelada recuperada",
+  "Decreto ejecutivo reglamentario de la Ley 276 (gradualidad) y resoluciones de la AAUD; acuerdos municipales",
+  "Ley 276, art. 6.41, 29, 30 y 50-51; Ley 33, art. 4.5, 8 y 19; Ley 502, art. 10",
+  "AAUD y municipios; MITRADEL e INADEH para la certificación",
+  "Contribuciones de la REP y tasa de gestión de residuos",
+  "Colombia (Decreto 596 de 2016, 76.707 recicladores registrados); Chile (Ley 20.920, art. 32)",
+  "Recicladores registrados; toneladas pagadas; ingreso medio",
+  "Captura del pago por intermediarios, como en Ecuador",
+  3, "Responsabilidad extendida del productor con metas por flujo", "Normativo y regulatorio", "Segundo",
+  "Precio: el costo del final de vida no está en el precio del producto",
+  "Residuos; Industrias; Agricultura y alimentos; Turismo",
+  "Obligación de financiar la recolección y valorización, con metas anuales",
+  "Decreto ejecutivo y resoluciones de la AAUD; ley de REP para metas con sanciones propias",
+  "Ley 276, art. 6.40, 7.8 y 36; Ley 51, art. 6-A num. 2, 6, 14 y 15; Ley 33, art. 6",
+  "AAUD (autoriza y fiscaliza sistemas de gestión) y MiAMBIENTE",
+  "Contribuciones de los productores por tonelada puesta en el mercado",
+  "Chile (D.S. 12 de envases); Colombia (Res. 1407 de 2018 y 803 de 2024); OCDE (2016)",
+  "Tasa de recolección y de valorización por flujo; toneladas recuperadas",
+  "Evasión de importadores; costos administrativos; concentración de mercado en sistemas colectivos",
+  4, "Ecomodulación de las contribuciones", "Normativo y regulatorio", "Segundo",
+  "Diseño: la tarifa uniforme no premia los envases reciclables",
+  "Industrias; Residuos",
+  "Tarifa diferenciada según reciclabilidad y contenido reciclado",
+  "Igual que la REP si la cobra un sistema de productores; ley si la cobra el Estado",
+  "Ley 502, art. 3; Ley 276, art. 7.3",
+  "Sistemas de gestión autorizados por la AAUD",
+  "Las mismas contribuciones de la REP",
+  "Chile (D.S. 12, art. 20); Bélgica (PET transparente y de color); Francia (textiles)",
+  "Proporción de envases reciclables puestos en el mercado",
+  "Diferencias de tarifa demasiado pequeñas para cambiar el diseño",
+  5, "Depósito y retorno de envases de bebidas", "Tributario y tarifario", "Segundo",
+  "Recolección: los envases de bebidas se pierden en la corriente mezclada",
+  "Residuos; Industrias; Turismo",
+  "Depósito reembolsable al devolver el envase",
+  "Autorización de la AAUD para un sistema sectorial; ley para un sistema obligatorio",
+  "Ley 51, art. 6-A num. 14; Ley 33, art. 6",
+  "Administrador del sistema (productores), autorizado por la AAUD; Aduanas y ACODECO en el control",
+  "Depósitos no reclamados y venta de material",
+  "Unión Europea (90 % de recolección separada al 2029); Ecuador (impuesto redimible)",
+  "Tasa de retorno por material",
+  "Fraude por envases que ingresan sin pagar depósito",
+  6, "Contenido reciclado y normas para el material secundario", "Normativo y regulatorio", "Segundo",
+  "Demanda: no hay mercado estable para el material recuperado",
+  "Industrias; Ciudades y construcción; Residuos",
+  "Porcentaje mínimo de material reciclado y norma técnica de calidad",
+  "Reglamento técnico DGNTI-COPANIT por resolución del MICI; decreto para la obligación",
+  "Ley 276, art. 8.21 y 30.1; Ley 33, art. 27; Ley 518 de 2026",
+  "MICI (DGNTI) y MiAMBIENTE",
+  "Sin costo fiscal; lo paga el productor",
+  "Unión Europea (25 % de PET reciclado desde 2025); Colombia (Res. 803 de 2024)",
+  "Contenido reciclado medio en botellas y en áridos de obra",
+  "Oferta nacional insuficiente de material reciclado de calidad",
+  7, "Tarifa de aseo a costo real, pago por generación y tasa de disposición final", "Tributario y tarifario", "Segundo",
+  "Financiamiento: el servicio de aseo recauda menos de lo que cuesta",
+  "Residuos; Ciudades y construcción; Turismo",
+  "Tasa que cubre el costo, cobrada por cantidad, con tarifa solidaria",
+  "Resolución de la Junta Directiva de la AAUD o acuerdo municipal, con participación ciudadana",
+  "Ley 276, art. 6.62, 16.9, 66 y 75; Ley 6 de 2002, art. 24-25",
+  "AAUD y municipios; distribuidoras eléctricas para el cobro",
+  "Usuarios del servicio",
+  "Unión Europea (pago por generación en 20 Estados); Reino Unido (impuesto al vertido)",
+  "Recaudación sobre costo del servicio; residuo mezclado por habitante",
+  "Rechazo político; vertido ilegal si sube el costo sin alternativas",
+  8, "Incentivos fiscales a la inversión circular", "Tributario y tarifario", "Primero",
+  "Costo de capital: la maquinaria de reciclaje y tratamiento es cara",
+  "Industrias; Residuos; Recursos hídricos; Turismo",
+  "Exoneraciones de renta, ITBMS y arancel para equipos elegibles",
+  "Reglamento del MEF para los incentivos vigentes; ley orgánica para incentivos nuevos",
+  "Ley 223 de 2021, art. 3-7; Ley 276, art. 52",
+  "MEF (DGI) con aval técnico de MiAMBIENTE y AAUD",
+  "Gasto tributario",
+  "Colombia (Estatuto Tributario, art. 255 y 428); Panamá (Ley 37 de 2013, solar)",
+  "Inversión acogida; gasto tributario por tonelada adicional reciclada",
+  "Costo fiscal; beneficio a inversiones que se harían igual",
+  9, "Compras públicas circulares", "Promoción y facilitación de inversiones", "Primero",
+  "Demanda: el Estado no exige contenido reciclado",
+  "Ciudades y construcción; Industrias",
+  "Criterios de economía circular en pliegos y fichas técnicas",
+  "Resolución de la DGCP; decreto que reglamente el art. 53 de la Ley 276",
+  "Ley 22 de 2006, art. 40 (modificado por la Ley 502, art. 12); Ley 276, art. 53; Ley 33, art. 28",
+  "Dirección General de Contrataciones Públicas",
+  "Presupuesto de las entidades compradoras",
+  "Comisión Europea (guía de contratación pública circular); Chile (hoja de ruta)",
+  "Proporción de contratos con criterios circulares",
+  "Licitaciones desiertas si no hay oferta nacional",
+  10, "Criterios de economía circular en la taxonomía", "Financiero", "Primero",
+  "Información: la banca no tiene criterios para clasificar lo circular",
+  "Todos los sectores de política",
+  "Criterios técnicos de contribución sustancial a la economía circular",
+  "Nueva edición técnica de la taxonomía; acuerdo de las superintendencias para su uso obligatorio",
+  "Taxonomía de Finanzas Sostenibles de 2024 (objetivo de economía circular)",
+  "SBP, SMV y SSRP con el Grupo de Trabajo de Finanzas Sostenibles; MiAMBIENTE y MEF",
+  "Presupuesto de las superintendencias; cooperación técnica",
+  "Unión Europea (Reglamento 2020/852, art. 13)",
+  "Cartera y emisiones alineadas al objetivo circular",
+  "Criterios demasiado exigentes para empresas pequeñas",
+  11, "Bonos temáticos y marco soberano", "Financiero", "Primero",
+  "Financiamiento: falta una cartera de proyectos circulares elegibles",
+  "Residuos; Recursos hídricos; Agricultura y alimentos",
+  "Emisión de deuda con uso de fondos o metas verificables",
+  "Resolución del MEF (marco vigente) dentro de los límites de endeudamiento",
+  "Marco de Financiamiento Sostenible (MEF-RES-2024-1529); guía de bonos temáticos de la SMV",
+  "MEF (Crédito Público); emisores privados y SMV",
+  "Mercado de capitales",
+  "Bonos verdes corporativos en América Latina; Chile (marco soberano)",
+  "Monto emitido con uso circular; proyectos financiados",
+  "Cartera de proyectos pequeña; límites de la regla fiscal",
+  12, "Crédito verde, garantías y financiamiento combinado", "Financiero", "Primero",
+  "Riesgo: la banca percibe como riesgosos los negocios circulares pequeños",
+  "Industrias; Residuos; Agricultura y alimentos; Turismo",
+  "Líneas de largo plazo y garantías parciales",
+  "Resoluciones de la banca pública y del fiduciario del Fondo de Garantías",
+  "Ley 276, art. 30.4 y 76; Ley 502, art. 2 y 4; Acuerdo 8-2025 de la SBP",
+  "Banco Nacional de Panamá, AMPYME y MEF, con el BID y BID Invest",
+  "Recursos multilaterales y concesionales",
+  "Bancóldex (Colombia); CORFO (Chile); Fondo de Garantías de Panamá",
+  "Crédito y garantías otorgados a negocios circulares",
+  "Morosidad; elegibilidad laxa",
+  13, "Alianzas público-privadas y mecanismos de promoción existentes", "Promoción y facilitación de inversiones", "Primero",
+  "Inversión: la infraestructura municipal de valorización es escasa",
+  "Residuos; Agricultura y alimentos; Industrias",
+  "Contratos de largo plazo con pagos por desempeño",
+  "Aplicación de la Ley 93 de 2019, la Ley 276 y la Ley 22; concesiones municipales",
+  "Ley 93 de 2019; Ley 276, art. 14, 46 y 59-62",
+  "Secretaría Nacional de APP, AAUD y municipios",
+  "Tasa de gestión de residuos, pagos del Estado y capital privado",
+  "Centro de clasificación de París XVII; prefactibilidad de APP de residuos de Panamá y San Miguelito",
+  "Capacidad instalada de valorización",
+  "Contratos sin refrendo; flujo de residuos insuficiente",
+  14, "Información, formación y certificación", "Capacidades y conciencia ambiental", "Primero",
+  "Capacidad: faltan competencias en banca, compras y recuperación",
+  "Transversal, con énfasis en turismo",
+  "Formación, certificación de competencias y reporte de indicadores",
+  "Resoluciones ministeriales y reglamento de la plataforma de indicadores",
+  "Ley 502, art. 5-7 y 11; Ley 276, art. 25-27 y 30.5",
+  "MiAMBIENTE, MICI, MEDUCA, INADEH y AAUD; ATP en turismo",
+  "Presupuesto y cooperación técnica",
+  "Costa Rica (Certificado de Sostenibilidad Turística); PNUMA (formación financiera)",
+  "Personas capacitadas y certificadas; reporte trienal publicado",
+  "Programas sin continuidad"
+)
+
+nrow(fichas)
+```
+
+# Evaluación de factibilidad
+
+La evaluación se escribe en una tabla larga, con una fila por cada combinación de instrumento y criterio, es decir, 98 filas. Cada fila tiene el puntaje y una frase que justifica por qué se asignó. Para no repetir la función que arma las filas, la función auxiliar `p()` recibe el número del instrumento y, en orden, los siete pares de puntaje y justificación.
+
+```{r}
+#| label: factibilidad
+
+criterios <- c("Impacto", "Técnica", "Institucional", "Política y regulatoria",
+               "Financiera", "Tiempo", "Equidad y competitividad")
+
+p <- function(id, ...) {
+  x <- list(...)
+  tibble(id = id, criterio = criterios, puntaje = unlist(x[c(TRUE, FALSE)]),
+         justificacion = unlist(x[c(FALSE, TRUE)]))
+}
+
+factibilidad <- bind_rows(
+  p(1, 4, "Base de cálculo de toda REP, depósito o meta; sin ella los demás no se sostienen",
+       4, "La aduana ya registra por partida y el MICI certifica importaciones de la Ley 187",
+       4, "La AAUD lleva un registro de gestores y un sistema de información por ley (Ley 276, art. 22 y 54)",
+       4, "Basta un decreto; la Hoja de Ruta de plásticos adoptada en 2026 pide el registro",
+       4, "Costo bajo: se apoya en sistemas existentes",
+       4, "Puede reglamentarse en un año",
+       4, "Carga de reporte proporcional; los grandes importadores concentran el volumen"),
+  p(2, 4, "Los recicladores recuperan la mayor parte del material reciclado del país",
+       3, "El único conteo de recicladores es de 2010; hay que censar",
+       3, "La Ley 276 los define y ordena gradualidad, pero remite al reglamento",
+       4, "Tres leyes reconocen su inclusión (33, 276 y 502)",
+       3, "El pago depende de que exista REP o tasa que lo financie",
+       3, "El registro puede iniciar pronto; el pago, con la REP",
+       5, "Mejora ingresos y protección de una población pobre e informal"),
+  p(3, 5, "Traslada el costo del final de vida al precio y financia la recolección de flujos grandes",
+       3, "Requiere registro, metas por flujo y red de recolección",
+       3, "La AAUD tiene la facultad de autorizar y fiscalizar sistemas de REP, pero con déficit financiero",
+       3, "Puede iniciar por decreto y resoluciones; las metas con sanción piden una ley de REP",
+       4, "Se autofinancia con contribuciones; la administración cuesta 5 % a 10 % del total (OCDE)",
+       2, "Requiere el registro operativo y un período de preparación de dos a tres años",
+       3, "Un cargo de 1 % sube la canasta de los hogares en 0,2 %; los importadores pagan igual que los productores nacionales"),
+  p(4, 3, "Incentiva el rediseño solo si la diferencia de tarifa es significativa",
+       2, "Exige criterios de reciclabilidad y datos por producto",
+       2, "Depende de que existan sistemas de gestión autorizados",
+       3, "Cabe en la REP si la tarifa es privada; ley si la cobra el Estado",
+       4, "No tiene costo fiscal",
+       1, "Solo después de que la REP opere",
+       3, "Puede encarecer envases baratos de productos de consumo popular"),
+  p(5, 4, "Los sistemas operativos superan 85 % de recolección de envases",
+       3, "Requiere red de retorno y control de envases que entran por frontera",
+       3, "La AAUD puede autorizar sistemas de depósito (Ley 51, art. 6-A num. 14)",
+       3, "Un proyecto de ley de reembolso de envases estaba en segundo debate en 2026",
+       4, "Lo financian los depósitos no reclamados y la venta de material",
+       2, "Requiere estudio de diseño y red de retorno",
+       3, "El costo de operación de 1 % para las bebidas sube la canasta en 0,01 %; hay que integrar a los recicladores"),
+  p(6, 3, "Crea demanda estable para el plástico y los áridos recuperados",
+       2, "La capacidad nacional de reciclaje de calidad es limitada",
+       4, "El MICI elabora reglamentos técnicos; la Ley 518 de 2026 ya obliga a usar caucho reciclado",
+       3, "Precedente de la Ley 518; los productores pueden objetar el costo",
+       4, "Sin costo fiscal",
+       2, "Metas graduales tras desarrollar la oferta",
+       3, "Puede favorecer a recicladores nacionales; riesgo de costo para pequeños envasadores"),
+  p(7, 4, "Financia la recolección selectiva y hace más caro mezclar o verter",
+       3, "El cobro en la factura eléctrica ya existe; el pago por generación necesita catastro",
+       4, "La AAUD y los municipios fijan la tasa por ley (Ley 276, art. 16 y 75)",
+       2, "Exige participación ciudadana; un tribunal anuló una tasa municipal por omitirla",
+       5, "Cierra la brecha entre lo recaudado (B/.35,2 millones) y lo gastado (B/.60,6 millones)",
+       3, "La tasa a costo real puede ajustarse pronto; el pago por generación, en pilotos",
+       2, "Regresiva si no se escalona; la ley ordena considerar el nivel socioeconómico"),
+  p(8, 3, "Reduce el costo de capital del reciclaje y el tratamiento",
+       4, "Requiere lista de bienes elegibles certificada",
+       4, "MEF y DGI administran exoneraciones; MiAMBIENTE avala las plantas (Ley 223)",
+       4, "Las leyes 223 y 276 ya otorgan incentivos; falta su reglamentación",
+       2, "Gasto tributario en un contexto de ingresos tributarios bajos y regla fiscal estricta",
+       4, "Los incentivos vigentes solo requieren reglamento",
+       3, "Beneficia a empresas formales con capacidad de invertir"),
+  p(9, 3, "Crea demanda para materiales reciclados en la obra pública",
+       3, "Requiere fichas técnicas y oferta certificada",
+       4, "La DGCP tiene el mandato expreso desde la Ley 502",
+       5, "El mandato ya está en la ley; basta una resolución",
+       4, "Sin costo adicional si se usa el costo del ciclo de vida",
+       4, "Puede iniciar con pliegos piloto en un año",
+       4, "Puede exigir formalidad y abrir mercado a pymes de reciclaje"),
+  p(10, 3, "Ordena el lenguaje del mercado y permite contar la cartera circular",
+       3, "Hay puntos de partida en la taxonomía vigente; faltan criterios por actividad",
+       4, "Tres superintendencias, el MEF y MiAMBIENTE ya gobiernan la taxonomía",
+       4, "Su uso es voluntario y la guía bancaria anticipa una segunda edición",
+       5, "Costo bajo",
+       3, "Una edición técnica toma uno a dos años",
+       3, "Neutral; conviene criterios simplificados para pymes"),
+  p(11, 3, "Moviliza recursos para inversión pública en residuos y agua",
+       3, "La cartera de proyectos elegibles es el cuello de botella",
+       4, "El MEF tiene el marco y la SMV una guía de bonos temáticos",
+       4, "El marco está vigente desde 2024",
+       3, "La deuda está sujeta a la regla fiscal, que baja el déficit a 1,5 % del PIB al 2030",
+       3, "Una primera emisión requiere preparar proyectos",
+       3, "Neutral"),
+  p(12, 4, "Llega a pymes y recuperadores que la banca no atiende",
+       3, "La banca no tiene criterios ni historial de crédito circular",
+       3, "Existe un Fondo de Garantías con el BID, sin ventana circular",
+       4, "No requiere ley; basta una ventana en programas existentes",
+       3, "Depende de recursos multilaterales",
+       4, "Puede operar en un año sobre el fondo existente",
+       5, "Favorece a microempresas, a mujeres en turismo y a recicladores"),
+  p(13, 4, "Permite infraestructura de valorización a escala",
+       3, "Requiere estudios de flujo y de demanda",
+       3, "Secretaría de APP y AAUD con funciones; contratos recientes cuestionados por falta de refrendo",
+       3, "Ley de APP vigente; contratos sensibles",
+       3, "Necesita una tasa que pague el servicio",
+       2, "Estructurar una APP toma de dos a tres años",
+       3, "Riesgo de desplazar a recicladores si no se integran"),
+  p(14, 2, "Efecto indirecto; habilita a los demás",
+       4, "Existen programas y entidades de formación",
+       4, "La Ley 502 asigna las funciones",
+       5, "Mandato legal vigente",
+       4, "Costo moderado",
+       5, "Puede iniciar de inmediato",
+       4, "La certificación en turismo diferencia a pequeños operadores")
+) |>
+  left_join(select(fichas, id, instrumento), by = "id") |>
+  mutate(criterio = factor(criterio, levels = criterios))
+
+# Confianza por instrumento según el tipo de evidencia
+confianza <- tibble(
+  id = 1:14,
+  confianza = c("Alta", "Media", "Media", "Media", "Media", "Media", "Alta",
+                "Alta", "Alta", "Alta", "Media", "Media", "Media", "Alta")
+)
+
+factibilidad <- factibilidad |> left_join(confianza, by = "id")
+
+stopifnot(nrow(factibilidad) == 98, all(factibilidad$puntaje %in% 1:5))
+```
+
+Las justificaciones se apoyan en la ruta legal por instrumento [@panama2021Ley276; @panama2010Ley51; @panama2025Ley502; @panama2021Ley223; @panama2026Ley518; @panama2002Ley6; @miambiente2026ResDM0351; @asamblea2026ActaPleno], las capacidades institucionales (memoria 12), las finanzas de la Autoridad de Aseo [@estrella2026AAUDMorosidad], el costo administrativo de la REP [@ocde2016EPRPolicyHighlights], el desempeño de los sistemas de depósito [@sidorczuk2025DepositReturn], el marco y la guía de bonos [@mef2024MarcoFinanciamientoSostenible; @smv2025GuiaBonosTematicos; @sbp2025GuiaTFSBancos], el Fondo de Garantías [@sbp2025Acuerdo8], la regla fiscal [@laestrella2026ReformaFiscal] y el modelo de precios (memoria 11).
+
+# Puntaje con pesos iguales
+
+Para resumir los siete puntajes de cada instrumento en una sola cifra calculamos su promedio simple, lo que equivale a dar a todos los criterios el mismo peso. El resultado ordena los instrumentos de mayor a menor factibilidad.
+
+```{r}
+#| label: ranking
+
+ranking <- factibilidad |>
+  summarize(puntaje_medio = mean(puntaje), .by = c(id, instrumento)) |>
+  arrange(desc(puntaje_medio)) |>
+  mutate(posicion = row_number())
+
+ranking
+```
+
+# Sensibilidad a los pesos
+
+Dar el mismo peso a todos los criterios es un punto de partida razonable, pero un lector puede considerar, por ejemplo, que el impacto importa más que el tiempo de implementación. Para saber si el orden de los instrumentos depende de esa elección hacemos dos pruebas. La primera elimina un criterio a la vez y vuelve a calcular la posición de cada instrumento, lo que muestra si algún criterio por sí solo determina el resultado. La segunda reparte el peso total entre los siete criterios al azar, 10.000 veces, y cuenta en qué proporción de los repartos cada instrumento queda entre los cinco primeros. Los pesos al azar se obtienen de una distribución de Dirichlet con parámetros iguales, que es la forma estándar de sortear proporciones que suman uno sin favorecer a ningún criterio. Un instrumento que queda entre los cinco primeros en casi todos los repartos es una prioridad que no depende de cómo se ponderen los criterios.
+
+```{r}
+#| label: sensibilidad
+
+matriz_puntajes <- factibilidad |>
+  select(id, criterio, puntaje) |>
+  pivot_wider(names_from = criterio, values_from = puntaje) |>
+  arrange(id)
+M <- as.matrix(matriz_puntajes[, -1])
+
+# Quitar un criterio a la vez
+sin_uno <- map_dfr(criterios, \(k) {
+  tibble(id = matriz_puntajes$id, criterio_omitido = k,
+         posicion = rank(-rowMeans(M[, colnames(M) != k]), ties.method = "min"))
+})
+
+rango_posiciones <- sin_uno |>
+  summarize(posicion_min = min(posicion), posicion_max = max(posicion), .by = id)
+
+# Pesos al azar
+n_sorteos <- 10000
+pesos <- matrix(rexp(n_sorteos * 7), ncol = 7)
+pesos <- pesos / rowSums(pesos)
+puntajes_sorteo <- M %*% t(pesos)
+top5 <- apply(puntajes_sorteo, 2, \(s) rank(-s, ties.method = "min") <= 5)
+
+sensibilidad <- ranking |>
+  left_join(rango_posiciones, by = "id") |>
+  mutate(pct_top5 = 100 * rowMeans(top5)[match(id, matriz_puntajes$id)])
+
+sensibilidad
+```
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+guardar_salida(fichas, "fichas_instrumentos", hoja = "fichas")
+guardar_salida(factibilidad, "factibilidad_instrumentos", hoja = "factibilidad")
+guardar_salida(sensibilidad, "factibilidad_ranking_sensibilidad", hoja = "ranking")
+```
+
+# Referencias
+
+::: {#refs}
+:::

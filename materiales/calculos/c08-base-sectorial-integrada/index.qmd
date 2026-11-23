@@ -25,7 +25,7 @@ execute:
 
 # Introducción
 
-Esta memoria junta en una sola base los indicadores de las memorias 2 a 7, de modo que cada sector de la Hoja de Ruta de Economía Circular [@miambiente2024HojaRutaEC] tenga un valor para cada criterio de evaluación de los Términos de Referencia. La base resultante, `data/outputs/sectores_priorizados.rds`, es la fuente de verdad del documento de análisis sectorial.
+Esta memoria junta en una sola base los indicadores de las memorias 2 a 7, de modo que cada sector de la Hoja de Ruta de Economía Circular [@miambiente2024HojaRutaEC] tenga un valor para cada criterio de evaluación del análisis sectorial. Al análisis se suma el turismo, delimitado en la memoria 1 con la Cuenta Satélite de Turismo [@un2010CST2008]. La base resultante, `data/outputs/sectores_priorizados.rds`, es la fuente de verdad del documento de análisis sectorial.
 
 Cada indicador lleva su año, su unidad, la memoria que lo calcula y una **bandera de calidad**:
 
@@ -34,7 +34,7 @@ Cada indicador lleva su año, su unidad, la memoria que lo calcula y una **bande
 - **Baja:** dato disponible solo para un grupo de sectores, de una sección más amplia, o de una fuente externa con cobertura limitada.
 - **Sin dato:** el criterio no tiene una fuente cuantitativa disponible; se trata cualitativamente en el documento.
 
-Se evalúan los seis sectores de política. La categoría "Resto de la economía" se incluye como referencia para calcular participaciones, pero no entra en las comparaciones.
+Se evalúan los siete sectores de política. La categoría "Resto de la economía" se incluye como referencia para calcular participaciones, pero no entra en las comparaciones.
 
 # Preámbulo
 
@@ -48,7 +48,7 @@ rm(list = ls())
 # Funciones y constantes compartidas
 source("materiales/calculos/scripts/funciones_comunes.R")
 
-seis_sectores <- sectores_politica[1:6]
+sectores_eval <- sectores_sin_resto
 ```
 
 # Lectura de las salidas anteriores
@@ -174,16 +174,19 @@ ied_posicion <- ied |>
   summarize(valor = sum(miles_balboas) / 1000, .by = grupo_sector)
 
 # Un sector por fila; los tres del grupo conjunto reciben el mismo valor
-grupo_de_sector <- tibble(
-  sector_principal = factor(sectores_politica, levels = sectores_politica),
-  grupo_sector = c(
-    "Energía, recursos hídricos y residuos (conjunto)",
-    "Energía, recursos hídricos y residuos (conjunto)",
-    "Energía, recursos hídricos y residuos (conjunto)",
-    "Industrias", "Agricultura y alimentos", "Ciudades y construcción",
-    "Resto de la economía"
-  )
-)
+grupo_de_sector <- tribble(
+  ~sector_principal, ~grupo_sector,
+  "Residuos", "Energía, recursos hídricos y residuos (conjunto)",
+  "Energía", "Energía, recursos hídricos y residuos (conjunto)",
+  "Recursos hídricos", "Energía, recursos hídricos y residuos (conjunto)",
+  "Industrias", "Industrias",
+  "Agricultura y alimentos", "Agricultura y alimentos",
+  "Ciudades y construcción", "Ciudades y construcción",
+  "Turismo", "Turismo",
+  "Resto de la economía", "Resto de la economía"
+) |>
+  mutate(sector_principal = factor(sector_principal, levels = sectores_politica))
+stopifnot(setequal(grupo_de_sector$sector_principal, sectores_politica))
 
 fbkf_ind <- fbkf_resumen |>
   mutate(metodo = if_else(str_starts(metodo, "Método 1"), "m1", "m2")) |>
@@ -232,14 +235,18 @@ inversion <- bind_rows(
 ```{r}
 #| label: crit-concentracion
 
-grupo_estructura <- tibble(
-  sector_principal = factor(sectores_politica, levels = sectores_politica),
-  grupo_sector = c(
-    "Recursos hídricos y residuos", "Energía", "Recursos hídricos y residuos",
-    "Industrias", "Agricultura y alimentos", "Ciudades y construcción",
-    NA
-  )
-)
+grupo_estructura <- tribble(
+  ~sector_principal, ~grupo_sector,
+  "Residuos", "Recursos hídricos y residuos",
+  "Energía", "Energía",
+  "Recursos hídricos", "Recursos hídricos y residuos",
+  "Industrias", "Industrias",
+  "Agricultura y alimentos", "Agricultura y alimentos",
+  "Ciudades y construcción", "Ciudades y construcción",
+  "Turismo", "Turismo",
+  "Resto de la economía", NA
+) |>
+  mutate(sector_principal = factor(sector_principal, levels = sectores_politica))
 
 concentracion <- bind_rows(
   grupo_estructura |>
@@ -275,7 +282,11 @@ emisiones_crit <- bind_rows(
               unidad = "Gg CO2e por millón de B/.", anio = 2023)
 ) |>
   filter(!is.na(valor)) |>
-  mutate(criterio = "Emisiones de GEI", memoria = "c05", calidad = "Media")
+  mutate(
+    criterio = "Emisiones de GEI", memoria = "c05",
+    # En turismo solo la aviación civil nacional es separable
+    calidad = if_else(sector_principal == "Turismo", "Baja", "Media")
+  )
 ```
 
 ## Uso de recursos
@@ -377,11 +388,11 @@ Las barreras de entrada y salida de los mercados no tienen indicadores cuantitat
 
 # Matriz de relevancia sectorial
 
-Para ofrecer una lectura comparativa construimos una matriz de relevancia con una selección de indicadores, donde cada sector recibe un puntaje de 1 a 5 según el lugar que ocupa entre los seis sectores en cada indicador. El puntaje 5 corresponde al mayor valor. Es un ordenamiento relativo y no una medida de importancia absoluta.
+Para ofrecer una lectura comparativa construimos una matriz de relevancia con una selección de indicadores, donde cada sector recibe un puntaje de 1 a 5 según el lugar que ocupa entre los siete sectores en cada indicador. El puntaje 5 corresponde al mayor valor. Es un ordenamiento relativo y no una medida de importancia absoluta.
 
 Dos advertencias sobre la matriz:
 
-- Los pesos son iguales como punto de partida. Los sectores de recursos hídricos y de ciudades y construcción no tienen emisiones propias en la base (están en residuos e industrias), y su puntaje medio se calcula con cinco indicadores. Los pesos definitivos deben acordarse con la CEPAL y el Ministerio de Ambiente, para que la matriz no incorpore las preferencias del consultor.
+- Los pesos son iguales, de modo que la matriz no incorpora preferencias sobre la importancia relativa de los criterios. Los sectores de recursos hídricos y de ciudades y construcción no tienen emisiones propias en la base (están en residuos e industrias). En turismo solo es separable la aviación civil nacional, porque las emisiones de hoteles y restaurantes están dentro de la categoría comercial y residencial; para no subestimar al sector, su puntaje no usa ese indicador. En los tres casos el puntaje medio se calcula con cinco indicadores.
 - Un valor alto no siempre indica un mayor atractivo para una política de economía circular. Un sector con muchas emisiones tiene más presión climática pero no necesariamente más viabilidad. Por eso la matriz se presenta como insumo y no como un ranking de priorización.
 
 ```{r}
@@ -397,7 +408,9 @@ indicadores_matriz <- c(
 )
 
 matriz <- sectores_priorizados |>
-  filter(indicador %in% indicadores_matriz, sector_principal %in% seis_sectores) |>
+  filter(indicador %in% indicadores_matriz, sector_principal %in% sectores_eval) |>
+  # Las emisiones de turismo son parciales (solo aviación nacional)
+  filter(!(indicador == "Emisiones de GEI (sin UTCUTS)" & sector_principal == "Turismo")) |>
   mutate(
     # Rango de menor a mayor entre los sectores con dato en el indicador
     rango = rank(valor, ties.method = "average"),

@@ -1,0 +1,234 @@
+---
+title: "Memoria de cálculo 11: modelo de precios de insumo-producto"
+description: "Traslado a precios de los cargos sobre productos que imponen la responsabilidad extendida del productor, el depósito y retorno, la tarifa de aseo a costo real y la tasa de disposición final"
+author: "Renato Vargas"
+date: "2026-11-23"
+lang: es
+categories:
+  - modelo de precios
+  - insumo-producto
+  - economía circular
+  - Panamá
+  - rstats
+bibliography: refs.bib
+csl: ../../../assets/apa-es.csl
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    css: ../../documentos/estilos.css
+  # docx: no se usa; las memorias se leen en el sitio
+execute:
+  warning: false
+---
+
+# Introducción
+
+Varios de los instrumentos propuestos operan como un cargo sobre un producto: la contribución de la responsabilidad extendida del productor (REP), el costo de operación del sistema de depósito y retorno, la tarifa de aseo a costo real y la tasa de disposición final. Esta memoria estima cuánto suben los precios de cada actividad económica, de cada sector de política y de la canasta de consumo de los hogares cuando esos cargos se trasladan por completo a lo largo de la cadena de producción.
+
+Un cargo de este tipo no se queda en quien lo paga. Si una fábrica de bebidas paga una contribución por sus envases y la traslada a su precio, los restaurantes que le compran bebidas ven subir sus costos y los trasladan a su vez a sus clientes. Para seguir esa cadena se usa la matriz insumo-producto, que registra cuánto compra cada actividad de la economía a cada una de las demás, y que permite sumar el efecto de todas las rondas de compras entre proveedores. El método es el modelo de precios de Leontief [@millerblair2022, cap. 2]. Si $\mathbf{A}$ es la matriz de coeficientes técnicos domésticos y $\mathbf{L} = (\mathbf{I} - \mathbf{A})^{-1}$ la inversa de Leontief, un aumento de costo $\Delta c_j$ por unidad de producción de la actividad $j$ cambia el vector de precios en
+
+$$
+\Delta \mathbf{p}' = \Delta \mathbf{c}' \mathbf{L}.
+$$
+
+El resultado incluye el efecto directo sobre la actividad que paga el cargo y los efectos indirectos sobre todas las que le compran, directa o indirectamente. Los supuestos son los del modelo: traslado completo del cargo a precios, sin cambios en las cantidades ni en la forma de producir, con la estructura de 2018 [@inec2024mip]. Por eso las cifras son una cota superior del efecto inflacionario de corto plazo: en la práctica, parte del cargo la absorben los márgenes y, a mediano plazo, el instrumento busca precisamente que productores y consumidores cambien de envases, materiales o prácticas. El modelo no incluye esos cambios de comportamiento.
+
+# Preámbulo
+
+```{r}
+#| label: preambulo
+#| message: false
+
+rm(list = ls())
+source("materiales/calculos/scripts/funciones_comunes.R")
+library(readxl)
+```
+
+# Matriz insumo-producto
+
+Leemos la matriz de 2018 como en la memoria 4: los flujos domésticos (cuadro 2), la producción total (cuadro 1) y el consumo final de los hogares, doméstico (cuadro 2) e importado (cuadro 3).
+
+```{r}
+#| label: lectura
+
+archivo_mip <- "data/inec/P0705547520240930151649Matriz Insumo Producto 2018.xlsx"
+
+leer_hoja <- function(hoja) {
+  read_excel(archivo_mip, sheet = hoja, col_names = FALSE, col_types = "text", .name_repair = "minimal")
+}
+total <- leer_hoja("Cuadro 1")
+domestica <- leer_hoja("Cuadro 2")
+importada <- leer_hoja("Cuadro 3")
+
+rango <- function(hoja, filas, columnas) {
+  matrix(as.numeric(unlist(hoja[filas, columnas])), nrow = length(filas))
+}
+
+Z <- rango(domestica, 10:85, 3:78)
+x <- rango(total, 103, 3:78)[1, ]
+hogares_dom <- rango(domestica, 10:85, 80)[, 1]
+hogares_imp <- rango(importada, 10:85, 80)[, 1]
+codigos <- domestica[[1]][10:85]
+nombres <- str_squish(domestica[[2]][10:85])
+
+A <- Z %*% diag(1 / x)
+L <- solve(diag(76) - A)
+dimnames(L) <- list(codigos, codigos)
+
+# Control: la producción total suma lo mismo que en la memoria 4 (miles de B/.)
+sum(x)
+```
+
+Cada actividad de la matriz pertenece a un único sector de política (memoria 1).
+
+```{r}
+#| label: sectores
+
+mapeo <- leer_salida("mapeo_sectores_scn")
+sector_mip <- mapeo |>
+  distinct(cod_mip, sector_principal)
+
+actividades <- tibble(cod_mip = codigos, actividad_mip = nombres, produccion = x) |>
+  left_join(sector_mip, by = "cod_mip")
+
+stopifnot(nrow(actividades) == 76, !anyNA(actividades$sector_principal))
+```
+
+# Escenarios
+
+Cada escenario define las actividades que pagan el cargo y el monto del cargo como proporción de su producción. Los montos se derivan de datos documentados cuando existen y, cuando el parámetro depende del diseño, se usa un cargo unitario de 1 % de la producción; como el modelo es lineal, el efecto de un cargo de $k$ % es $k$ veces el que se reporta.
+
+- **REP de envases.** Pagan los fabricantes de alimentos, bebidas, productos químicos de consumo y farmacéuticos (AE16 a AE23, AE29 y AE30), que son quienes ponen productos envasados en el mercado. Cargo unitario de 1 % de su producción. Los importadores pagan el mismo cargo sobre lo que importan, lo que encarece los bienes importados en una proporción similar; ese efecto directo se suma en la canasta de los hogares más adelante.
+- **Depósito y retorno.** El depósito es reembolsable y no es un costo; el costo es la operación del sistema, que paga la industria de bebidas (AE23). Cargo unitario de 1 % de su producción.
+- **Tarifa de aseo a costo real.** En 2025 la Autoridad de Aseo Urbano y Domiciliario recaudó B/.35,2 millones por tasa de aseo y gastó B/.60,6 millones [@estrella2026AAUDMorosidad]. Cerrar esa brecha exige subir la recaudación en 72 %. El escenario aplica ese aumento al precio del servicio de recolección y tratamiento de desechos (AE40), que pagan las actividades y los hogares que lo usan. Es una cota superior, porque el servicio de la actividad AE40 incluye operadores privados y municipios con tarifas distintas.
+- **Tasa de disposición final de residuos de construcción.** Se generan unas 1,07 millones de toneladas al año de residuos de construcción y demolición [@worldbank2026wwaste]. Una tasa de B/.10 por tonelada, similar al costo de operación del relleno de Cerro Patacón en el contrato de 2023 (USD 10,78 por tonelada) [@tvn2023Ecolimpia] y la cuarta parte del promedio de las tasas de vertido europeas [@eea2023EconomicInstruments], equivale a B/.10,7 millones al año, que pagan las tres actividades de construcción (AE41 a AE43).
+
+```{r}
+#| label: escenarios
+
+t_rcd <- leer_salida("residuos_otros_indicadores") |>
+  filter(str_starts(indicador, "Construcción")) |>
+  pull(valor)
+
+# Producción de construcción en millones de B/. (la matriz está en miles)
+prod_construccion <- sum(x[codigos %in% c("AE41", "AE42", "AE43")]) / 1000
+cargo_rcd <- 10 * t_rcd / 1e6 / prod_construccion
+
+escenarios <- tribble(
+  ~escenario, ~instrumento, ~actividades_obligadas, ~cargo,
+  "rep_envases", "REP de envases (cargo de 1 %)", list(c(sprintf("AE%02d", 16:23), "AE29", "AE30")), 0.01,
+  "deposito", "Depósito y retorno (costo de operación de 1 %)", list("AE23"), 0.01,
+  "aseo", "Tarifa de aseo a costo real (+72 %)", list("AE40"), 60.6 / 35.2 - 1,
+  "tasa_rcd", "Tasa de disposición de residuos de obra (B/.10 por t)", list(c("AE41", "AE42", "AE43")), cargo_rcd
+)
+
+escenarios |> mutate(actividades_obligadas = map_chr(actividades_obligadas, \(o) paste(unlist(o), collapse = ", ")))
+```
+
+# Traslado a precios
+
+La función siguiente arma el vector de cargos y lo multiplica por la inversa de Leontief.
+
+```{r}
+#| label: modelo
+
+traslado <- function(obligadas, cargo) {
+  obligadas <- unlist(obligadas)
+  dc <- setNames(rep(0, 76), codigos)
+  dc[obligadas] <- cargo
+  as.vector(dc %*% L)
+}
+
+precios <- escenarios |>
+  mutate(dp = map2(actividades_obligadas, cargo, traslado)) |>
+  select(escenario, instrumento, actividades_obligadas, dp) |>
+  mutate(actividad = list(actividades)) |>
+  unnest(c(dp, actividad)) |>
+  mutate(
+    directo = map2_lgl(cod_mip, actividades_obligadas, \(c, o) c %in% unlist(o)),
+    variacion_pct = 100 * dp
+  ) |>
+  select(escenario, instrumento, cod_mip, actividad_mip, sector_principal, produccion, directo, variacion_pct)
+```
+
+Las actividades con mayor aumento de precio en cada escenario son, como es de esperar, las obligadas. Entre las demás, los mayores efectos indirectos se dan en las que compran más a las obligadas.
+
+```{r}
+#| label: tbl-indirectos
+#| tbl-cap: "Actividades no obligadas con mayor aumento indirecto de precio por escenario (%)"
+
+precios |>
+  filter(!directo) |>
+  slice_max(variacion_pct, n = 4, by = escenario) |>
+  transmute(Instrumento = instrumento, Actividad = actividad_mip, `Variación (%)` = variacion_pct) |>
+  tabla_ft(digitos = 3)
+```
+
+# Incidencia por sector de política
+
+El aumento de precio de un sector es el promedio de sus actividades ponderado por la producción.
+
+```{r}
+#| label: incidencia-sector
+
+incidencia_sector <- precios |>
+  summarize(
+    variacion_pct = weighted.mean(variacion_pct, produccion),
+    .by = c(escenario, instrumento, sector_principal)
+  ) |>
+  mutate(sector_principal = factor(sector_principal, levels = sectores_politica)) |>
+  arrange(escenario, sector_principal)
+
+incidencia_sector |>
+  select(instrumento, sector_principal, variacion_pct) |>
+  pivot_wider(names_from = instrumento, values_from = variacion_pct) |>
+  tabla_ft(digitos = 3)
+```
+
+# Incidencia en la canasta de los hogares
+
+El efecto sobre el costo de la canasta de consumo de los hogares se calcula con su consumo de 2018 a precios básicos. El consumo de bienes domésticos se encarece según el modelo. En el escenario de la REP de envases, los bienes importados de las mismas actividades pagan el mismo cargo, de modo que su precio sube 1 % de forma directa; en los demás escenarios los bienes importados no cambian de precio.
+
+```{r}
+#| label: hogares
+
+consumo <- tibble(cod_mip = codigos, dom = hogares_dom, imp = hogares_imp)
+
+incidencia_hogares <- escenarios |>
+  mutate(
+    dp = map2(actividades_obligadas, cargo, traslado),
+    dp_imp = map2(actividades_obligadas, cargo, \(o, k) {
+      if (identical(unlist(o), unlist(escenarios$actividades_obligadas[[1]]))) as.numeric(codigos %in% unlist(o)) * k else rep(0, 76)
+    }),
+    variacion_canasta_pct = map2_dbl(dp, dp_imp, \(d, m) {
+      100 * sum(consumo$dom * d + consumo$imp * m) / sum(consumo$dom + consumo$imp)
+    })
+  ) |>
+  select(escenario, instrumento, cargo, variacion_canasta_pct)
+
+incidencia_hogares
+```
+
+El orden de magnitud es pequeño en todos los escenarios. Un cargo de REP equivalente a 1 % de la producción de los fabricantes de bienes envasados, que es alto frente a las tarifas internacionales, sube la canasta de los hogares en `r formato_es(incidencia_hogares$variacion_canasta_pct[incidencia_hogares$escenario == "rep_envases"], 2)` %. Cerrar por completo la brecha financiera del servicio de aseo, el escenario con el mayor aumento de un precio individual, la sube en `r formato_es(incidencia_hogares$variacion_canasta_pct[incidencia_hogares$escenario == "aseo"], 2)` %, porque el servicio pesa poco en el gasto total, aunque para los hogares de menores ingresos el peso es mayor y justifica una tarifa solidaria.
+
+# Exportación
+
+```{r}
+#| label: exportar
+
+incidencia_precios <- precios |>
+  select(escenario, instrumento, cod_mip, actividad_mip, sector_principal, directo, variacion_pct)
+
+guardar_salida(incidencia_precios, "incidencia_precios_actividad_mip2018", hoja = "actividad")
+guardar_salida(incidencia_sector, "incidencia_precios_sector_mip2018", hoja = "sector")
+guardar_salida(incidencia_hogares, "incidencia_precios_hogares_mip2018", hoja = "hogares")
+```
+
+Las tres bases de `data/outputs/` son la fuente de verdad de los efectos por sector que reportan los documentos de factibilidad y de Hoja de Ruta.
+
+# Referencias
+
+::: {#refs}
+:::

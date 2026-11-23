@@ -8,4 +8,9 @@ toc: false
 
 - [Metodología](a1a-metodologia/index.qmd): marco conceptual, criterios de evaluación de los instrumentos y procedimiento de trabajo de la consultoría.
 - [Plan de trabajo](a1b-plan-de-trabajo/index.qmd): actividades, calendario, necesidades de información y riesgos.
-- [Sectores económicos priorizados](a1c-sectores-economicos-priorizados/index.qmd): caracterización de los seis sectores de política con datos oficiales, eslabonamientos productivos y catorce instrumentos propuestos.
+- [Sectores económicos priorizados](a1c-sectores-economicos-priorizados/index.qmd): caracterización de los siete sectores de política con datos oficiales, eslabonamientos productivos y catorce instrumentos propuestos.
+
+## Factibilidad y Hoja de Ruta
+
+- [Factibilidad de los instrumentos y capacidades](a2-factibilidad-capacidades/index.qmd): factibilidad política y técnica de los catorce instrumentos, efectos por sector de política, capacidades institucionales y sistema financiero nacional.
+- [Hoja de Ruta Nacional para el Financiamiento de la Economía Circular](a3-hoja-de-ruta/index.qmd): diseño de los instrumentos, actores y roles, fuentes de financiamiento, reformas e indicadores de seguimiento.

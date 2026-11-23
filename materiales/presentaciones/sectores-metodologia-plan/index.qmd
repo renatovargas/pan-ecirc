@@ -13,7 +13,7 @@ subtitle: "Instrumentos económicos para la economía circular en Panamá"
 
 ## Objetivos
 
-- Mostrar qué ocurre en los seis sectores de política priorizados y por qué se proponen los instrumentos de política para la circularidad.
+- Mostrar qué ocurre en los siete sectores de política priorizados y por qué se proponen los instrumentos de política para la circularidad.
 - Presentar la metodología con que se evalúan los sectores y los instrumentos.
 - Presentar el plan de trabajo, sus hitos y sus riesgos.
 

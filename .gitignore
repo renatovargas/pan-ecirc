@@ -58,3 +58,9 @@ $RECYCLE.BIN/
 *.pdf
 *.zip
 /refs/
+
+# Notas internas del proyecto (no se publican)
+/AGENTS.md
+/estructura.md
+/HANDOVER.md
+/docs/refs/

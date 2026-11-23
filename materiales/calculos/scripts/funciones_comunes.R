@@ -7,7 +7,9 @@ library(flextable)
 library(openxlsx)
 
 # Los seis sectores de la Hoja de Ruta de Economía Circular de Panamá (2024),
-# más una categoría residual para que los totales sumen a la economía completa.
+# más Turismo (actividades características según la Cuenta Satélite de Turismo,
+# Naciones Unidas 2010, cuadro 3.1) y una categoría residual para que los
+# totales sumen a la economía completa. "Resto de la economía" va siempre al final.
 sectores_politica <- c(
   "Residuos",
   "Energía",
@@ -15,7 +17,26 @@ sectores_politica <- c(
   "Industrias",
   "Agricultura y alimentos",
   "Ciudades y construcción",
+  "Turismo",
   "Resto de la economía"
+)
+
+# Los siete sectores de política, sin la categoría residual
+sectores_sin_resto <- setdiff(sectores_politica, "Resto de la economía")
+
+# Número de sectores de política en letras, para el texto corrido
+n_sectores_texto <- "siete"
+
+# Colores por sector, comunes a gráficos de documentos y presentaciones
+colores_sector <- c(
+  "Residuos" = "#8C564B",
+  "Energía" = "#F39C12",
+  "Recursos hídricos" = "#009EDB",
+  "Industrias" = "#6C3483",
+  "Agricultura y alimentos" = "#2E8B57",
+  "Ciudades y construcción" = "#C0392B",
+  "Turismo" = "#E377C2",
+  "Resto de la economía" = "#B3B3B3"
 )
 
 # Formato común de las tablas de flextable

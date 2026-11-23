@@ -25,7 +25,7 @@ execute:
 
 # Introducción
 
-Los Términos de Referencia piden evaluar el empleo de cada sector con un desglose por género y por condición laboral formal e informal. Panamá publica el empleo en dos fuentes que no coinciden en su nivel de detalle:
+El análisis sectorial evalúa el empleo de cada sector con un desglose por género y por condición laboral formal e informal. Panamá publica el empleo en dos fuentes que no coinciden en su nivel de detalle:
 
 - La **matriz de empleo de las cuentas nacionales** del Instituto Nacional de Estadística y Censo (INEC) [@inec2026empleo] da los puestos de trabajo por actividad (80 actividades) y condición en la ocupación (asalariados, cuenta propia, empleadores y otros) para 2018 a 2024. No distingue sexo ni formalidad.
 - La **Encuesta de Mercado Laboral** (EML) del INEC da el empleo por sexo y su informalidad, pero solo en las 21 secciones de la Clasificación Industrial Internacional Uniforme (CIIU Rev. 4) y sin cruzar sexo con informalidad [@inec2026eml]. La Organización Internacional del Trabajo (OIT) publica ese cruce en ILOSTAT a partir de la misma encuesta [@ilo2026ilostat].
@@ -184,7 +184,7 @@ perfil_seccion <- ocupados_sexo |>
     tasa_informal_hombres = 100 * informales_Male / ocupados_Male
   )
 
-perfil_seccion |> filter(seccion %in% c("A", "C", "D", "E", "F"))
+perfil_seccion |> filter(seccion %in% c("A", "C", "D", "E", "F", "H", "I", "R"))
 ```
 
 # Imputación a actividades y agregación a sectores

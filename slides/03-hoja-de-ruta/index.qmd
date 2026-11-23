@@ -1,0 +1,139 @@
+---
+title: "Hoja de Ruta Nacional para el Financiamiento de la Economía Circular en Panamá"
+subtitle: "Diseño de instrumentos, actores, fuentes de financiamiento, reformas e indicadores"
+author:
+  - name: "Renato Vargas"
+    affiliations:
+      - name: "Consultor para la CEPAL"
+lang: es
+bibliography: refs.bib
+csl: ../../assets/apa-es.csl
+format:
+  revealjs:
+    theme: [simple, ../pstyles.scss]
+    slide-number: c/t
+    footer: "Hoja de Ruta Nacional para el Financiamiento de la Economía Circular en Panamá"
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: preparacion
+
+source("materiales/calculos/scripts/funciones_comunes.R")
+
+diseno <- leer_salida("hoja_ruta_instrumentos")
+rep <- leer_salida("hoja_ruta_rep_trayectoria")
+fuentes <- leer_salida("hoja_ruta_fuentes_financiamiento")
+reformas <- leer_salida("hoja_ruta_reformas")
+indicadores <- leer_salida("hoja_ruta_indicadores")
+precios_hogares <- leer_salida("incidencia_precios_hogares_mip2018")
+otros_res <- leer_salida("residuos_otros_indicadores")
+
+tabla_slide <- function(x, tamano = 14, ...) tabla_ft_es(x, tamano = tamano, ...)
+hog <- function(esc) precios_hogares$variacion_canasta_pct[precios_hogares$escenario == esc]
+t_rcd <- otros_res |> filter(str_starts(indicador, "Construcción")) |> pull(valor)
+```
+
+## Contenido {.theme-content}
+
+1.  **Diseño.** Catorce instrumentos, dos pasos, 2027 a 2030.
+2.  **Montos.** Lo que movilizan la REP, la tarifa y la tasa de obra.
+3.  **Actores, fuentes y reformas.** Quién hace qué y con qué recursos.
+4.  **Seguimiento.** Indicadores alineados con la Ley 502.
+
+[Documento completo](https://renatovargas.github.io/pan-ecirc/materiales/documentos/a3-hoja-de-ruta/){target="_blank"}
+
+## Tres decisiones de diseño
+
+- **Usar lo que existe.** La AAUD es la autoridad de la REP y del depósito por la Ley 276; el Ministerio de Ambiente tiene la plataforma de la Ley 502; la DGCP, el mandato de compras circulares.
+- **Empezar por el registro.** Productores e importadores declaran por partida arancelaria; sin registro no hay REP ni metas.
+- **Que pague quien pone el producto y quien usa el servicio.** Contribuciones de REP, depósitos y tasa a costo real, con apoyo multilateral para crédito y garantías.
+
+# Diseño {.theme-content}
+
+## Cronograma
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.6
+
+diseno |>
+  mutate(instrumento = fct_reorder(str_wrap(instrumento, 55), -anio_inicio), fin = 2031) |>
+  ggplot(aes(y = instrumento, x = anio_inicio, xend = fin, color = paso)) +
+  geom_segment(aes(yend = instrumento), linewidth = 6) +
+  scale_color_manual(values = c("Primero" = "#2E8B57", "Segundo" = "#009EDB"), name = "Paso") +
+  scale_x_continuous(breaks = 2027:2031, labels = c(2027:2030, "")) +
+  labs(x = NULL, y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 14), legend.title = element_text())
+```
+
+## REP de envases: metas y montos
+
+```{r}
+rep |>
+  transmute(Año = as.character(anio), `Meta (%)` = 100 * meta_valorizacion,
+            `Toneladas` = toneladas_valorizadas,
+            `Mínimo (millones de US$)` = costo_min_musd, `Máximo (millones de US$)` = costo_max_musd) |>
+  tabla_slide(tamano = 18, digitos = 0)
+```
+
+::: aside
+Costo del sistema colectivo de envases de Chile, de 380.000 a 500.000 pesos por tonelada valorizada [@resimple2023Garantias], a 692 pesos por dólar [@mmaChile2020AGIESEnvases]. Cotas superiores. Lo pagan productores e importadores. Efecto en la canasta: `r formato_es(hog("rep_envases"), 2)` % por cada punto de cargo.
+:::
+
+## Tarifa, depósito y tasa de obra
+
+- **Tasa de gestión a costo real:** cierra una brecha de B/.25,4 millones al año, escalonada por nivel socioeconómico, como ordena la Ley 276 [@panama2021Ley276, art. 66].
+- **Pago por generación:** pilotos en comercios, hoteles y restaurantes.
+- **Tasa de obra:** B/.10 por tonelada, hasta B/.`r formato_es(10 * t_rcd / 1e6, 1)` millones al año.
+- **Destinos turísticos:** cargo municipal por visitante para residuos, como en Taboga [@laestrella2025Taboga].
+- **Depósito:** PET, aluminio y vidrio, operado por los productores; meta de 90 % de recolección de botellas.
+
+# Actores, fuentes y reformas {.theme-content}
+
+## Fuentes de financiamiento
+
+```{r}
+fuentes |>
+  transmute(Fuente = fuente, Origen = origen, Tipo = tipo) |>
+  tabla_slide(tamano = 13)
+```
+
+## Una ley y varias resoluciones
+
+```{r}
+reformas |>
+  transmute(Nivel = nivel, Reforma = reforma, Emisor = emisor) |>
+  tabla_slide(tamano = 11)
+```
+
+# Seguimiento {.theme-content}
+
+## Indicadores alineados con la Ley 502
+
+```{r}
+indicadores |>
+  transmute(Indicador = indicador, `Línea de base` = linea_base, `Meta 2030` = meta_2030) |>
+  tabla_slide(tamano = 11)
+```
+
+::: aside
+Plataforma de indicadores del artículo 11 de la Ley 502 y reporte trienal del Ministerio de Ambiente [@panama2025Ley502, art. 11].
+:::
+
+## Cinco decisiones, en orden {.theme-content}
+
+1. Reglamento de la Ley 502 con el registro y la plataforma (2027).
+2. Pliego tarifario a costo real y primeras normas de REP de la AAUD.
+3. Reglamento de los incentivos vigentes y ventana circular en el fondo de garantías.
+4. Ley de REP con metas, sistemas colectivos, sanciones y depósito.
+5. Cartera de proyectos para la emisión soberana temática y la APP de residuos.
+
+## Referencias
+
+::: {#refs}
+:::

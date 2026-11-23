@@ -24,7 +24,7 @@ execute:
 
 source("materiales/calculos/scripts/funciones_comunes.R")
 
-seis <- sectores_politica[1:6]
+sectores_eval <- sectores_sin_resto
 
 si <- leer_salida("sectores_priorizados")
 cuentas <- leer_salida("cuentas_sector_2018_2024")
@@ -48,8 +48,8 @@ val <- function(indicador, sector) {
   si |> filter(indicador == !!indicador, sector_principal == !!sector) |> pull(valor)
 }
 
-part_vab_seis <- sum(cuentas$participacion_vab[cuentas$anio == 2024 & cuentas$sector_principal %in% seis])
-part_emp_seis <- sum(empleo$participacion_empleo[empleo$anio == 2024 & empleo$sector_principal %in% seis])
+part_vab_sect <- sum(cuentas$participacion_vab[cuentas$anio == 2024 & cuentas$sector_principal %in% sectores_eval])
+part_emp_sect <- sum(empleo$participacion_empleo[empleo$anio == 2024 & empleo$sector_principal %in% sectores_eval])
 emis_2023 <- emisiones_sector |> filter(anio == 2023)
 emis_total_2023 <- sum(emis_2023$emisiones_gg)
 part_energia_agro <- sum(emis_2023$participacion[emis_2023$sector_principal %in% c("Energía", "Agricultura y alimentos")])
@@ -68,8 +68,8 @@ fbkf_tasa_total <- fbkf_tipo |>
   filter(anio >= 2022) |>
   summarize(t = mean(100 * f / v)) |>
   pull(t)
-fbkf_pp_seis <- fbkf_sector |>
-  filter(str_starts(metodo, "Método 1"), sector_principal %in% seis, anio >= 2022) |>
+fbkf_pp_sect <- fbkf_sector |>
+  filter(str_starts(metodo, "Método 1"), sector_principal %in% sectores_eval, anio >= 2022) |>
   summarize(f = sum(fbkf), .by = anio) |>
   left_join(vab_total, by = "anio") |>
   summarize(pp = mean(100 * f / v)) |>
@@ -79,20 +79,11 @@ fbkf_pp_seis <- fbkf_sector |>
 tabla_slide <- function(x, tamano = 18, ...) tabla_ft_es(x, tamano = tamano, ...)
 tema_slide <- function() tema_grafico() + theme(text = element_text(size = 15))
 
-colores_sector <- c(
-  "Residuos" = "#8C564B",
-  "Energía" = "#F39C12",
-  "Recursos hídricos" = "#009EDB",
-  "Industrias" = "#6C3483",
-  "Agricultura y alimentos" = "#2E8B57",
-  "Ciudades y construcción" = "#C0392B",
-  "Resto de la economía" = "#B3B3B3"
-)
 ```
 
 ## Contenido {.theme-content}
 
-1.  **Sectores priorizados e instrumentos.** Qué muestran los datos de los seis sectores de política y por qué proponemos los instrumentos que proponemos.
+1.  **Sectores priorizados e instrumentos.** Qué muestran los datos de los siete sectores de política y por qué proponemos los instrumentos que proponemos.
 2.  **Metodología.** Cómo se evalúan los sectores y los instrumentos.
 3.  **Plan de trabajo.** Qué sigue, con quién y cuándo.
 
@@ -101,13 +92,13 @@ colores_sector <- c(
 - La Ley 502 de 2025 fija el marco de la transición hacia la economía circular [@panama2025Ley502].
 - La ley declara la responsabilidad extendida del productor (REP), crea una plataforma de indicadores y abre las compras públicas a criterios circulares.
 - Las tarifas de la REP, los incentivos fiscales y las metas quedan para el reglamento.
-- La Hoja de Ruta de Economía Circular priorizó seis sectores de política [@miambiente2024HojaRutaEC].
+- La Hoja de Ruta de Economía Circular priorizó seis sectores de política [@miambiente2024HojaRutaEC]; el análisis suma el turismo, delimitado con la Cuenta Satélite de Turismo [@un2010CST2008].
 - En las hojas de ruta de la región, el financiamiento es solo el 7 % de las iniciativas [@cepal2022HojasRuta, p. 26-27].
 - La pregunta central: qué instrumentos pueden llevar recursos hacia la circularidad en esos sectores.
 
 # Sectores priorizados e instrumentos {.theme-content}
 
-Qué pasa en los seis sectores de política y por qué proponemos estos instrumentos.
+Qué pasa en los siete sectores de política y por qué proponemos estos instrumentos.
 
 [Documento completo](https://renatovargas.github.io/pan-ecirc/materiales/documentos/a1c-sectores-economicos-priorizados/){target="_blank"}
 
@@ -119,7 +110,7 @@ Qué pasa en los seis sectores de política y por qué proponemos estos instrume
 
 ```{r}
 mapeo |>
-  filter(sector_principal %in% seis) |>
+  filter(sector_principal %in% sectores_eval) |>
   summarize(
     Actividades = n(),
     `Actividades principales` = paste(actividad[seq_len(min(3, n()))], collapse = "; "),
@@ -141,7 +132,7 @@ Elaboración propia con base en la Hoja de Ruta y las cuentas nacionales del INE
 #| fig-width: 6.5
 #| fig-height: 5.2
 cuentas |>
-  filter(anio == 2024, sector_principal %in% seis) |>
+  filter(anio == 2024, sector_principal %in% sectores_eval) |>
   select(sector_principal, vab = participacion_vab) |>
   left_join(
     empleo |> filter(anio == 2024) |> select(sector_principal, empleo = participacion_empleo),
@@ -157,10 +148,11 @@ cuentas |>
 ```
 :::
 ::: {.column width="45%" .smaller}
-- Los seis sectores generan `r formato_es(part_vab_seis, 1)` % del valor agregado y `r formato_es(part_emp_seis, 1)` % de los puestos de trabajo.
+- Los siete sectores generan `r formato_es(part_vab_sect, 1)` % del valor agregado y `r formato_es(part_emp_sect, 1)` % de los puestos de trabajo.
 - Ciudades y construcción es el mayor por valor agregado: `r formato_es(val("Participación en el valor agregado", "Ciudades y construcción"), 1)` %.
 - Agricultura y alimentos es el mayor empleador: `r formato_es(val("Participación en el empleo", "Agricultura y alimentos"), 1)` % de los puestos.
 - Residuos, recursos hídricos y energía son pequeños en las cuentas nacionales.
+- Turismo: `r formato_es(val("Participación en el valor agregado", "Turismo"), 1)` % del valor agregado, `r formato_es(val("Participación en el empleo", "Turismo"), 1)` % del empleo y mayoría de mujeres (`r formato_es(val("Mujeres en el empleo (estimado)", "Turismo"), 0)` %).
 - Energía y agricultura crecen más de 6 % anual desde 2018, a precios corrientes.
 :::
 ::::
@@ -177,7 +169,7 @@ Elaboración propia con datos del INEC. Memorias [C2](https://renatovargas.githu
 #| fig-width: 6.5
 #| fig-height: 5.2
 empleo_perfil |>
-  filter(sector_principal %in% seis) |>
+  filter(sector_principal %in% sectores_eval) |>
   select(sector_principal, Informales = pct_informal_est, Mujeres = pct_mujeres_est) |>
   pivot_longer(-sector_principal, names_to = "medida", values_to = "porcentaje") |>
   ggplot(aes(x = porcentaje, y = fct_rev(sector_principal), fill = medida)) +
@@ -215,7 +207,7 @@ fbkf_origen |>
       pivot_wider(names_from = indicador, values_from = valor),
     by = "sector_origen"
   ) |>
-  mutate(orden = match(sector_origen, c(seis, "Resto de la economía", "Bienes importados"))) |>
+  mutate(orden = match(sector_origen, c(sectores_eval, "Resto de la economía", "Bienes importados"))) |>
   arrange(orden) |>
   transmute(
     `Sector de política` = sector_origen,
@@ -241,7 +233,7 @@ fbkf_origen |>
 - La inversión fue de `r formato_es(fbkf_total_2024, 0)` millones de balboas en 2024, `r formato_es(100 * fbkf_total_2024 / vab_total_2024, 1)` % del valor agregado.
 - Las cuentas nacionales la publican por producto; la inversión por sector se estimó con dos métodos.
 - La construcción produce el `r formato_es(fbkf_origen_part("Ciudades y construcción"), 0)` % de los bienes de capital, y el `r formato_es(fbkf_origen_part("Bienes importados"), 0)` % es importado.
-- Los seis sectores aportan `r formato_es(fbkf_pp_seis, 1)` de los `r formato_es(fbkf_tasa_total, 1)` puntos porcentuales de la tasa de inversión, porque las viviendas se asignan al alquiler.
+- Los siete sectores aportan `r formato_es(fbkf_pp_sect, 1)` de los `r formato_es(fbkf_tasa_total, 1)` puntos porcentuales de la tasa de inversión, porque las viviendas se asignan al alquiler.
 - Residuos es el sector con menor inversión estimada.
 :::
 ::::
@@ -255,7 +247,7 @@ Elaboración propia con datos del INEC. Cifras por sector como órdenes de magni
 ```{r}
 si |>
   filter(
-    sector_principal %in% seis,
+    sector_principal %in% sectores_eval,
     indicador %in% c("Exportaciones", "Importaciones", "Saldo comercial", "Exportaciones sobre producción")
   ) |>
   select(sector_principal, indicador, valor) |>
@@ -271,12 +263,13 @@ si |>
 ```
 
 ::: smaller
-- Industrias y agricultura y alimentos tienen saldos comerciales negativos; industrias importa insumos equivalentes al `r formato_es(imp_industrias, 0)` % de su producción, el coeficiente más alto de los seis sectores.
+- Industrias y agricultura y alimentos tienen saldos comerciales negativos; industrias importa insumos equivalentes al `r formato_es(imp_industrias, 0)` % de su producción, uno de los coeficientes más altos entre los siete sectores.
+- El turismo es la excepción: exporta `r formato_es(val("Exportaciones", "Turismo"), 0)` millones de balboas, sobre todo gasto de visitantes y transporte aéreo.
 - Una REP recae sobre quien pone el producto en el mercado, y en Panamá ese actor suele importar; hace falta un registro de importadores por partida arancelaria, con la aduana como aliada.
 :::
 
 ::: aside
-Elaboración propia con datos del INEC (cuadros de oferta y utilización, millones de balboas de 2024, y matriz insumo-producto de 2018). El cero indica que el sector no tiene comercio registrado.
+Elaboración propia con datos del INEC (cuadros de oferta y utilización, millones de balboas de 2024, y matriz insumo-producto de 2018). El cero indica que el sector no tiene comercio registrado. Las exportaciones del turismo incluyen el gasto de los visitantes no residentes, sin producción asociada.
 :::
 
 ## Mercados concentrados arriba y atomizados abajo
@@ -414,7 +407,7 @@ enlaces_act |>
 :::
 ::: {.column width="45%" .smaller}
 - La matriz insumo-producto de 2018 sigue la cadena de compras entre 76 actividades; un índice mayor que 1 indica un vínculo superior al promedio.
-- Agricultura y alimentos tiene los encadenamientos más fuertes y `r formato_es(val("Multiplicador de empleo", "Agricultura y alimentos"), 0)` puestos por millón de balboas de demanda final.
+- Agricultura y alimentos tiene los encadenamientos más fuertes, seguida por el turismo hacia atrás, y `r formato_es(val("Multiplicador de empleo", "Agricultura y alimentos"), 0)` puestos por millón de balboas de demanda final.
 - La electricidad (AE38) impulsa hacia adelante: es insumo de casi todas las actividades.
 - Residuos genera `r formato_es(val("Multiplicador de empleo", "Residuos"), 0)` puestos por millón, el segundo valor más alto.
 :::
@@ -426,8 +419,8 @@ La matriz tiene 76 actividades y las cuentas nacionales 80, porque reúne pesca 
 
 ## La matriz de relevancia mide tamaño
 
-- Cada sector de política recibe de 1 a 5 puntos según su lugar en seis indicadores; los pesos son iguales hasta acordarlos con las instituciones.
-- Agricultura, industrias y construcción encabezan la matriz por su peso económico.
+- Cada sector de política recibe de 1 a 5 puntos según su lugar en seis indicadores, con pesos iguales.
+- Agricultura y turismo encabezan la matriz, seguidos por construcción e industrias.
 - Residuos queda al final y, sin embargo, gestiona los flujos de material de toda la economía.
 
 ```{r}
@@ -648,13 +641,13 @@ tribble(
   ~Instrumento, ~`Sectores de política`, ~`Respaldo en los datos`,
   "Registro de productores e importadores", "Residuos, industrias, agricultura", "Saldos comerciales negativos",
   "Formalización de recicladores", "Residuos", "Cadena atomizada; sin registro actualizado",
-  "Incentivos fiscales", "Industrias, residuos, agua", "Precedente de la Ley 37 de 2013",
+  "Incentivos fiscales", "Industrias, residuos, agua, turismo", "Precedente de la Ley 37 de 2013",
   "Compras públicas circulares", "Construcción, industrias", "Mayor sector por valor agregado",
   "Criterios en la taxonomía", "Todos", "Contribución circular solo en uso del suelo",
   "Bonos temáticos", "Residuos, agua, agricultura", "Pérdidas de agua cercanas al 40 %",
-  "Crédito verde y garantías", "Industrias, residuos, agricultura", "Pymes, 96 % de las empresas",
+  "Crédito verde y garantías", "Industrias, residuos, agricultura, turismo", "Pymes, 96 % de las empresas",
   "Alianzas y promoción existente", "Residuos, agricultura, industrias", "Infraestructura municipal escasa",
-  "Información y formación", "Transversal", "Brechas de información"
+  "Información y formación", "Transversal; certificación en turismo", "Brechas de información"
 ) |>
   tabla_slide(digitos = 0, tamano = 16)
 ```
@@ -666,9 +659,9 @@ tribble(
   ~Instrumento, ~`Sectores de política`, ~`Respaldo en los datos`,
   "REP con metas por flujo", "Residuos, industrias", "Envases hasta 38 % del peso de los residuos",
   "Ecomodulación", "Industrias, residuos", "Industrias importa 17 % de su producción en insumos",
-  "Depósito y retorno", "Residuos, bebidas, comercio", "Plástico, vidrio y metal, cerca de un cuarto de los residuos",
+  "Depósito y retorno", "Residuos, bebidas, comercio, turismo", "Plástico, vidrio y metal, cerca de un cuarto de los residuos",
   "Contenido reciclado", "Industrias, construcción, residuos", "Más de un millón de t de residuos de obra; 13 cementeras",
-  "Tarifa de aseo y tasa de disposición", "Residuos, ciudades y construcción", "Recolección de 64 % del peso; más de 57 vertederos"
+  "Tarifa de aseo y tasa de disposición", "Residuos, turismo, construcción", "Recolección de 64 % del peso; más de 57 vertederos"
 ) |>
   tabla_slide(digitos = 0, tamano = 17)
 ```
@@ -685,6 +678,7 @@ Pueden prepararse en paralelo y entran en vigor cuando el registro esté operati
 - **Agricultura y alimentos:** aprovechamiento de orgánicos, REP de envases de agroquímicos y crédito para subproductos.
 - **Energía:** bonos vinculados a metas y revisión de los incentivos vigentes para incluir eficiencia y biogás.
 - **Recursos hídricos:** bonos para tratamiento y reducción de pérdidas, e incentivos a equipos de reúso.
+- **Turismo:** tarifa de aseo comercial con separación de orgánicos, puntos de retorno, crédito verde y certificación.
 
 ## Brechas de información
 
@@ -756,7 +750,7 @@ ggplot() +
 - **Respaldo legal.** Tienen base en el marco legal panameño o en la Hoja de Ruta.
 - **Rasgo de la economía panameña.** Responden a un hallazgo del análisis sectorial.
 - **Experiencia internacional.** Cuentan con evidencia documentada en una fuente primaria.
-- **Cobertura.** En conjunto cubren las familias de instrumentos y los seis sectores de política.
+- **Cobertura.** En conjunto cubren las familias de instrumentos y los siete sectores de política.
 - La factibilidad se evalúa después, en la Actividad 2.
 
 ## Familias de instrumentos
@@ -814,7 +808,7 @@ tribble(
 
 ## Herramientas del análisis sectorial
 
-- **Tabla de equivalencias.** Asigna las 80 actividades a los seis sectores de política y se entrega editable para que MiAMBIENTE y el Ministerio de Comercio e Industrias la validen.
+- **Tabla de equivalencias.** Asigna las 80 actividades a los siete sectores de política y se publica editable, con la evidencia de cada asignación.
 - **Eslabonamientos.** El modelo de Leontief sobre la matriz insumo-producto de 2018 mide arrastre e impulso entre actividades [@millerblair2022].
 - **Matriz de relevancia.** Ordena los sectores de 1 a 5 en cada indicador para comparar unidades distintas.
 - **Memorias de cálculo.** Cada paso está documentado en código en el [sitio del proyecto](https://renatovargas.github.io/pan-ecirc/materiales/calculos/){target="_blank"}.

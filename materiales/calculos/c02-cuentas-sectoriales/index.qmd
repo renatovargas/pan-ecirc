@@ -25,7 +25,7 @@ execute:
 
 # Introducción
 
-Esta memoria calcula, para cada una de las 80 actividades de las cuentas nacionales de Panamá y para cada año de 2018 a 2024, la producción, el consumo intermedio, el valor agregado bruto, las exportaciones y las importaciones, y luego los agrega a los seis sectores de la Hoja de Ruta de Economía Circular. Responde a los criterios de producto interno bruto y de comercio exterior de los Términos de Referencia de la consultoría.
+Esta memoria calcula, para cada una de las 80 actividades de las cuentas nacionales de Panamá y para cada año de 2018 a 2024, la producción, el consumo intermedio, el valor agregado bruto, las exportaciones y las importaciones, y luego los agrega a los siete sectores de política: los seis de la Hoja de Ruta de Economía Circular y el turismo. Responde a los criterios de producto interno bruto y de comercio exterior del análisis sectorial.
 
 La fuente es la base consolidada de los cuadros de oferta y utilización del Instituto Nacional de Estadística y Censo (INEC) [@inec2026cou]. Los valores están en millones de balboas (B/.) a precios corrientes. Los años 2018 a 2023 son definitivos y 2024 es provisional.
 
@@ -203,7 +203,7 @@ exportaciones |>
 
 # Tabla de cuentas por actividad
 
-Unimos todo en una tabla por año y actividad. Las categorías `REEXP` y `DIRECTAS` se agregan como filas con producción y valor agregado de cero, para que los totales de comercio exterior queden completos.
+Unimos todo en una tabla por año y actividad. Las categorías `REEXP` y `DIRECTAS` se agregan como filas con producción y valor agregado de cero, para que los totales de comercio exterior queden completos. `REEXP` queda en "Resto de la economía". `DIRECTAS` se asigna a Turismo: sus exportaciones son el gasto de los visitantes no residentes en Panamá y sus importaciones el gasto de los residentes que viajan al exterior, que en la Cuenta Satélite de Turismo corresponden al consumo turístico receptor y emisor [@un2010CST2008]. Como su producción y valor agregado son cero, la asignación no cambia el valor agregado del sector y solo completa su comercio exterior.
 
 ```{r}
 #| label: cuentas-actividad
@@ -221,10 +221,10 @@ cuentas_actividad <- cuentas |>
       cod_scn == "DIRECTAS" ~ "Compras directas de residentes y no residentes",
       TRUE ~ actividad
     ),
-    sector_principal = if_else(
-      cod_scn %in% c("REEXP", "DIRECTAS"),
-      factor("Resto de la economía", levels = sectores_politica),
-      sector_principal
+    sector_principal = case_when(
+      cod_scn == "REEXP" ~ factor("Resto de la economía", levels = sectores_politica),
+      cod_scn == "DIRECTAS" ~ factor("Turismo", levels = sectores_politica),
+      TRUE ~ sector_principal
     ),
     across(c(produccion, consumo_intermedio, vab, exportaciones, importaciones), \(x) replace_na(x, 0))
   ) |>

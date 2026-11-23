@@ -1,6 +1,6 @@
 ---
 title: "Memoria de cálculo 1: mapeo de sectores de política a actividades del SCN"
-description: "Equivalencia entre los seis sectores de la Hoja de Ruta de Economía Circular de Panamá y las actividades económicas de las cuentas nacionales"
+description: "Equivalencia entre los siete sectores de política (los seis de la Hoja de Ruta de Economía Circular de Panamá y el turismo) y las actividades económicas de las cuentas nacionales"
 author: "Renato Vargas"
 date: "2026-10-22"
 lang: es
@@ -24,9 +24,9 @@ execute:
 
 # Introducción
 
-Esta memoria construye la tabla de equivalencias que conecta los sectores priorizados por la política de economía circular de Panamá con las 80 actividades económicas de las cuentas nacionales del Instituto Nacional de Estadística y Censo (INEC). Las demás memorias de cálculo y los documentos de la consultoría usan esa tabla para agrupar cifras de producción, empleo, comercio, emisiones y eslabonamientos por sector.
+Esta memoria construye la tabla de equivalencias que conecta los sectores priorizados por la política de economía circular de Panamá con las 80 actividades económicas de las cuentas nacionales del Instituto Nacional de Estadística y Censo (INEC). Las demás memorias de cálculo y los documentos de análisis usan esa tabla para agrupar cifras de producción, empleo, comercio, emisiones y eslabonamientos por sector.
 
-La Hoja de Ruta de Economía Circular con enfoque de cambio climático [@miambiente2024HojaRutaEC] prioriza seis sectores: residuos, recursos hídricos, energía, industrias, agricultura y alimentos, y ciudades y construcción. La Ley 502 de 2025 [@panama2025Ley502] crea el marco legal, pero no define sectores ni lista actividades; su artículo 10 ordena un Plan Estratégico Nacional con guías técnicas por actividad económica, que todavía no existe. Por eso la equivalencia con las actividades del Sistema de Cuentas Nacionales (SCN) es un trabajo propio de la consultoría y se documenta aquí para que pueda revisarse y corregirse.
+La Hoja de Ruta de Economía Circular con enfoque de cambio climático [@miambiente2024HojaRutaEC] prioriza seis sectores: residuos, recursos hídricos, energía, industrias, agricultura y alimentos, y ciudades y construcción. La Ley 502 de 2025 [@panama2025Ley502] crea el marco legal, pero no define sectores ni lista actividades; su artículo 10 ordena un Plan Estratégico Nacional con guías técnicas por actividad económica, que todavía no existe. A estos seis sectores se suma el turismo, por su peso en la economía panameña y por los flujos de residuos, agua y energía que generan el alojamiento, la provisión de alimentos y bebidas y las actividades recreativas. Para delimitarlo usamos la lista de actividades características del turismo de la Cuenta Satélite de Turismo [@un2010CST2008, cuadro 3.1, p. 27], que es el estándar internacional para medir la oferta turística. Por eso la equivalencia con las actividades del Sistema de Cuentas Nacionales (SCN) es un trabajo propio de este análisis y se documenta aquí para que pueda revisarse y corregirse.
 
 ## Regla de asignación
 
@@ -180,18 +180,27 @@ asignacion <- tribble(
   "36.2", "Ciudades y construcción", "", "Núcleo", "Fuente", "HR p. 30, 48, 57; RB p. 66-68",
   "36.3", "Ciudades y construcción", "", "Núcleo", "Fuente", "HR p. 30, 48, 57; RB p. 66-68",
 
+  # Turismo (actividades características, CST 2008, cuadro 3.1)
+  "39.3", "Turismo", "Energía", "Intensivo", "Fuente", "CST cuadro 3.1, cat. 6",
+  "40.1", "Turismo", "Residuos; Recursos hídricos; Energía", "Intensivo", "Fuente", "CST cuadro 3.1, cat. 1; Ley 187, art. 9",
+  "40.2", "Turismo", "Residuos; Agricultura y alimentos", "Intensivo", "Fuente", "CST cuadro 3.1, cat. 2; HR p. 56; Ley 33, art. 34; Ley 187, art. 9",
+  "47.1", "Turismo", "Residuos", "Intensivo", "Fuente", "CST cuadro 3.1, cat. 9 y 10",
+
   # Comercio, transporte y servicios con vínculo
   "37.1", "Resto de la economía", "Residuos", "Habilitante", "Inferido", "HR p. 42-43 (puntos de retorno)",
   "38.1", "Resto de la economía", "Residuos; Agricultura y alimentos", "Habilitante", "Fuente", "HR p. 42-43, 56",
-  "38.2", "Resto de la economía", "Residuos; Agricultura y alimentos", "Habilitante", "Fuente", "HR p. 42-43, 56; Ley 187, art. 7",
+  "38.2", "Resto de la economía", "Residuos; Agricultura y alimentos; Turismo", "Habilitante", "Fuente", "HR p. 42-43, 56; Ley 187, art. 7",
   "38.3", "Resto de la economía", "Industrias", "Habilitante", "Fuente", "Ley 502, art. 5 (reparación y mantenimiento)",
-  "39.1", "Resto de la economía", "Energía; Ciudades y construcción", "Intensivo", "Fuente", "HR p. 30; RB p. 50, 54",
+  "39.1", "Resto de la economía", "Energía; Ciudades y construcción; Turismo", "Intensivo", "Fuente", "HR p. 30; RB p. 50, 54",
   "39.4", "Resto de la economía", "Energía; Agricultura y alimentos", "Intensivo", "Fuente", "RB p. 50, 54",
+  "39.2", "Resto de la economía", "Turismo", "Habilitante", "Fuente", "CST cuadro 3.1, cat. 5 (pasajeros; la actividad es sobre todo de carga)",
   "39.5", "Resto de la economía", "Recursos hídricos", "Intensivo", "Fuente", "RB p. 56; Ley 33, art. 2",
-  "40.2", "Resto de la economía", "Residuos; Agricultura y alimentos", "Intensivo", "Fuente", "HR p. 56; Ley 33, art. 34; Ley 187, art. 9",
+  "39.7", "Resto de la economía", "Turismo", "Habilitante", "Fuente", "CST cuadro 3.1, cat. 6 (apoyo al transporte aéreo)",
   "42.1", "Resto de la economía", "Transversal", "Habilitante", "Fuente", "Ley 502, art. 2.6; HR p. 46",
+  "43.1", "Resto de la economía", "Turismo", "Habilitante", "Fuente", "CST cuadro 3.1, cat. 1 (viviendas alquiladas a visitantes)",
   "44.2", "Resto de la economía", "Ciudades y construcción", "Habilitante", "Inferido", "RB p. 67-68",
   "44.3", "Resto de la economía", "Transversal", "Habilitante", "Fuente", "Ley 502, art. 4; HR p. 40",
+  "44.6", "Resto de la economía", "Turismo", "Habilitante", "Fuente", "CST cuadro 3.1, cat. 7 y 8 (alquiler de equipo y agencias de viajes)",
   "45.1", "Resto de la economía", "Transversal", "Habilitante", "Fuente", "Ley 502, art. 7; HR p. 40",
   "48.1", "Resto de la economía", "Industrias", "Habilitante", "Inferido", "Ley 502, art. 5 (reparación)",
   "50.1", "Resto de la economía", "Ciudades y construcción", "Habilitante", "Fuente", "HR p. 48-49; Ley 502, art. 12"
@@ -199,6 +208,8 @@ asignacion <- tribble(
 
 nrow(asignacion)
 ```
+
+El sector Turismo reúne las actividades del SCN que coinciden por completo con una categoría característica del turismo y que en la matriz insumo-producto tienen un código propio, de modo que la suma por sector no duplica valores. Son el alojamiento (40.1, categoría 1), la provisión de alimentos y bebidas (40.2, categoría 2), el transporte aéreo (39.3, categoría 6), que en Panamá es sobre todo de pasajeros por el centro de conexiones de Tocumen, y las actividades artísticas, de entretenimiento y recreativas (47.1, categorías 9 y 10), que incluyen los juegos de azar y los casinos. Otras actividades atienden a visitantes, pero su producción es mayoritariamente de otro tipo o comparte código de la matriz con actividades no turísticas: el transporte terrestre (39.1) y por agua (39.2) llevan sobre todo carga, los aeropuertos (39.7) son un servicio de apoyo, las agencias de viajes están dentro de los servicios administrativos (44.6) y el comercio al por menor (38.2) comparte código con el comercio de zona franca y al por mayor. Esas actividades quedan en "Resto de la economía" con Turismo como sector secundario.
 
 Las actividades que no aparecen en `asignacion` se asignan a "Resto de la economía" con tipo "Sin vínculo directo". La minería (`13.1`) queda aquí porque ninguna fuente de la política la menciona, aunque suministra áridos a la construcción; el análisis de materiales la retomará.
 
@@ -252,9 +263,24 @@ sum(is.na(mapeo$cod_mip))
 # Códigos de la asignación que no existen en el SCN
 setdiff(asignacion$cod_scn, actividades$cod_scn)
 
-# Una fila por actividad
-anyDuplicated(mapeo$cod_scn)
+# Una fila por actividad, sin códigos repetidos en el puente ni en la asignación
+stopifnot(
+  anyDuplicated(mapeo$cod_scn) == 0,
+  anyDuplicated(puente_mip$cod_scn) == 0,
+  anyDuplicated(asignacion$cod_scn) == 0,
+  nrow(mapeo) == 80
+)
+
+# Cada código de la matriz pertenece a un solo sector principal
+mip_varios_sectores <- mapeo |>
+  distinct(cod_mip, sector_principal) |>
+  count(cod_mip) |>
+  filter(n > 1)
+stopifnot(nrow(mip_varios_sectores) == 0)
+n_distinct(mapeo$cod_mip)
 ```
+
+La última comprobación asegura que los sectores son mutuamente excluyentes también en la matriz insumo-producto: ninguno de sus 76 códigos queda repartido entre dos sectores.
 
 La siguiente tabla resume cuántas actividades quedan en cada sector principal.
 

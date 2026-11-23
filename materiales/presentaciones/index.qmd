@@ -6,4 +6,6 @@ toc: false
 
 Presentaciones de la consultoría.
 
-- [Sectores priorizados, metodología y plan de trabajo](sectores-metodologia-plan/index.qmd): qué muestran los datos de los seis sectores de política, por qué se proponen los instrumentos, cómo se evalúan y qué sigue.
+- [Sectores priorizados, metodología y plan de trabajo](sectores-metodologia-plan/index.qmd): qué muestran los datos de los siete sectores de política, por qué se proponen los instrumentos, cómo se evalúan y qué sigue.
+- [Factibilidad de los instrumentos](factibilidad/index.qmd): factibilidad política y técnica, efectos por sector, capacidades institucionales y sistema financiero.
+- [Hoja de Ruta Nacional para el Financiamiento de la Economía Circular](hoja-de-ruta/index.qmd): diseño de los instrumentos, montos, actores, fuentes, reformas e indicadores.

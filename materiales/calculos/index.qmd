@@ -6,7 +6,7 @@ toc: false
 
 Las memorias de cálculo documentan, con código en R y texto breve, cómo se construyó cada base de datos que sustenta los documentos. Cada una indica sus fuentes, explica los supuestos y exporta su resultado para que el cálculo pueda reproducirse y revisarse.
 
-- [C1. Mapeo de sectores](c01-mapeo-sectores/index.qmd): equivalencia entre los seis sectores de política de la Hoja de Ruta y las actividades de las cuentas nacionales.
+- [C1. Mapeo de sectores](c01-mapeo-sectores/index.qmd): equivalencia entre los siete sectores de política (los seis de la Hoja de Ruta y el turismo) y las actividades de las cuentas nacionales.
 - [C2. Cuentas por actividad y sector](c02-cuentas-sectoriales/index.qmd): producción, valor agregado y comercio exterior de 2018 a 2024.
 - [C3. Empleo, género e informalidad](c03-empleo-sectorial/index.qmd): puestos de trabajo, remuneración y estimación de participación femenina e informalidad.
 - [C4. Eslabonamientos](c04-eslabonamientos/index.qmd): encadenamientos y multiplicadores con la matriz insumo-producto de 2018.
@@ -15,3 +15,8 @@ Las memorias de cálculo documentan, con código en R y texto breve, cómo se co
 - [C7. Inversión y estructura empresarial](c07-inversion-y-estructura-empresarial/index.qmd): inversión extranjera directa y tamaño de las empresas por sector.
 - [C8. Base sectorial integrada](c08-base-sectorial-integrada/index.qmd): integración de todos los indicadores y matriz de relevancia sectorial.
 - [C9. Formación bruta de capital](c09-formacion-bruta-capital/index.qmd): FBKF por producto, sector de origen del bien y estimación por actividad que invierte.
+- [C10. Fichas y factibilidad de los instrumentos](c10-fichas-instrumentos/index.qmd): ficha normalizada y evaluación con siete criterios de los catorce instrumentos, con análisis de sensibilidad de los pesos.
+- [C11. Modelo de precios](c11-modelo-precios/index.qmd): traslado a precios de los cargos sobre productos con la matriz insumo-producto de 2018.
+- [C12. Capacidades institucionales](c12-capacidades-institucionales/index.qmd): matriz de funciones por institución con su base legal.
+- [C13. Sistema financiero](c13-sistema-financiero/index.qmd): cartera de crédito por sector, emisiones temáticas y mapa de actores.
+- [C14. Hoja de Ruta](c14-hoja-de-ruta/index.qmd): diseño de los instrumentos, fuentes de financiamiento, reformas e indicadores.
