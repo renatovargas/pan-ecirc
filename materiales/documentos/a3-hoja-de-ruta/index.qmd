@@ -1,6 +1,6 @@
 ---
 title: "Hoja de Ruta Nacional para el Financiamiento de la Economía Circular en Panamá"
-subtitle: "Diseño de instrumentos, actores y roles, fuentes de financiamiento, reformas e indicadores"
+subtitle: "Diseño de instrumentos, pasos de implementación, actores y roles, fuentes de financiamiento, reformas e indicadores"
 author:
   - name: "Renato Vargas"
     affiliation: "Consultor para la Comisión Económica para América Latina y el Caribe (CEPAL)"
@@ -44,30 +44,69 @@ source("materiales/calculos/scripts/funciones_comunes.R")
 
 diseno <- leer_salida("hoja_ruta_instrumentos")
 rep <- leer_salida("hoja_ruta_rep_trayectoria")
+rep_anual <- leer_salida("hoja_ruta_rep_anual")
 fuentes <- leer_salida("hoja_ruta_fuentes_financiamiento")
 reformas <- leer_salida("hoja_ruta_reformas")
 indicadores <- leer_salida("hoja_ruta_indicadores")
-capacidades <- leer_salida("capacidades_institucionales")
+pasos <- leer_salida("hoja_ruta_pasos")
+roles <- leer_salida("hoja_ruta_roles")
+riesgos <- leer_salida("hoja_ruta_riesgos")
+montos <- leer_salida("hoja_ruta_montos")
+normas <- leer_salida("hoja_ruta_contenido_normas")
+aseo <- leer_salida("hoja_ruta_aseo_finanzas")
+personal <- leer_salida("capacidades_personal_2026")
 precios_hogares <- leer_salida("incidencia_precios_hogares_mip2018")
 composicion <- leer_salida("residuos_composicion_2021")
 otros_res <- leer_salida("residuos_otros_indicadores")
 
+corto <- tibble(
+  id = 1:14,
+  nombre = c("Registro de productores", "Recicladores de base", "REP de envases", "Ecomodulación",
+             "Depósito y retorno", "Contenido reciclado", "Tarifa de aseo", "Incentivos fiscales",
+             "Compras públicas", "Taxonomía", "Bonos soberanos", "Garantías y crédito",
+             "APP de residuos", "Formación y certificación")
+)
+ejes <- leer_salida("factibilidad_impacto_facilidad") |> left_join(corto, by = "id")
+
+diseno <- diseno |>
+  left_join(corto, by = "id") |>
+  mutate(etapa = if_else(anio_inicio == 2027, "Primer paso (2027)", "Segundo paso (2028-2030)"))
+
 hog <- function(esc) precios_hogares$variacion_canasta_pct[precios_hogares$escenario == esc]
 t_rcd <- otros_res |> filter(str_starts(indicador, "Construcción")) |> pull(valor)
+cobertura_rec <- otros_res |> filter(str_detect(indicador, "Cobertura")) |> pull(valor)
 rsm_mt <- sum(composicion$toneladas_anio) / 1e6
+envases <- c("Plástico", "Papel y cartón", "Vidrio", "Metal")
+t_envases <- sum(composicion$toneladas_anio[composicion$material %in% envases])
+pct_envases <- 100 * t_envases / sum(composicion$toneladas_anio)
+ra <- function(a, v) rep_anual[[v]][rep_anual$anio == a]
+pers <- function(i) formato_es(personal$funcionarios[personal$institucion == i], 0)
+n_pasos <- function(i) sum(pasos$id == i)
+colores_etapa <- c("Primer paso (2027)" = "#2E8B57", "Segundo paso (2028-2030)" = "#009EDB")
+
+plazo_texto <- function(a, s) paste0(a, ", ", if_else(s == 1, "primer", "segundo"), " semestre")
+
+tabla_pasos <- function(i) {
+  pasos |>
+    filter(id == i) |>
+    arrange(orden) |>
+    transmute(Paso = orden, Acción = accion, Responsable = responsable,
+              Vehículo = vehiculo, Plazo = plazo_texto(anio, semestre)) |>
+    tabla_ft_es(digitos = 0, enteros = "Paso", anchos_cm = c(1.1, 7.3, 3.6, 3, 2.4), lineas_tenues = TRUE, tamano = 7)
+}
 ```
 
 # Resumen ejecutivo {.unnumbered}
 
-La transición hacia una economía circular, en la que los materiales se mantienen en uso en lugar de terminar en un relleno sanitario, necesita dinero. Hace falta pagar la recolección separada de los residuos, su clasificación y su reciclaje, invertir en plantas y equipos y dar acceso al crédito a los recicladores y a las pequeñas empresas que quieren participar. Esta Hoja de Ruta propone cómo movilizar esos recursos en Panamá entre 2027 y 2030 por medio de catorce instrumentos económicos y financieros. Para cada uno define parámetros de diseño, una meta, la institución responsable, la norma legal necesaria, un año de inicio y una fuente de recursos.
+La transición hacia una economía circular, en la que los materiales se mantienen en uso en lugar de terminar en un relleno sanitario, necesita dinero. Hace falta pagar la recolección separada de los residuos, su clasificación y su reciclaje, invertir en plantas y equipos y dar acceso al crédito a los recicladores y a las pequeñas empresas que quieren participar. Hoy ese dinero no alcanza. El servicio de aseo de la región metropolitana recauda poco más de la mitad de lo que cuesta, y el sistema de residuos no recibe ningún aporte de quienes ponen en el mercado los productos que se convierten en residuo. Esta Hoja de Ruta propone cómo movilizar esos recursos en Panamá entre 2027 y 2030 por medio de catorce instrumentos económicos y financieros, y funciona como un manual para las instituciones que deben aplicarlos. Para cada instrumento explica qué es y cómo funciona, quién hace qué, los pasos de su implementación con su responsable y su plazo, cuánto cuesta y quién paga, qué riesgos tiene y cómo se medirá.
 
-La propuesta parte de dos estudios previos. El primero caracterizó con estadísticas oficiales los siete sectores de la economía donde la circularidad es más relevante, que son los seis que prioriza la Hoja de Ruta de Economía Circular del Ministerio de Ambiente y el turismo, y propuso los catorce instrumentos [@vargas2026SectoresPriorizados]. El segundo evaluó su factibilidad y concluyó que casi todas las facultades legales que requieren ya existen en leyes vigentes, aunque faltan los reglamentos que las pongan en operación [@vargas2026Factibilidad].
+La propuesta parte de dos estudios previos. El primero caracterizó con estadísticas oficiales los siete sectores de política donde la circularidad es más relevante, que son los seis que prioriza la Hoja de Ruta de Economía Circular del Ministerio de Ambiente y el turismo, y propuso los catorce instrumentos [@vargas2026SectoresPriorizados]. El segundo evaluó su factibilidad y concluyó que casi todas las facultades legales que requieren ya existen en leyes vigentes, aunque faltan los reglamentos que las pongan en operación [@vargas2026Factibilidad].
 
 La Hoja de Ruta descansa en tres decisiones de diseño. La primera es usar las instituciones y las leyes que ya existen antes que crear nuevas. La Ley 276 de 2021 ya hace de la Autoridad de Aseo Urbano y Domiciliario (AAUD) la institución que propone las normas de responsabilidad extendida del productor (REP), el mecanismo que obliga a quien vende un producto a financiar su gestión cuando se convierte en residuo, y que autoriza los sistemas de depósito y retorno de envases [@panama2021Ley276, art. 74]. La Ley 502 de 2025 encarga al Ministerio de Ambiente la plataforma de indicadores y la reglamentación de la ley [@panama2025Ley502, arts. 11 y 13], y la Dirección General de Contrataciones Públicas ya tiene el mandato de incluir criterios de economía circular en las compras del Estado [@panama2025Ley502, art. 12]. La segunda decisión es empezar por lo que habilita todo lo demás, que es un registro de productores e importadores alimentado por las declaraciones de aduana. La tercera es que los instrumentos se financien sobre todo con aportes de quienes ponen productos en el mercado y de quienes usan el servicio de aseo, con apoyo de la banca multilateral para el crédito y las garantías.
 
-Los instrumentos se ordenan en dos pasos. El primer paso, en 2027, crea las condiciones. Incluye el reglamento de la Ley 502 con el registro y la plataforma de indicadores, el registro de los recicladores de base como gestores de residuos, el reglamento de los incentivos fiscales que ya otorgan las leyes, criterios circulares en las compras públicas, una ventana para proyectos circulares en el Fondo de Garantías de Panamá, la tarifa de aseo a costo real escalonada según el nivel socioeconómico, y programas de formación y certificación que incluyen el turismo sostenible. El segundo paso, entre 2028 y 2030, introduce las metas y los cargos. Incluye la REP de envases, con metas de valorización que empiezan en 10 % y llegan a 45 % al décimo año, el depósito y retorno de envases de bebidas, normas de contenido reciclado, una segunda edición de la taxonomía de finanzas sostenibles con criterios circulares, una primera emisión de bonos soberanos para proyectos de residuos y agua, la asociación público-privada de residuos de Panamá y San Miguelito y, al final, la ecomodulación de las contribuciones de la REP.
+Los instrumentos se ordenan en dos pasos y forman tres cadenas de dependencia. El primer paso, en 2027, crea las condiciones con siete instrumentos que solo requieren reglamentos y resoluciones: el registro de productores, el registro de los recicladores de base, la tarifa de aseo a costo real escalonada según el nivel socioeconómico, el reglamento de los incentivos fiscales vigentes, los criterios circulares en las compras públicas, una ventana circular en el Fondo de Garantías de Panamá y la formación y certificación. El segundo paso, entre 2028 y 2030, introduce las metas y los cargos. Incluye la REP de envases, con metas de valorización que empiezan en 10 % y llegan a 45 % al décimo año, el depósito y retorno de envases de bebidas, normas de contenido reciclado, una segunda edición de la taxonomía de finanzas sostenibles, una primera emisión de bonos soberanos para proyectos de residuos y agua, la asociación público-privada de residuos de Panamá y San Miguelito y, al final, la ecomodulación de las contribuciones de la REP. Los `r nrow(pasos)` pasos de implementación de este documento asignan a cada acción un responsable, un vehículo legal y un semestre.
 
-Los montos de referencia muestran que los instrumentos movilizarían recursos considerables con un costo pequeño para los hogares. La REP de envases movilizaría entre `r formato_es(rep$costo_min_musd[1], 0)` y `r formato_es(rep$costo_max_musd[1], 0)` millones de dólares en su primer año de operación, aportados por productores e importadores, y entre `r formato_es(rep$costo_min_musd[3], 0)` y `r formato_es(rep$costo_max_musd[3], 0)` millones al décimo año. La tarifa de aseo a costo real cerraría una brecha anual de B/.25,4 millones entre lo que la AAUD recauda y lo que gasta [@estrella2026AAUDMorosidad]. Una tasa de B/.10 por tonelada de residuos de construcción recaudaría hasta B/.`r formato_es(10 * t_rcd / 1e6, 1)` millones al año. Aun si todo el cargo se trasladara a los precios, el costo de la canasta de consumo de los hogares subiría `r formato_es(hog("rep_envases"), 2)` % por cada punto porcentual de contribución de REP y `r formato_es(hog("aseo"), 2)` % por el cierre de la brecha del aseo [@vargas2026Factibilidad].
+Los montos de referencia muestran que los instrumentos movilizarían recursos considerables con un costo pequeño para los hogares. La REP de envases movilizaría entre `r formato_es(rep$costo_min_musd[1], 0)` y `r formato_es(rep$costo_max_musd[1], 0)` millones de dólares en su primer año de operación, aportados por productores e importadores, y entre `r formato_es(rep$costo_min_musd[3], 0)` y `r formato_es(rep$costo_max_musd[3], 0)` millones al décimo año. En promedio, eso equivale a entre `r formato_es(ra(2028, "envase20g_min_centavos"), 2)` y `r formato_es(ra(2028, "envase20g_max_centavos"), 2)` centavos de dólar por un envase de 20 gramos en el primer año. La tarifa de aseo a costo real cerraría una brecha anual de B/.25,4 millones entre lo que la AAUD recauda y lo que gasta [@estrella2026AAUDMorosidad]. Una tasa de B/.10 por tonelada de residuos de construcción recaudaría hasta B/.`r formato_es(10 * t_rcd / 1e6, 1)` millones al año. Aun si todo el cargo se trasladara a los precios, el costo de la canasta de consumo de los hogares subiría `r formato_es(hog("rep_envases"), 2)` % por cada punto porcentual de contribución de REP y `r formato_es(hog("aseo"), 2)` % por el cierre de la brecha del aseo [@vargas2026Factibilidad].
 
 Para lograrlo hacen falta una ley de REP con metas, sistemas colectivos de productores, sanciones y un depósito obligatorio; cuatro decretos que reglamenten las leyes 502, 276 y 223; resoluciones de la AAUD, de la Dirección General de Contrataciones Públicas y del Ministerio de Comercio e Industrias; acuerdos de las superintendencias para la taxonomía y acuerdos municipales para las tasas. El avance se medirá con catorce indicadores alineados con la plataforma que ordena la Ley 502, y el Ministerio de Ambiente los reportará cada tres años.
 
@@ -75,18 +114,45 @@ Para lograrlo hacen falta una ley de REP con metas, sistemas colectivos de produ
 
 **Cuadros**
 
+- @tbl-siglas: Glosario de siglas
+- @tbl-lectura: Estructura de cada ficha de instrumento
+- @tbl-hitos: Calendario de hitos
 - @tbl-diseno: Diseño de los instrumentos
+- @tbl-pasos-registro: Pasos del registro de productores e importadores
+- @tbl-pasos-recicladores: Pasos de la formalización de los recicladores de base
+- @tbl-pasos-tarifa: Pasos de la tarifa de aseo a costo real
+- @tbl-pasos-incentivos: Pasos de los incentivos fiscales
+- @tbl-pasos-compras: Pasos de las compras públicas circulares
+- @tbl-pasos-garantias: Pasos de la ventana circular del Fondo de Garantías
+- @tbl-pasos-formacion: Pasos de la formación, la certificación y la información
 - @tbl-rep: Trayectoria de la REP de envases
-- @tbl-roles: Actores y roles por instrumento
+- @tbl-pasos-rep: Pasos de la REP de envases
+- @tbl-pasos-taxonomia: Pasos de la segunda edición de la taxonomía
+- @tbl-pasos-deposito: Pasos del depósito y retorno
+- @tbl-pasos-contenido: Pasos del contenido reciclado
+- @tbl-pasos-bonos: Pasos de la emisión soberana temática
+- @tbl-pasos-app: Pasos de la APP de residuos
+- @tbl-pasos-ecomodulacion: Pasos de la ecomodulación
+- @tbl-montos: Montos anuales de referencia por fuente
 - @tbl-fuentes: Fuentes de financiamiento
 - @tbl-reformas: Reformas normativas por nivel jurídico
+- @tbl-ley-rep: Contenido mínimo de la ley de REP
+- @tbl-reglamento: Contenido mínimo del reglamento de la Ley 502
+- @tbl-riesgos: Riesgos y medidas de mitigación
 - @tbl-articulacion: Articulación con la Ley 502 y otros instrumentos nacionales
 - @tbl-indicadores: Indicadores de seguimiento
-- @tbl-siglas: Glosario de siglas
 
 **Figuras**
 
-- @fig-cronograma: Cronograma de entrada en vigor de los instrumentos
+- @fig-composicion: Composición de los residuos municipales
+- @fig-leyes: Leyes y políticas que forman el marco de la Hoja de Ruta
+- @fig-impacto-facilidad: Impacto y facilidad de aplicación de los instrumentos
+- @fig-cadenas: Las tres cadenas de dependencia entre instrumentos
+- @fig-cronograma: Cronograma de preparación y operación de los instrumentos
+- @fig-aseo: Finanzas del servicio de aseo de la AAUD
+- @fig-flujos-rep: Cómo funciona la REP de envases
+- @fig-rep-trayectoria: Metas y costo anual de la REP de envases
+- @fig-roles: Actores que lideran y participan en cada instrumento
 
 # Glosario de siglas {.unnumbered}
 
@@ -106,12 +172,16 @@ tribble(
   "BID", "Banco Interamericano de Desarrollo",
   "CEPAL", "Comisión Económica para América Latina y el Caribe",
   "DGCP", "Dirección General de Contrataciones Públicas",
+  "DGI", "Dirección General de Ingresos",
   "DGNTI", "Dirección General de Normas y Tecnología Industrial",
+  "INADEH", "Instituto Nacional de Formación Profesional y Capacitación para el Desarrollo Humano",
+  "ITBMS", "Impuesto de transferencia de bienes muebles y servicios",
   "MEF", "Ministerio de Economía y Finanzas",
   "MiAMBIENTE", "Ministerio de Ambiente",
   "MICI", "Ministerio de Comercio e Industrias",
   "MINSA", "Ministerio de Salud",
   "OCDE", "Organización para la Cooperación y el Desarrollo Económicos",
+  "PET", "Tereftalato de polietileno",
   "REP", "Responsabilidad extendida del productor",
   "SBP", "Superintendencia de Bancos de Panamá",
   "SINIA", "Sistema Nacional de Información Ambiental",
@@ -123,50 +193,279 @@ tribble(
 
 # Introducción
 
-Panamá decidió el rumbo de su transición hacia la economía circular con la Ley 502 de 2025, que declara la REP como uno de sus mecanismos y ordena un Plan Estratégico Nacional de Economía Circular [@panama2025Ley502, arts. 2 y 10]. Una ley marco como esa fija objetivos, pero no dice cuánto costará alcanzarlos, quién pagará ni por medio de qué instituciones. Esta Hoja de Ruta responde esas preguntas. Propone un conjunto de instrumentos económicos y financieros, los diseña para la realidad institucional, legal y financiera del país, y los ordena en el tiempo.
+Panamá decidió el rumbo de su transición hacia la economía circular con la Ley 502 de 2025, que declara la REP como uno de sus mecanismos y ordena un Plan Estratégico Nacional de Economía Circular [@panama2025Ley502, arts. 2 y 10]. Una ley marco como esa fija objetivos, pero no dice cuánto costará alcanzarlos, quién pagará ni por medio de qué instituciones. Esta Hoja de Ruta responde esas preguntas. Propone un conjunto de instrumentos económicos y financieros, los diseña para la realidad institucional, legal y financiera del país, los ordena en el tiempo y descompone cada uno en pasos concretos.
 
-La Hoja de Ruta es el tercer documento de una secuencia. El primero relacionó las actividades económicas de las cuentas nacionales con siete sectores de política, caracterizó cada uno con indicadores de producción, empleo, comercio, emisiones y residuos, y propuso catorce instrumentos [@vargas2026SectoresPriorizados]. El segundo evaluó la factibilidad política y técnica de esos instrumentos, estimó su efecto sobre los precios, revisó las capacidades de las instituciones públicas y analizó el sistema financiero [@vargas2026Factibilidad]. Este documento toma los resultados de ambos y los convierte en un plan de acción.
-
-El documento se organiza en siete partes. Después de los objetivos y de un resumen de los antecedentes, presenta el diseño de cada instrumento con sus montos de referencia, los actores y sus roles, las fuentes de financiamiento, las reformas normativas necesarias, la articulación con la Ley 502 y con otras políticas nacionales, y los indicadores de seguimiento.
+La Hoja de Ruta es el tercer documento de una secuencia. El primero relacionó las 80 actividades económicas de las cuentas nacionales con siete sectores de política, caracterizó cada uno con indicadores de producción, empleo, comercio, emisiones y residuos, y propuso catorce instrumentos [@vargas2026SectoresPriorizados]. El segundo evaluó la factibilidad política y técnica de esos instrumentos, estimó su efecto sobre los precios, revisó las capacidades de las instituciones públicas y analizó el sistema financiero [@vargas2026Factibilidad]. Este documento toma los resultados de ambos y los convierte en un plan de acción. Para que pueda leerse sin consultar los anteriores, la sección de antecedentes resume lo que hace falta saber de ellos.
 
 El documento forma parte de la cooperación técnica que la CEPAL presta al Ministerio de Ambiente, financiada por el programa CEPAL-BMZ/GIZ "Promoviendo la Economía Circular". Sus cálculos se documentan en memorias de cálculo públicas.[^memorias]
 
 [^memorias]: Las memorias de cálculo están disponibles en <https://renatovargas.github.io/pan-ecirc/materiales/calculos/>. Las de este documento son la 10 a la 14.
 
+## Cómo usar esta Hoja de Ruta
+
+El documento está pensado para que cada institución encuentre rápido lo que le toca. Las secciones de antecedentes y de arquitectura explican por qué se proponen estos instrumentos y en qué orden. Después, cada instrumento tiene su propia ficha dentro del paso al que pertenece. Como muestra el @tbl-lectura, todas las fichas siguen la misma estructura, de modo que quien busca, por ejemplo, qué debe hacer la aduana o cuánto pagará un productor encuentra la respuesta en el mismo lugar de cada ficha. Las secciones finales reúnen lo transversal, que son los actores y sus roles, las fuentes de financiamiento, las reformas normativas, los riesgos, la articulación con otras políticas y los indicadores.
+
+```{r}
+#| label: tbl-lectura
+#| tbl-cap: "Estructura de cada ficha de instrumento"
+
+tribble(
+  ~Elemento, ~`Pregunta que responde`,
+  "Qué es y para qué sirve", "Qué problema resuelve el instrumento y cuál es su mecanismo",
+  "Cómo funciona en Panamá", "Qué parámetros tiene, sobre qué ley se apoya y qué particularidades institucionales importan",
+  "Cuánto cuesta y quién paga", "Monto de referencia y fuente de los recursos",
+  "Riesgos", "Qué puede salir mal y cómo evitarlo",
+  "Pasos", "Qué acción concreta, a cargo de quién, con qué norma y en qué semestre"
+) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(5, 12.4), lineas_tenues = TRUE)
+```
+
+*Fuente: elaboración propia.*
+
 # Objetivos
 
 ## Objetivo general
 
-Definir y diseñar los instrumentos económicos y financieros, aplicables a la realidad de Panamá, que pueden potenciar las iniciativas de economía circular, con sus responsables, fuentes de financiamiento, reformas normativas e indicadores de seguimiento.
+Definir y diseñar los instrumentos económicos y financieros, aplicables a la realidad de Panamá, que pueden potenciar las iniciativas de economía circular, con sus responsables, pasos de implementación, fuentes de financiamiento, reformas normativas e indicadores de seguimiento.
 
 ## Objetivos específicos
 
 1. Diseñar cada instrumento, incluida la REP, con parámetros, metas, montos de referencia y año de entrada en vigor.
-2. Asignar los roles de los actores públicos y privados en la implementación, el monitoreo y la evaluación de los instrumentos.
-3. Identificar las fuentes de financiamiento nacionales e internacionales, públicas y privadas.
-4. Identificar las reformas normativas e institucionales necesarias según su nivel jurídico.
-5. Proponer indicadores para dar seguimiento al desempeño y al impacto de los instrumentos.
-6. Articular la propuesta con la Ley 502 y con los demás instrumentos nacionales de política.
+2. Descomponer cada instrumento en pasos de implementación con responsable, vehículo legal y plazo.
+3. Asignar los roles de los actores públicos y privados en la implementación, el monitoreo y la evaluación de los instrumentos.
+4. Identificar las fuentes de financiamiento nacionales e internacionales, públicas y privadas.
+5. Identificar las reformas normativas e institucionales necesarias según su nivel jurídico.
+6. Proponer indicadores para dar seguimiento al desempeño y al impacto de los instrumentos.
+7. Articular la propuesta con la Ley 502 y con los demás instrumentos nacionales de política.
 
 # Antecedentes
 
-## Lo que muestran los datos de la economía
+## Por qué hace falta financiar la economía circular
 
-El estudio sectorial documentó seis rasgos de la economía panameña que orientan el diseño de los instrumentos [@vargas2026SectoresPriorizados]. El primero es el volumen de residuos, pues el país genera `r formato_es(rsm_mt, 2)` millones de toneladas de residuos municipales al año [@worldbank2026wwaste], y los materiales de envase (plástico, papel y cartón, vidrio y metal) suman hasta 38 % de ese peso. El segundo es que los sectores que pondrían productos en el mercado importan más de lo que exportan, de modo que quienes paguen la REP serán en buena parte importadores, y el instrumento tiene que apoyarse en la aduana. El tercero es la informalidad, que supera 60 % del empleo en los sectores con más trabajadores, lo que obliga a acompañar los cargos con crédito y apoyo técnico. El cuarto es el peso de la construcción, que es el mayor sector de política por valor agregado y genera más de un millón de toneladas de residuos de obra al año. El quinto es que la energía y el agua, aunque pequeñas en las cuentas nacionales, atraen inversión y ya tienen marcos de financiamiento. El sexto es el turismo, que es el principal exportador entre los sectores de política, emplea a más mujeres que hombres y está formado en su mayoría por microempresas.
+Panamá genera `r formato_es(rsm_mt, 2)` millones de toneladas de residuos municipales al año, y su sistema de recolección cubre `r formato_es(cobertura_rec, 0)` % de ese peso [@worldbank2026wwaste]. El resto se quema, se entierra o termina en ríos, quebradas y playas. Lo que sí se recolecta va en su mayoría a rellenos sanitarios, de modo que materiales con valor, como el plástico, el papel o el aluminio, salen de la economía después de un solo uso. Como muestra la @fig-composicion, los residuos orgánicos son la fracción más grande, pero los cuatro materiales de envase (plástico, papel y cartón, vidrio y metal) suman `r formato_es(pct_envases, 0)` % del peso, unas `r formato_es(t_envases / 1000, 0)` mil toneladas al año. Esa fracción es la que la REP de envases y el depósito buscan devolver a la producción.
 
-## Lo que muestra la evaluación de factibilidad
+```{r}
+#| label: fig-composicion
+#| fig-cap: "Composición de los residuos municipales por material (% del peso)"
+#| fig-width: 7
+#| fig-height: 3.6
 
-La evaluación de factibilidad calificó cada instrumento con siete criterios, que incluyen su impacto, su factibilidad técnica, institucional, política y financiera, el tiempo que toma aplicarlo y su efecto sobre la equidad [@vargas2026Factibilidad]. Sus resultados principales son cuatro. El marco legal vigente permite iniciar doce de los catorce instrumentos con decretos, resoluciones o acuerdos, sin una ley nueva. La REP y el depósito pueden empezar con resoluciones de la AAUD, porque la Ley 276 de 2021 le dio esa facultad [@panama2021Ley276, art. 74], aunque las metas con sanciones propias y un depósito obligatorio tendrían una base más sólida en una ley específica, como recomienda la Hoja de Ruta de plásticos que el Ministerio de Ambiente adoptó en 2026 [@miambiente2026ResDM0351]. La AAUD es la institución con las funciones legales más completas para los instrumentos de residuos, pero recauda poco más de la mitad de lo que gasta [@estrella2026AAUDMorosidad]. Por último, el sistema financiero tiene una arquitectura de finanzas sostenibles, pero su taxonomía todavía no tiene criterios para reconocer una inversión como circular [@sbp2025GuiaTFSBancos].
+composicion |>
+  mutate(tipo = if_else(material %in% envases, "Material de envase", "Otros materiales"),
+         material = fct_reorder(material, porcentaje)) |>
+  ggplot(aes(x = porcentaje, y = material, fill = tipo)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = formato_es(porcentaje, 1)), hjust = -0.15, size = 3) +
+  scale_fill_manual(values = c("Material de envase" = "#8C564B", "Otros materiales" = "#C8C8C8")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(x = "Porcentaje del peso", y = NULL) +
+  tema_grafico()
+```
 
-# Diseño de los instrumentos
+*Fuente: elaboración propia con datos del Banco Mundial [@worldbank2026wwaste].*
+
+Recuperar esos materiales cuesta dinero, y hoy nadie paga lo suficiente. El Plan Nacional de Gestión Integral de Residuos estimó en 2017 que un modelo moderno de gestión costaría en promedio B/.84,31 por tonelada, de los cuales la venta de materiales y energía cubriría unos B/.15, y constató que el sistema de residuos no recibía ningún financiamiento de la REP [@aaud2017PNGIR, pp. 123 y 266]. En la región metropolitana, la AAUD recaudó en 2025 B/.35,2 millones por la tasa de aseo y gastó B/.60,6 millones [@estrella2026AAUDMorosidad]. Los instrumentos de esta Hoja de Ruta existen para cerrar esa brecha haciendo que quienes ponen productos en el mercado paguen la gestión de sus residuos y que el servicio de aseo cobre lo que cuesta, y, además, abriendo el acceso al crédito a quienes invierten en recuperar materiales.
+
+## Los sectores de política
+
+El estudio sectorial agrupó las actividades económicas en siete sectores de política, que son los seis de la Hoja de Ruta de Economía Circular (residuos; energía; recursos hídricos; industrias; agricultura y alimentos; ciudades y construcción) más el turismo, y documentó seis rasgos que orientan el diseño de los instrumentos [@vargas2026SectoresPriorizados]. Los sectores que ponen productos envasados en el mercado importan más de lo que exportan, de modo que quienes paguen la REP serán en buena parte importadores y el instrumento tiene que apoyarse en la aduana. La informalidad supera 60 % del empleo en los sectores con más trabajadores, lo que obliga a acompañar los cargos con crédito y apoyo técnico. La construcción es el mayor sector de política por valor agregado y genera más de un millón de toneladas de residuos de obra al año. La energía y el agua, aunque pequeñas en las cuentas nacionales, atraen inversión y ya tienen marcos de financiamiento. El turismo es el principal exportador entre los sectores de política, emplea a más mujeres que hombres y está formado en su mayoría por microempresas. Por último, los residuos son un sector pequeño en valor agregado, pero es el que articula a todos los demás.
+
+## El marco legal
+
+La Hoja de Ruta se apoya en un marco legal que Panamá acumuló en quince años y que ya contiene casi todas las piezas que necesitan los instrumentos. Como muestra la @fig-leyes, las piezas se agregaron una tras otra, desde la creación de la AAUD en 2010 hasta la Ley 502 de economía circular en 2025.
+
+```{r}
+#| label: fig-leyes
+#| fig-cap: "Leyes y políticas que forman el marco de la Hoja de Ruta"
+#| fig-width: 7
+#| fig-height: 3.4
+
+tribble(
+  ~anio, ~nivel, ~texto,
+  2010, 1, "Ley 51: crea la AAUD,\nsus tasas y su fondo",
+  2018, -1, "Ley 33: Basura Cero y\nprogramas de recuperación",
+  2020, 1, "Ley 187: plásticos de\nun solo uso",
+  2021, -1.6, "Ley 223: incentivos\nal reciclaje",
+  2021, 1.6, "Ley 276: REP, tasa a costo\nreal y facultades de la AAUD",
+  2024, -1, "Taxonomía y marco\nsoberano sostenible",
+  2025, 1, "Ley 502: economía\ncircular",
+  2026, -1.6, "Ley 518 (neumáticos) y\nHoja de Ruta de plásticos"
+) |>
+  ggplot(aes(x = anio, y = nivel)) +
+  geom_hline(yintercept = 0, color = "gray50") +
+  geom_segment(aes(xend = anio, y = 0, yend = nivel), color = "gray70") +
+  geom_point(aes(y = 0), size = 2.5, color = "#2E8B57") +
+  geom_label(aes(label = texto), size = 2.6, linewidth = 0.2, fill = "white", lineheight = 0.9) +
+  scale_x_continuous(breaks = c(2010, 2014, 2018, 2021, 2024, 2026), limits = c(2008.3, 2027.7)) +
+  scale_y_continuous(limits = c(-2.2, 2.2)) +
+  labs(x = NULL, y = NULL) +
+  tema_grafico() +
+  theme(axis.text.y = element_blank(), panel.grid = element_blank())
+```
+
+*Fuente: elaboración propia con base en las leyes citadas en el texto.*
+
+La Ley 51 de 2010 creó la AAUD como responsable del servicio de aseo en la región metropolitana y le permitió fijar tasas según el nivel socioeconómico de los usuarios, cobrarlas en la factura eléctrica y administrar un fondo propio [@panama2010Ley51]. La Ley 33 de 2018 estableció la Política Basura Cero y obligó a los productores e importadores de bienes cuyos residuos requieren un manejo especial a establecer programas de recuperación, con la posibilidad de asociarse y de adoptar sistemas de depósito y retorno [@panama2018Ley33, art. 6]. La Ley 187 de 2020 ordenó reemplazar de forma progresiva los plásticos de un solo uso y repartió su control entre la aduana, ACODECO y el Ministerio de Salud [@panama2020Ley187, art. 15]. La Ley 223 de 2021 exonera de impuestos por cinco años a las plantas de reciclaje que avala el Ministerio de Ambiente [@panama2021Ley223].
+
+La pieza más importante es la Ley 276 de 2021, que reorganizó la gestión de los residuos sólidos. Adoptó la REP como principio, creó una tasa de gestión integral que debe incorporar el costo de todas las fases del servicio, otorgó incentivos fiscales al aprovechamiento y dio a la AAUD la facultad de proponer normas de REP y de autorizar los sistemas colectivos de productores y los de depósito [@panama2021Ley276, arts. 7, 52, 66 y 74]. La Ley 502 de 2025 es una ley marco. Crea el Consejo Nacional de Economía Circular, un Plan Estratégico Nacional, una plataforma de indicadores y criterios de economía circular para las compras públicas, y deja su reglamentación al Órgano Ejecutivo por medio del Ministerio de Ambiente [@panama2025Ley502, arts. 8-13]. A ese marco se suman la Ley 518 de 2026, que ordena a la AAUD reglamentar un esquema en el que los importadores de neumáticos asumen el costo de su gestión por cada unidad importada [@panama2026Ley518, art. 15], y la Hoja de Ruta de plásticos del Ministerio de Ambiente, que recomienda aprobar una ley de REP [@miambiente2026ResDM0351].
+
+Una distinción constitucional determina qué vía legal requiere cada instrumento. Un tributo, como un impuesto, es un pago obligatorio al Estado que no corresponde a un servicio específico, y la Constitución exige que se establezca por ley, propuesta por una comisión permanente de la Asamblea o por el Ejecutivo con autorización del Consejo de Gabinete [@panama2004Constitucion, arts. 52, 159 y 165]. Una tasa es el pago por un servicio que se recibe, como la recolección de la basura, y la fija quien presta el servicio, sea la AAUD o el municipio, después de una consulta ciudadana [@panama2021Ley276, arts. 16 y 75; @panama2002Ley6, arts. 24-25]. Esa consulta tiene consecuencias prácticas, pues la Corte Suprema anuló en 2016 la tasa de aseo de San Miguelito por haberla omitido [@laprensa2016TasaAseoSanMiguelito].
+
+## Lo que mostró la evaluación de factibilidad
+
+La evaluación de factibilidad calificó cada instrumento de 1 a 5 en siete criterios, que son su impacto sobre los flujos de material, su factibilidad técnica, institucional, política y regulatoria y financiera, el tiempo que toma aplicarlo y su efecto sobre la equidad y la competitividad [@vargas2026Factibilidad]. Su hallazgo central es una disyuntiva. Como muestra la @fig-impacto-facilidad, los instrumentos con más impacto, como la REP, el depósito y las alianzas público-privadas, son también los más difíciles de aplicar, y los más fáciles, como la formación o las compras públicas, tienen un efecto más indirecto. El registro de productores y el crédito con garantías combinan un impacto alto con una aplicación fácil, y por eso encabezan la secuencia.
+
+```{r}
+#| label: fig-impacto-facilidad
+#| fig-cap: "Impacto y facilidad de aplicación de los instrumentos (puntajes de 1 a 5)"
+#| fig-width: 7
+#| fig-height: 4.4
+
+ggplot(ejes, aes(x = facilidad, y = impacto, color = paso)) +
+  geom_hline(yintercept = mean(ejes$impacto), linetype = "dashed", color = "gray70") +
+  geom_vline(xintercept = mean(ejes$facilidad), linetype = "dashed", color = "gray70") +
+  geom_point(size = 2.8) +
+  ggrepel::geom_text_repel(aes(label = nombre), size = 2.8, seed = 7, show.legend = FALSE,
+                           box.padding = 0.4, max.overlaps = Inf) +
+  scale_color_manual(values = c(Primero = "#2E8B57", Segundo = "#C0392B"),
+                     labels = c(Primero = "Crea condiciones", Segundo = "Impone metas o cargos")) +
+  scale_y_continuous(limits = c(1.7, 5.3), breaks = 2:5) +
+  labs(x = "Facilidad de aplicación (promedio de cinco criterios)", y = "Impacto") +
+  tema_grafico()
+```
+
+*Fuente: elaboración propia con base en la evaluación de factibilidad [@vargas2026Factibilidad]. La facilidad es el promedio de los criterios técnico, institucional, político y regulatorio, financiero y de tiempo. Las líneas punteadas marcan los promedios.*
+
+La evaluación arrojó otros cuatro resultados que esta Hoja de Ruta toma como punto de partida. El marco legal vigente permite iniciar doce de los catorce instrumentos con decretos, resoluciones o acuerdos, sin una ley nueva. La restricción más repetida es la falta de información sobre lo que se pone en el mercado, pues nadie sabe hoy cuántas toneladas de envases, aparatos o neumáticos venden los productores e importadores. Los cargos tendrían un efecto pequeño sobre los precios, y ningún escenario eleva la canasta de los hogares en más de un cuarto de punto porcentual. Por último, el sistema financiero tiene recursos y una arquitectura de finanzas sostenibles, pero su taxonomía todavía no tiene criterios para reconocer una inversión como circular, y en el piloto con siete bancos 99 % de la cartera verde elegible correspondía a la mitigación del cambio climático [@sbp2025GuiaTFSBancos].
+
+## Las instituciones que aplicarán la Hoja de Ruta
+
+Las instituciones que aplicarán los instrumentos tienen facultades amplias y medios desiguales. La AAUD es la única con las funciones de regular, registrar, recaudar, controlar y monitorear asignadas por ley para los residuos, pero en 2025 gastó B/.25,4 millones más de lo que recaudó, arrastra una morosidad de B/.118,8 millones [@estrella2026AAUDMorosidad] y su presupuesto para 2026 se recortó de B/.93,3 millones solicitados a B/.66,0 millones [@tvn2025AAUDPresupuesto2026]. El Estado en su conjunto está mejor equipado para vigilar que para cobrar y pagar, pues de quince instituciones revisadas nueve pueden monitorear de forma expresa y solo dos pueden financiar [@vargas2026Factibilidad]. Algunas instituciones clave son pequeñas. La DGCP, que debe fijar los criterios circulares de todas las compras públicas, tiene `r pers("DGCP")` funcionarios, y la Superintendencia del Mercado de Valores, `r pers("SMV")` [@cgr2026PlanillaJulio]. Por último, el Consejo Nacional de Economía Circular da voz y voto al Ministerio de Ambiente, al de Salud, al MICI y a representantes privados y de la sociedad civil, mientras que la AAUD solo tiene voz y el MEF, la aduana, ACODECO y la DGCP no lo integran [@panama2025Ley502, arts. 8-9]. Estos rasgos explican varias decisiones de diseño de la Hoja de Ruta, como empezar por sanear las finanzas del aseo y apoyar a las instituciones pequeñas con formatos estándar y sistemas que ya existen.
+
+# Arquitectura de la Hoja de Ruta
 
 ## Principios de diseño
 
-El diseño de los catorce instrumentos sigue cuatro principios, cada uno derivado de la evidencia de los estudios previos y de la experiencia de otros países. El primero es la gradualidad. Las metas empiezan bajas y suben a medida que los sistemas ganan capacidad, como ocurrió en Chile y en Colombia con sus sistemas de REP de envases [@mmaChile2020DS12Envases; @minambienteCo2018Res1407], y la propia Ley 276 consagra la gradualidad como principio [@panama2021Ley276, art. 7.2]. El segundo es la secuencia, que significa que ningún cargo entra en vigor antes de que el registro y el control funcionen, porque la experiencia europea muestra que los impuestos y las obligaciones pierden eficacia cuando nadie los fiscaliza [@eea2023EconomicInstruments]. El tercero es la inclusión. Los recicladores de base reciben un pago por cada tonelada recuperada, financiado con la REP y la tasa de aseo, y la tarifa se escalona según el nivel socioeconómico de los hogares, como ordena la ley [@panama2021Ley276, arts. 7.1 y 66]. El cuarto es aprovechar las instituciones que ya existen antes de crear otras nuevas.
+El diseño de los catorce instrumentos sigue cinco principios, cada uno derivado de la evidencia de los estudios previos y de la experiencia de otros países. El primero es aprovechar las instituciones y las leyes que ya existen antes de crear otras nuevas, lo que permite empezar en 2027 sin esperar una reforma legal.
 
-## Los catorce instrumentos
+El segundo es la secuencia. Ningún cargo entra en vigor antes de que el registro y el control funcionen, porque los impuestos y las obligaciones pierden eficacia cuando nadie los fiscaliza [@eea2023EconomicInstruments]. La experiencia de Ecuador lo ilustra. Su impuesto redimible de dos centavos por botella de plástico llegó a devolver más botellas de las que se vendieron en el país, porque entraban envases de los países vecinos para cobrar el reembolso, y entre 2012 y abril de 2014 su recaudación neta fue negativa en 9,6 millones de dólares [@sri2014IRBPNR].
 
-El @tbl-diseno resume el diseño de cada instrumento, ordenado por el año en que entraría en vigor, con sus parámetros principales, su meta y su monto de referencia. Los montos se calcularon con las bases de datos de las memorias de cálculo, y las secciones que siguen explican los más importantes.
+El tercero es la gradualidad. Las metas empiezan bajas y suben a medida que los sistemas ganan capacidad. En Chile, la meta de valorización de envases plásticos domiciliarios empezó en 3 % y llega a 45 % en el año doce, y la de vidrio va de 11 % a 65 % [@mmaChile2020DS12Envases, art. 21]; en Colombia, la meta global de aprovechamiento de envases empezó en 10 % en 2021 y llega a 30 % en 2030 [@minambienteCo2018Res1407Vigente, art. 9]. La propia Ley 276 consagra la gradualidad como principio [@panama2021Ley276, art. 7.2].
+
+El cuarto es la inclusión. Los recicladores de base reciben un pago por cada tonelada recuperada, financiado con la REP y la tasa de aseo, y la tarifa se escalona según el nivel socioeconómico de los hogares, como ordena la ley [@panama2021Ley276, arts. 7.1 y 66]. El quinto es que pague quien pone el producto en el mercado y quien usa el servicio, de modo que los recursos no dependan del presupuesto público, cuyo espacio es estrecho.
+
+## Dos pasos y tres cadenas
+
+Los catorce instrumentos se ordenan en dos pasos. El primero crea las condiciones y el segundo introduce las metas y los cargos, que solo funcionan cuando esas condiciones existen. El orden responde a que los instrumentos dependen unos de otros y forman tres cadenas. Como muestra la @fig-cadenas, la cadena de la REP empieza en el registro de productores, sigue con la REP de envases y el depósito y termina en la ecomodulación; la de la infraestructura empieza en la tarifa de aseo a costo real, que da a la AAUD el flujo de recursos que necesita una asociación público-privada y la del financiamiento empieza en la ventana del fondo de garantías y en la nueva edición de la taxonomía, que permite etiquetar los bonos y los créditos como circulares. La formación, los incentivos y las compras públicas apoyan a todas las cadenas desde el primer año.
+
+```{r}
+#| label: fig-cadenas
+#| fig-cap: "Las tres cadenas de dependencia entre instrumentos"
+#| fig-width: 7
+#| fig-height: 4.8
+
+nodos <- tribble(
+  ~x, ~y, ~nombre, ~etapa,
+  2027, 6, "Registro de\nproductores", "Primer paso (2027)",
+  2028, 6, "REP de\nenvases", "Segundo paso (2028-2030)",
+  2029, 6, "Depósito y\nretorno", "Segundo paso (2028-2030)",
+  2030, 6, "Ecomodulación", "Segundo paso (2028-2030)",
+  2027, 5, "Registro de\nrecicladores", "Primer paso (2027)",
+  2028, 5, "Pago por tonelada\na recicladores", "Segundo paso (2028-2030)",
+  2027, 4, "Tarifa de aseo\na costo real", "Primer paso (2027)",
+  2029, 4, "APP de\nresiduos", "Segundo paso (2028-2030)",
+  2027, 3, "Compras públicas\ncirculares", "Primer paso (2027)",
+  2029, 3, "Contenido\nreciclado", "Segundo paso (2028-2030)",
+  2027, 2, "Ventana del fondo\nde garantías", "Primer paso (2027)",
+  2028, 2, "Taxonomía,\n2.ª edición", "Segundo paso (2028-2030)",
+  2029, 2, "Bonos soberanos\ntemáticos", "Segundo paso (2028-2030)",
+  2027, 1, "Incentivos fiscales,\nformación y certificación", "Primer paso (2027)"
+)
+flechas <- tribble(
+  ~x, ~y, ~xend, ~yend,
+  2027.36, 6, 2027.66, 6,
+  2028.34, 6, 2028.66, 6,
+  2027.36, 5, 2027.58, 5,
+  2028, 5.72, 2028, 5.3,
+  2027.3, 4.25, 2027.7, 4.8,
+  2027.38, 4, 2028.7, 4,
+  2027.42, 3, 2028.66, 3,
+  2028.34, 2, 2028.6, 2
+)
+ggplot() +
+  geom_segment(data = flechas, aes(x = x, y = y, xend = xend, yend = yend),
+               arrow = arrow(length = unit(0.09, "in"), type = "closed"), color = "gray45", linewidth = 0.5) +
+  geom_curve(aes(x = 2028.3, y = 6.3, xend = 2029.75, yend = 6.3), curvature = -0.25,
+             arrow = arrow(length = unit(0.09, "in"), type = "closed"), color = "gray45", linewidth = 0.5) +
+  geom_label(data = nodos, aes(x = x, y = y, label = nombre, fill = etapa), size = 2.5,
+             key_glyph = "rect",
+             color = "white", linewidth = 0, lineheight = 0.9, fontface = "bold") +
+  annotate("text", x = 2026.35, y = c(5.5, 4, 3, 2, 1),
+           label = c("Cadena de\nla REP", "Cadena de la\ninfraestructura", "Demanda de\nmaterial reciclado", "Cadena del\nfinanciamiento", "Apoyo a\ntodas"),
+           hjust = 0.5, size = 2.6, color = "gray30", lineheight = 0.9) +
+  scale_fill_manual(values = colores_etapa) +
+  scale_x_continuous(breaks = 2027:2030, limits = c(2025.9, 2030.4), position = "top") +
+  scale_y_continuous(limits = c(0.5, 6.8)) +
+  labs(x = "Año de entrada en operación", y = NULL) +
+  tema_grafico() +
+  theme(axis.text.y = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor = element_blank())
+```
+
+*Fuente: elaboración propia. Cada flecha indica que el instrumento de la derecha necesita al de la izquierda para funcionar.*
+
+Dos instrumentos merecen una aclaración sobre su lugar en la secuencia. La tarifa de aseo a costo real es un cargo, y la evaluación de factibilidad la clasificó con los instrumentos del segundo paso, pero esta Hoja de Ruta la adelanta a 2027 porque la Ley 276 ya la ordena y porque la AAUD necesita sanear sus finanzas antes de asumir la autorización y el control de los sistemas de REP. A la inversa, la segunda edición de la taxonomía, los bonos soberanos y la asociación público-privada no imponen cargos, pero toman de uno a tres años de preparación, de modo que entran en operación entre 2028 y 2029.
+
+## Cronograma y calendario de hitos
+
+Cada instrumento tiene un período de preparación, en el que se dictan las normas y se arman los sistemas, y un período de operación. Como muestra la @fig-cronograma, los siete instrumentos del primer paso se preparan en el primer semestre de 2027 y operan desde el segundo, mientras que los del segundo paso combinan preparaciones de uno a dos años con una entrada escalonada entre 2028 y 2030. La REP es el instrumento con la preparación más larga en relación con su arranque, porque requiere la ley, las resoluciones de la AAUD y la constitución de los sistemas colectivos. Como referencia, Chile dio 30 meses entre la publicación de su decreto de envases y la entrada en vigor de las metas [@mmaChile2020DS12Envases, art. 47]; Panamá puede acortar ese plazo porque su primer año opera con una meta baja, de 10 %, que funciona como un año de arranque.
+
+```{r}
+#| label: fig-cronograma
+#| fig-cap: "Cronograma de preparación y operación de los instrumentos"
+#| fig-width: 7
+#| fig-height: 4.4
+
+crono <- pasos |>
+  mutate(t = anio + (semestre - 1) / 2) |>
+  summarize(prep_ini = min(t), .by = id) |>
+  left_join(select(diseno, id, nombre, anio_inicio, etapa), by = "id") |>
+  mutate(
+    op_ini = if_else(anio_inicio == 2027, 2027.5, anio_inicio),
+    prep_ini = if_else(prep_ini >= op_ini, op_ini - 0.5, prep_ini),
+    nombre = fct_reorder(nombre, -op_ini - id / 100)
+  )
+
+ggplot(crono, aes(y = nombre)) +
+  geom_segment(aes(x = prep_ini, xend = op_ini, yend = nombre), linewidth = 4, color = "#DDDDDD") +
+  geom_segment(aes(x = op_ini, xend = 2031, yend = nombre, color = etapa), linewidth = 4) +
+  scale_color_manual(values = colores_etapa) +
+  scale_x_continuous(breaks = 2027:2031, labels = c(2027:2030, ""), limits = c(2027, 2031)) +
+  labs(x = NULL, y = NULL, caption = "Gris: preparación. Color: operación.") +
+  tema_grafico() +
+  theme(axis.text.y = element_text(size = 7.5), panel.grid.minor = element_blank())
+```
+
+*Fuente: elaboración propia con base en los pasos de implementación de cada instrumento.*
+
+Los hitos son los pasos que marcan el avance de la Hoja de Ruta y que conviene vigilar desde el más alto nivel. Como muestra el @tbl-hitos, el año 2027 concentra los hitos normativos (el reglamento de la Ley 502, el pliego tarifario, el reglamento de los incentivos, la resolución de compras y la ventana del fondo de garantías), el año 2028 los de arranque de la REP y de la taxonomía y los años 2029 y 2030 los de operación plena.
+
+```{r}
+#| label: tbl-hitos
+#| tbl-cap: "Calendario de hitos"
+
+pasos |>
+  filter(hito) |>
+  left_join(corto, by = "id") |>
+  arrange(anio, semestre, id) |>
+  transmute(Plazo = plazo_texto(anio, semestre), Hito = accion, Instrumento = nombre, Responsable = responsable) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(2.6, 8.2, 3.2, 3.4), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia.*
+
+## Resumen del diseño
+
+El @tbl-diseno reúne en un solo lugar el diseño de los catorce instrumentos, ordenados por el año en que entrarían en operación, con sus parámetros principales, su meta y su monto de referencia. Es el cuadro de consulta de la Hoja de Ruta; las secciones siguientes desarrollan cada fila.
 
 ```{r}
 #| label: tbl-diseno
@@ -186,92 +485,491 @@ diseno |>
 
 *Fuente: elaboración propia con base en las memorias de cálculo 10 a 14.*
 
-La @fig-cronograma muestra cómo se ordenan los instrumentos en el tiempo. Los del primer paso se concentran en 2027 porque solo requieren reglamentos y resoluciones. Los del segundo paso se escalonan entre 2028 y 2030 según el tiempo que toma preparar cada uno, y la ecomodulación queda al final porque requiere que los sistemas de REP ya estén operando.
+# Primer paso (2027): crear las condiciones
+
+El primer paso reúne siete instrumentos que pueden empezar en 2027 porque solo requieren reglamentos, resoluciones o cambios en programas existentes. Son el registro de productores e importadores, la formalización de los recicladores de base, la tarifa de aseo a costo real, los incentivos fiscales vigentes, las compras públicas circulares, la ventana circular del Fondo de Garantías de Panamá y la formación, la certificación y la información. Juntos crean la información, los actores, los recursos y la demanda que necesitan los instrumentos del segundo paso.
+
+## Registro de productores e importadores
+
+**Qué es y para qué sirve.** El registro es la lista oficial de las empresas que fabrican o importan los productos que se convierten en residuos, con las toneladas y los materiales que ponen en el mercado cada año. Es la base de cálculo de todo lo demás. Sin él no se puede fijar una meta de reciclaje, cobrar una contribución de REP, controlar un depósito ni saber si los instrumentos funcionan.
+
+**Cómo funciona en Panamá.** El registro aprovecha que casi todo lo que se pone en el mercado pasa por la aduana o por una fábrica identificable. Las importaciones ya se declaran por partida arancelaria, que es el código que identifica cada tipo de producto, y el reglamento de la ley de plásticos ya exige una certificación del MICI para ciertas importaciones [@panama2022DE9, arts. 7-13]. El registro se crea en el reglamento de la Ley 502 y vive en la plataforma de indicadores que esa ley ordena establecer en el Sistema Nacional de Información Ambiental [@panama2025Ley502, arts. 11 y 13]. La aduana entrega cada año las importaciones de las partidas de los flujos iniciales, que son envases, aparatos eléctricos y electrónicos, neumáticos, aceites y baterías, y los productores e importadores confirman o corrigen esos datos y agregan la producción nacional. Un umbral de exención evita cargar a los importadores muy pequeños, porque los grandes concentran el volumen. Una particularidad institucional importa aquí. El registro lo opera el Ministerio de Ambiente, pero quien autoriza y fiscaliza los sistemas de REP es la AAUD [@panama2021Ley276, art. 74], de modo que el reglamento debe garantizar que ambas instituciones compartan los mismos datos.
+
+**Cuánto cuesta y quién paga.** El costo es administrativo y lo cubre el presupuesto del Ministerio de Ambiente y de la AAUD, porque el registro se monta sobre sistemas que ya existen. Para los obligados, el costo es una declaración anual.
+
+**Riesgos.** El riesgo principal es la subdeclaración, que se reduce precargando el registro con los datos de aduana, cruzando las declaraciones con ellos y sancionando la omisión.
+
+**Pasos.** Como muestra el @tbl-pasos-registro, el registro se arma en `r n_pasos(1)` pasos. Las normas y el convenio de datos se preparan en 2027, la primera declaración se recibe en el primer semestre de 2028 con 2027 como año base, y la primera publicación de toneladas por flujo sale en el segundo semestre de 2028, justo a tiempo para fijar las primeras metas de la REP.
 
 ```{r}
-#| label: fig-cronograma
-#| fig-cap: "Cronograma de entrada en vigor de los instrumentos"
-#| fig-width: 7
-#| fig-height: 4.6
+#| label: tbl-pasos-registro
+#| tbl-cap: "Pasos del registro de productores e importadores"
 
-diseno |>
-  mutate(
-    instrumento = fct_reorder(str_wrap(instrumento, 45), -anio_inicio),
-    fin = 2031
-  ) |>
-  ggplot(aes(y = instrumento, x = anio_inicio, xend = fin, color = paso)) +
-  geom_segment(aes(yend = instrumento), linewidth = 4) +
-  scale_color_manual(values = c("Primero" = "#2E8B57", "Segundo" = "#009EDB"), name = "Paso") +
-  scale_x_continuous(breaks = 2027:2031, labels = c(2027:2030, "")) +
-  labs(x = NULL, y = NULL) +
-  tema_grafico() +
-  theme(legend.title = element_text(), axis.text.y = element_text(size = 7))
+tabla_pasos(1)
 ```
 
 *Fuente: elaboración propia.*
 
-## Responsabilidad extendida del productor de envases
+## Formalización e inclusión de los recicladores de base
 
-La REP de envases es el instrumento de mayor impacto y el que más recursos moviliza, por lo que su diseño merece una explicación detallada. La idea es sencilla: quien pone en el mercado un producto envasado debe pagar por la recolección y el reciclaje de ese envase cuando se convierte en residuo, en lugar de que lo paguen los municipios con recursos de todos los contribuyentes. En la práctica, los productores e importadores de bienes envasados se inscriben en el registro y se agrupan en sistemas colectivos, que son organizaciones sin fines de lucro autorizadas por la AAUD que contratan la recolección, la clasificación y el reciclaje de los envases de todos sus miembros. Cada sistema debe cumplir metas anuales de valorización, es decir, de la proporción de envases que se recupera y vuelve a la producción, y se somete a una auditoría independiente. Los recicladores de base registrados pueden vender su material a los sistemas, como en Chile, donde al menos la mitad de las instalaciones de recepción deben incorporarlos [@mmaChile2020DS12Envases, art. 41]. Cada productor paga según las toneladas de envases que pone en el mercado y, a partir de 2030, el pago se ajusta según qué tan reciclables son sus envases.
+**Qué es y para qué sirve.** Los recicladores de base son las personas que recuperan materiales de los residuos y los venden, a menudo de manera informal y sin protección social. Hoy son el eslabón que más material devuelve a la producción, y lo hacen sin pago por el servicio que prestan. La formalización los registra como gestores de residuos y les paga por cada tonelada que recuperan.
 
-Para estimar cuánto costaría el sistema se partió de la experiencia de Chile, el país de la región con un sistema de REP de envases en operación. Su primer sistema colectivo de envases domiciliarios estimó un costo de entre 380.000 y 500.000 pesos chilenos por cada tonelada valorizada [@resimple2023Garantias], que equivalen a entre 549 y 722 dólares con el tipo de cambio de 692 pesos por dólar del estudio de impacto chileno [@mmaChile2020AGIESEnvases]. Ese costo por tonelada se multiplicó por las toneladas que habría que valorizar en Panamá para cumplir una trayectoria de metas similar a la chilena. Como muestra el @tbl-rep, con una meta de 10 % en el primer año el sistema valorizaría unas `r formato_es(rep$toneladas_valorizadas[1] / 1000, 0)` mil toneladas, con un costo de entre `r formato_es(rep$costo_min_musd[1], 0)` y `r formato_es(rep$costo_max_musd[1], 0)` millones de dólares, que crecería a medida que suben las metas. Estas cifras son un techo por dos razones: la base de toneladas incluye materiales que no son envases, y el peso chileno se ha depreciado desde que se hizo el estudio. La Organización para la Cooperación y el Desarrollo Económicos (OCDE) estima que la administración de estos sistemas representa entre 5 % y 10 % del costo total, y que la mayor parte se va en la recolección y la clasificación [@ocde2016EPRPolicyHighlights].
+**Cómo funciona en Panamá.** La Ley 276 define a los recicladores y ordena que se les apliquen requisitos graduales para registrarse como gestores [@panama2021Ley276, arts. 50-51], y la Ley 33 los incluye en el sistema de información de residuos [@panama2018Ley33]. El último conteo disponible de esta población es de 2010, de modo que el primer paso es un censo en los distritos con mayor generación de residuos. El pago por tonelada se financia con las contribuciones de la REP y con la tasa de aseo, y llega a través de los contratos de los sistemas colectivos. La experiencia de la región muestra que el registro funciona a escala, pues Colombia tiene 76.707 recicladores registrados que prestan el servicio de aprovechamiento [@sspd2025Aprovechamiento2024], y Chile exige que al menos la mitad de las instalaciones de recepción de envases incorporen recicladores de base [@mmaChile2020DS12Envases, art. 41].
+
+**Cuánto cuesta y quién paga.** El censo y el registro tienen un costo administrativo para la AAUD y los municipios. El pago por tonelada lo cubren las contribuciones de la REP desde 2028.
+
+**Riesgos.** Que los intermediarios se queden con el pago, lo que se evita pagando directamente a los recicladores registrados y trazando las toneladas, y que el depósito o la asociación público-privada los desplacen, lo que se evita incorporándolos como operadores de los puntos de retorno y de las plantas.
+
+**Pasos.** Como muestra el @tbl-pasos-recicladores, el censo, el reglamento y la inscripción se hacen en 2027, y el pago por tonelada empieza en el segundo semestre de 2028, cuando los sistemas colectivos de la REP contratan la recolección.
 
 ```{r}
-#| label: tbl-rep
-#| tbl-cap: "Trayectoria de la REP de envases"
+#| label: tbl-pasos-recicladores
+#| tbl-cap: "Pasos de la formalización de los recicladores de base"
 
-rep |>
-  transmute(
-    Año = as.character(anio),
-    `Meta de valorización (%)` = 100 * meta_valorizacion,
-    `Toneladas valorizadas` = toneladas_valorizadas,
-    `Costo mínimo (millones de US$)` = costo_min_musd,
-    `Costo máximo (millones de US$)` = costo_max_musd
-  ) |>
-  tabla_ft_es(digitos = 1, enteros = c("Meta de valorización (%)", "Toneladas valorizadas"), anchos_cm = c(2.4, 3.6, 3.8, 3.8, 3.8))
+tabla_pasos(2)
 ```
 
-*Fuente: elaboración propia con datos de residuos del Banco Mundial [@worldbank2026wwaste] y costos del sistema colectivo de envases de Chile [@resimple2023Garantias; @mmaChile2020AGIESEnvases].*
+*Fuente: elaboración propia.*
 
-## Depósito y retorno de envases de bebidas
+## Tarifa de aseo a costo real
 
-En un sistema de depósito y retorno, el consumidor paga un pequeño monto adicional al comprar una bebida envasada y lo recupera al devolver el envase vacío. El depósito es un incentivo para devolver el envase, y lo que se recauda por los envases que no se devuelven ayuda a financiar el sistema. El sistema propuesto cubre las botellas de PET, las latas de aluminio y el vidrio de bebidas, y lo operan los productores dentro de la REP de envases, con autorización de la AAUD [@panama2021Ley276, art. 74]. La red de retorno incluye comercios, hoteles y restaurantes, y la meta es acercarse al estándar europeo de 90 % de recolección separada de botellas para 2029 [@ue2025Reglamento40]. El control de los envases que entran por las fronteras es indispensable, porque en Ecuador se devolvieron más botellas de las que se vendieron cuando empezaron a entrar envases de países vecinos para cobrar el depósito [@sri2014IRBPNR]. Su efecto sobre el costo de vida es mínimo, pues un costo de operación igual a 1 % del valor de la producción de bebidas eleva la canasta de los hogares en `r formato_es(hog("deposito"), 3)` % [@vargas2026Factibilidad].
+**Qué es y para qué sirve.** La tarifa de aseo es lo que pagan los hogares y los comercios por la recolección y la disposición de sus residuos. Cuando cobra menos de lo que cuesta el servicio, la diferencia la cubre el presupuesto público o se convierte en deudas y en un servicio deficiente. Cobrar el costo real da al servicio recursos estables y, si se cobra según la cantidad de residuos, premia a quienes separan.
 
-## Tarifa de gestión de residuos a costo real
+**Cómo funciona en Panamá.** La brecha está documentada. Como muestra la @fig-aseo, en 2025 la AAUD recaudó B/.35,2 millones y gastó B/.60,6 millones, y la morosidad acumulada de sus usuarios, B/.118,8 millones, casi duplica su gasto anual [@estrella2026AAUDMorosidad]. Cerrar esa brecha es un mandato legal, porque la Ley 51 ordena que el pliego tarifario refleje el costo económico del servicio, con un subsidio cruzado entre niveles socioeconómicos y una revisión cada dos años [@panama2010Ley51, arts. 8-9], y la Ley 276 ordena que la tasa incorpore el costo de todas las fases del servicio [@panama2021Ley276, arts. 66 y 75].
 
-Hoy el servicio de aseo recauda menos de lo que cuesta, y la diferencia la cubre el presupuesto público o se convierte en deuda y en un servicio deficiente. La Ley 276 ordena corregirlo, pues establece que la tasa de gestión integral de residuos debe incorporar el costo de todas las fases del servicio y considerar el nivel socioeconómico de cada comunidad [@panama2021Ley276, arts. 66 y 75]. El diseño propuesto tiene tres componentes. El primero es una tasa residencial escalonada por nivel socioeconómico, que cierra la brecha de B/.25,4 millones entre lo que la AAUD recauda y lo que gasta y protege a los hogares de menores ingresos. El segundo son pilotos de pago por generación, en los que comercios, hoteles y restaurantes pagan según la cantidad de residuos mezclados que producen, lo que premia a quienes separan sus residuos reciclables. El tercero es una tasa de disposición de B/.10 por tonelada de residuos de construcción, similar al costo de operación del relleno sanitario de Cerro Patacón [@tvn2023Ecolimpia], que se aplicaría cuando existan sitios autorizados para recibir y valorizar esos residuos. El pliego de tarifas debe pasar por la consulta ciudadana que exige la Ley 6 de 2002 [@panama2002Ley6], y el cobro puede hacerse en la factura eléctrica, como ya ocurre en San Miguelito [@panama2026ResGabinete21].
+```{r}
+#| label: fig-aseo
+#| fig-cap: "Finanzas del servicio de aseo de la AAUD (millones de balboas)"
+#| fig-width: 7
+#| fig-height: 2.4
 
-En los destinos turísticos, la Hoja de Ruta propone que los municipios con mayor afluencia de visitantes complementen la tasa con un cargo por visitante destinado a la gestión de residuos. Hay un precedente en el país, pues Taboga cobra desde 2025 un dólar por visitante para la limpieza de la isla [@laestrella2025Taboga], y uno internacional en el impuesto de estancias turísticas de las Islas Baleares, cuyo fondo da prioridad a los proyectos de agua y residuos [@baleares2016Ley2ITS].
+aseo |>
+  mutate(concepto = factor(concepto, levels = rev(concepto))) |>
+  ggplot(aes(x = millones_balboas, y = concepto, fill = concepto)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = formato_es(millones_balboas, 1)), hjust = -0.2, size = 3.2) +
+  scale_fill_manual(values = c("#C0392B", "#8C564B", "#2E8B57"), guide = "none") +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(x = "Millones de balboas", y = NULL) +
+  tema_grafico()
+```
+
+*Fuente: elaboración propia con datos de la AAUD publicados por La Estrella de Panamá [@estrella2026AAUDMorosidad].*
+
+El diseño propuesto tiene tres componentes. El primero es una tasa residencial a costo real escalonada por nivel socioeconómico, de modo que los hogares de menores ingresos paguen menos y el aumento recaiga en quienes pueden pagarlo. Como referencia de magnitud, el Plan Nacional de Gestión Integral de Residuos estimó en 2017 que su modelo de gestión requería una tasa de entre B/.115,82 y B/.136,77 al año por hogar [@aaud2017PNGIR, p. 266]. El segundo son pilotos de pago por generación, en los que comercios, hoteles y restaurantes pagan según la cantidad de residuos mezclados que producen; ese sistema opera en 20 Estados de la Unión Europea [@eea2023EconomicInstruments]. El tercero es una tasa de disposición de B/.10 por tonelada de residuos de construcción, similar al costo de operación del relleno de Cerro Patacón [@tvn2023Ecolimpia], que recaudaría hasta B/.`r formato_es(10 * t_rcd / 1e6, 1)` millones al año y se aplicaría solo donde existan sitios autorizados para recibir y valorizar esos residuos. Conviene tener claro el propósito de esa tasa. Su función inicial es financiar los sitios autorizados y registrar las toneladas, pues para cambiar la conducta de las empresas tendría que acercarse a los 100 euros por tonelada, nivel a partir del cual en Europa es más probable reciclar la mitad de los residuos [@eea2013ManagingMSW].
+
+Dos particularidades institucionales facilitan la aplicación. La primera es que la AAUD ya cobra en la factura eléctrica, y desde 2026 lo hace en San Miguelito por medio de un convenio de cinco años [@panama2026ResGabinete21], lo que reduce la morosidad porque el pago se une a un servicio que los hogares no dejan de pagar. La segunda es que la Autoridad de Turismo integra la Junta Directiva de la AAUD [@panama2010Ley51, art. 11], lo que permite coordinar en la misma mesa las tarifas de los destinos turísticos. En esos destinos, la Hoja de Ruta propone que los municipios con mayor afluencia de visitantes complementen la tasa con un cargo por visitante destinado a la gestión de residuos. Hay un precedente en el país, pues Taboga cobra desde 2025 un dólar por visitante para la limpieza de la isla [@laestrella2025Taboga], y uno internacional en el impuesto de estancias turísticas de las Islas Baleares, cuyo fondo da prioridad a los proyectos de agua y residuos [@baleares2016Ley2ITS].
+
+**Cuánto cuesta y quién paga.** La tarifa cierra una brecha de B/.25,4 millones al año, que pagan los usuarios del servicio según su nivel socioeconómico. Su efecto sobre la canasta de consumo de los hogares sería de `r formato_es(hog("aseo"), 2)` % aun si todo el aumento se trasladara a los precios [@vargas2026Factibilidad].
+
+**Riesgos.** El rechazo social y la anulación judicial si se omite la consulta, que se previenen con una consulta ciudadana completa y con una mejora visible del servicio, y el vertido ilegal si sube el costo de disposición sin alternativas, que se previene aplicando la tasa de obra solo donde haya sitios autorizados.
+
+**Pasos.** Como muestra el @tbl-pasos-tarifa, el estudio de costos y la consulta ciudadana ocupan el primer semestre de 2027, el pliego se aprueba en el segundo, los pilotos de pago por generación empiezan en 2028 y la tasa de obra y la primera revisión bienal llegan en 2029.
+
+```{r}
+#| label: tbl-pasos-tarifa
+#| tbl-cap: "Pasos de la tarifa de aseo a costo real"
+
+tabla_pasos(7)
+```
+
+*Fuente: elaboración propia.*
 
 ## Incentivos fiscales
 
-Los incentivos fiscales que propone la Hoja de Ruta ya están en la ley, y lo que falta es hacerlos operativos. La Ley 223 de 2021 exonera por cinco años del impuesto sobre la renta, del impuesto de dividendos y de los aranceles de los equipos a las plantas de reciclaje que avala el Ministerio de Ambiente [@panama2021Ley223]. La Ley 276 reduce la tasa del impuesto sobre la renta a 15 % para el aprovechamiento de residuos y exime del impuesto de transferencia de bienes y servicios la compraventa de residuos valorizados y la importación de maquinaria de aprovechamiento [@panama2021Ley276, art. 52]. El Ministerio de Economía y Finanzas debe reglamentar estos beneficios, con una lista certificada de equipos que pueden recibirlos y una evaluación a los cinco años para comprobar que cumplen su propósito. La Hoja de Ruta no propone incentivos nuevos, porque el espacio fiscal es estrecho: los ingresos tributarios del Gobierno Central equivalen a cerca de 7 % del producto interno bruto [@inec2026IngresosGobierno] y la regla fiscal reduce el déficit permitido hasta 1,5 % del producto en 2030 [@laestrella2026ReformaFiscal].
+**Qué es y para qué sirve.** Los incentivos fiscales reducen los impuestos que pagan quienes invierten en reciclaje y aprovechamiento de residuos, lo que baja el costo de los equipos y mejora la rentabilidad de las plantas.
 
-## Instrumentos financieros
+**Cómo funciona en Panamá.** Los incentivos ya están en la ley y lo que falta es hacerlos operativos. La Ley 223 de 2021 exonera por cinco años del impuesto sobre la renta, del impuesto de dividendos y de los aranceles de los equipos a las plantas de reciclaje que avala el Ministerio de Ambiente [@panama2021Ley223]. La Ley 276 reduce la tasa del impuesto sobre la renta a 15 % para el aprovechamiento de residuos y exime del ITBMS la compraventa de residuos valorizados y la importación de maquinaria de aprovechamiento [@panama2021Ley276, art. 52]. El MEF debe reglamentar estos beneficios con una lista cerrada de equipos elegibles por partida arancelaria, que la DGI pueda verificar, y el Ministerio de Ambiente debe fijar el procedimiento de aval de las plantas. La Hoja de Ruta no propone incentivos nuevos, porque el espacio fiscal es estrecho. Los ingresos tributarios del Gobierno Central equivalen a cerca de 7 % del producto interno bruto [@inec2026IngresosGobierno] y la regla fiscal reduce el déficit permitido hasta 1,5 % del producto en 2030 [@laestrella2026ReformaFiscal].
 
-Los instrumentos financieros buscan que el capital llegue a proyectos que hoy no lo consiguen, y la Hoja de Ruta propone cuatro que aprovechan mecanismos existentes. El primero es una ventana de economía circular en el Fondo de Garantías de Panamá, que ya cuenta con recursos del Banco Interamericano de Desarrollo (BID) y que la Superintendencia de Bancos reconoce como mitigante del riesgo de crédito [@sbp2025Acuerdo8]. Una garantía parcial cubre una parte de la pérdida si el deudor no paga, lo que permite a los bancos prestar a recicladores, gestores de residuos y pequeñas empresas con proyectos circulares, incluidas las turísticas, que de otra forma considerarían demasiado riesgosos. El segundo es una segunda edición de la taxonomía de finanzas sostenibles con criterios para reconocer cuándo una actividad contribuye a la economía circular [@sbp2024TaxonomiaPanama]. El tercero es una primera emisión de bonos soberanos temáticos con proyectos de valorización de residuos y tratamiento de agua, bajo la categoría de economía circular que ya contiene el Marco de Financiamiento Sostenible de la República [@mef2024MarcoFinanciamientoSostenible]. El cuarto es apoyar a las empresas de reciclaje para que emitan bonos en la bolsa local, siguiendo el ejemplo de la primera empresa de este tipo que lo hizo en 2026 [@bgmetal2026SuplementoSerieI].
+**Cuánto cuesta y quién paga.** El costo es gasto tributario, es decir, impuestos que el Estado deja de cobrar, acotado por la lista de bienes elegibles.
+
+**Riesgos.** Que los incentivos premien inversiones que se harían de todas formas, lo que se controla con la lista cerrada, con un reporte anual del gasto tributario y con una evaluación a los cinco años.
+
+**Pasos.** Como muestra el @tbl-pasos-incentivos, el reglamento y el procedimiento de aval se dictan en el primer semestre de 2027, el primer reporte de gasto tributario se publica en 2028 y la evaluación se hace en 2032.
+
+```{r}
+#| label: tbl-pasos-incentivos
+#| tbl-cap: "Pasos de los incentivos fiscales"
+
+tabla_pasos(8)
+```
+
+*Fuente: elaboración propia.*
+
+## Compras públicas circulares
+
+**Qué es y para qué sirve.** El Estado es el mayor comprador del país, sobre todo de obra pública. Si sus pliegos exigen materiales reciclados o productos reparables, crea una demanda estable para el material que recuperan los recicladores y las plantas.
+
+**Cómo funciona en Panamá.** El mandato ya existe. La Ley 502 modificó la ley de contrataciones para que la DGCP establezca criterios de economía circular en las compras de todas las entidades [@panama2025Ley502, art. 12], la Ley 33 ordena priorizar insumos reutilizables y reciclables en las compras públicas [@panama2018Ley33, art. 28] y la Ley 276 ordena fomentar la compra de productos con material reciclado nacional [@panama2021Ley276, art. 53]. La DGCP opera el sistema PanamaCompra y la tienda virtual de convenios marco [@panama2006Ley22TU, art. 15], que son los dos lugares donde los criterios llegan a todas las entidades a la vez. Como la DGCP tiene `r pers("DGCP")` funcionarios [@cgr2026PlanillaJulio], conviene empezar por pocas categorías de alto volumen (obra, papel, mobiliario y equipos) y por fichas técnicas estándar que las entidades puedan copiar.
+
+**Cuánto cuesta y quién paga.** Las compras no tienen costo adicional si se evalúan por el costo del ciclo de vida. Las pagan las entidades compradoras con su presupuesto ordinario.
+
+**Riesgos.** Licitaciones desiertas si no hay oferta nacional de material reciclado, que se evitan con criterios graduales y con obras piloto antes de la obligación.
+
+**Pasos.** Como muestra el @tbl-pasos-compras, la resolución con los criterios se dicta en el primer semestre de 2027, las fichas técnicas y la etiqueta de PanamaCompra se implementan en el segundo, y las primeras obras piloto con materiales reciclados se licitan en 2028.
+
+```{r}
+#| label: tbl-pasos-compras
+#| tbl-cap: "Pasos de las compras públicas circulares"
+
+tabla_pasos(9)
+```
+
+*Fuente: elaboración propia.*
+
+## Ventana circular del Fondo de Garantías de Panamá
+
+**Qué es y para qué sirve.** Una garantía parcial cubre una parte de la pérdida del banco si el deudor no paga. Con ella, los bancos pueden prestar a recicladores, gestores de residuos y pequeñas empresas con proyectos circulares, a quienes hoy consideran demasiado riesgosos por su tamaño y por la falta de historial.
+
+**Cómo funciona en Panamá.** El fondo ya existe y tiene una ventaja que pocos instrumentos tienen. Se creó con un préstamo de 150 millones de dólares del BID, lo administra el Banco Nacional como fiduciario para las micro, pequeñas y medianas empresas del agro, el comercio y los servicios, y la Superintendencia de Bancos lo reconoce como mitigante del riesgo de crédito al calcular las provisiones de los bancos [@sbp2025Acuerdo8]. Ese reconocimiento hace que un crédito garantizado le cueste menos capital al banco. La ventana circular se abre en el reglamento del fideicomiso, con criterios de elegibilidad, una cobertura o una prima preferente y un reporte semestral. Es el instrumento con más potencial para el turismo, cuyo grupo de hoteles y restaurantes está formado en su gran mayoría por microempresas con acceso limitado al crédito [@vargas2026SectoresPriorizados].
+
+**Cuánto cuesta y quién paga.** La ventana se abre dentro del fondo existente, con recursos del BID por medio del MEF. Su costo es la pérdida esperada de las garantías que se ejecuten.
+
+**Riesgos.** Morosidad y criterios de elegibilidad laxos, que se controlan con criterios claros, con la formación de los analistas de crédito y con el reporte semestral del fiduciario.
+
+**Pasos.** Como muestra el @tbl-pasos-garantias, la ventana se abre en el primer semestre de 2027 y las primeras operaciones se garantizan en el segundo, de modo que es uno de los primeros instrumentos en mover recursos.
+
+```{r}
+#| label: tbl-pasos-garantias
+#| tbl-cap: "Pasos de la ventana circular del Fondo de Garantías"
+
+tabla_pasos(12)
+```
+
+*Fuente: elaboración propia.*
+
+## Formación, certificación e información
+
+**Qué es y para qué sirve.** Los demás instrumentos necesitan personas que sepan aplicarlos, como analistas de crédito que reconozcan un proyecto circular, compradores públicos que redacten un pliego con criterios circulares o recicladores con competencias certificadas. También necesitan información pública que permita saber si la Hoja de Ruta avanza.
+
+**Cómo funciona en Panamá.** La Ley 502 asigna funciones de formación y de información al Ministerio de Ambiente, al MICI y a otras instituciones [@panama2025Ley502, arts. 5-7 y 11]. La certificación de competencias de los recicladores puede hacerla el INADEH, y la de sostenibilidad turística, la Autoridad de Turismo, con referentes cercanos como el Certificado de Sostenibilidad Turística de Costa Rica [@ict2026CST] y en línea con el plan maestro de turismo sostenible 2025-2030, que incluye acciones de reducción de plásticos y el programa Bandera Azul [@atp2025PlanMaestro]. La pieza de información es el reporte trienal del estado de la economía circular que la Ley 502 encarga al Ministerio de Ambiente [@panama2025Ley502, art. 11].
+
+**Cuánto cuesta y quién paga.** El presupuesto de las instituciones y la cooperación técnica internacional.
+
+**Riesgos.** Programas sin continuidad, que se evitan atándolos a los demás instrumentos, por ejemplo, exigiendo la formación de los analistas para operar la ventana del fondo de garantías.
+
+**Pasos.** Como muestra el @tbl-pasos-formacion, la formación de analistas y compradores empieza en el primer semestre de 2027, la certificación de recicladores en el segundo, la de turismo en 2028 y el primer reporte trienal se publica en 2029.
+
+```{r}
+#| label: tbl-pasos-formacion
+#| tbl-cap: "Pasos de la formación, la certificación y la información"
+
+tabla_pasos(14)
+```
+
+*Fuente: elaboración propia.*
+
+# Segundo paso (2028-2030): metas y cargos
+
+El segundo paso reúne siete instrumentos que dependen de las condiciones creadas en 2027 o que requieren una preparación más larga. Son la REP de envases, la segunda edición de la taxonomía, el depósito y retorno de envases de bebidas, el contenido reciclado, la emisión soberana temática, la asociación público-privada de residuos y la ecomodulación. Los cuatro primeros imponen metas u obligaciones a los productores y a la banca; los otros tres movilizan inversión y ajustan los incentivos de la REP.
+
+## Responsabilidad extendida del productor de envases
+
+**Qué es y para qué sirve.** La REP de envases es el instrumento de mayor impacto y el que más recursos moviliza. Su idea es sencilla. Quien pone en el mercado un producto envasado debe pagar por la recolección y el reciclaje de ese envase cuando se convierte en residuo, en lugar de que lo paguen los municipios con los recursos de todos los contribuyentes.
+
+**Cómo funciona.** El sistema involucra a seis actores que se relacionan por tres tipos de flujos, que son el dinero, el material y la información y el control. Como muestra la @fig-flujos-rep, los productores e importadores declaran en el registro las toneladas que ponen en el mercado y pagan una contribución por tonelada a un sistema colectivo, que es una organización sin fines de lucro creada por ellos mismos y autorizada por la AAUD. El sistema usa esos recursos para pagar a los recolectores y a los recicladores de base por cada tonelada recolectada y clasificada, y ese material llega a las plantas de reciclaje, que lo devuelven a la industria. La AAUD autoriza el sistema, fija sus metas con base en el registro, recibe su informe anual auditado y sanciona a quien incumple. Los hogares y los comercios separan los envases y pagan, en el precio del producto, la contribución que trasladan los productores.
+
+```{r}
+#| label: fig-flujos-rep
+#| fig-cap: "Cómo funciona la REP de envases"
+#| fig-width: 7
+#| fig-height: 4.8
+
+nodos_rep <- tribble(
+  ~x, ~y, ~nombre,
+  1.5, 4.6, "Productores e\nimportadores",
+  5, 4.6, "Sistema colectivo\nde gestión",
+  8.5, 4.6, "AAUD",
+  5, 6.6, "Registro de productores\n(plataforma de la Ley 502)",
+  1.5, 1.5, "Hogares, comercios\ny turistas",
+  5, 1.5, "Recolectores y\nrecicladores de base",
+  8.5, 1.5, "Plantas de reciclaje\n(material a la industria)"
+)
+flechas_rep <- tribble(
+  ~x, ~y, ~xend, ~yend, ~tipo, ~etiqueta, ~lx, ~ly,
+  2.65, 4.6, 3.75, 4.6, "Dinero", "Contribución\npor tonelada", 3.2, 5.05,
+  5, 4.15, 5, 1.95, "Dinero", "Pago por tonelada\nrecolectada", 6.1, 3.05,
+  1.5, 1.95, 1.5, 4.15, "Dinero", "Precio que incluye\nla contribución", 2.65, 3.05,
+  2.75, 1.5, 3.8, 1.5, "Material", "Envases\nseparados", 3.27, 2.0,
+  6.2, 1.5, 6.95, 1.5, "Material", "Material\nclasificado", 6.57, 2.0,
+  2.2, 5.0, 3.6, 6.3, "Información y control", "Declaran\ntoneladas", 2.2, 5.9,
+  6.4, 6.3, 8.1, 5.0, "Información y control", "Base para metas\ny control", 7.95, 5.95,
+  8.05, 4.6, 6.25, 4.6, "Información y control", "Autoriza, fiscaliza y\nrecibe el informe", 7.15, 4.05
+)
+ggplot() +
+  geom_segment(data = flechas_rep, aes(x = x, y = y, xend = xend, yend = yend, color = tipo),
+               arrow = arrow(length = unit(0.1, "in"), type = "closed"), linewidth = 0.9) +
+  geom_text(data = flechas_rep, aes(x = lx, y = ly, label = etiqueta, color = tipo),
+            size = 2.5, lineheight = 0.9, show.legend = FALSE) +
+  geom_label(data = nodos_rep, aes(x = x, y = y, label = nombre), size = 2.8,
+             fill = "#F2F2F2", linewidth = 0.3, lineheight = 0.9) +
+  scale_color_manual(values = c("Dinero" = "#2E8B57", "Material" = "#8C564B", "Información y control" = "#009EDB")) +
+  scale_x_continuous(limits = c(-0.2, 10.2)) +
+  scale_y_continuous(limits = c(0.9, 7.2)) +
+  theme_void() +
+  theme(legend.position = "bottom", legend.title = element_blank())
+```
+
+*Fuente: elaboración propia con base en la Ley 276 de 2021 [@panama2021Ley276] y en el diseño del sistema chileno de envases [@mmaChile2020DS12Envases].*
+
+**Particularidades en Panamá.** Tres decisiones de diseño adaptan el modelo a las condiciones del país. La primera es que la REP puede empezar con resoluciones de la AAUD, porque la Ley 276 le da la facultad de proponer las normas de REP y de autorizar los sistemas de gestión [@panama2021Ley276, art. 74], aunque las metas con sanciones propias y el depósito obligatorio necesitan la ley de REP que se describe en la sección de reformas. La segunda es que buena parte de los obligados son importadores, de modo que la aduana es el principal control contra la evasión. La tercera es que la REP de neumáticos ya está en marcha, porque la Ley 518 de 2026 ordenó a la AAUD reglamentar un esquema en el que los importadores asumen el costo por unidad importada [@panama2026Ley518, art. 15], y conviene que ambos esquemas compartan el registro y las reglas de autorización.
+
+**Metas y montos.** La trayectoria de metas sigue la lógica de Chile y Colombia, que empezaron con metas de un dígito o cercanas a 10 % y las subieron a lo largo de una década. Aquí se propone una meta media para todos los materiales de 10 % en el primer año, 25 % en el quinto y 45 % en el décimo. Para estimar el costo se usó la experiencia de Chile, el país de la región con un sistema de REP de envases en operación. Su primer sistema colectivo de envases domiciliarios estimó un costo de entre 380.000 y 500.000 pesos chilenos por tonelada valorizada [@resimple2023Garantias], que equivalen a entre 549 y 722 dólares con el tipo de cambio de 692 pesos por dólar del estudio de impacto chileno [@mmaChile2020AGIESEnvases]. Ese costo por tonelada se multiplicó por las toneladas que habría que valorizar en Panamá para cumplir cada meta. Como muestra la @fig-rep-trayectoria, el costo del sistema crecería de entre `r formato_es(ra(2028, "costo_min_musd"), 0)` y `r formato_es(ra(2028, "costo_max_musd"), 0)` millones de dólares en 2028 a entre `r formato_es(ra(2037, "costo_min_musd"), 0)` y `r formato_es(ra(2037, "costo_max_musd"), 0)` millones en 2037. Estas cifras son un techo por dos razones. La base de toneladas incluye materiales que no son envases, y el peso chileno se ha depreciado desde que se hizo el estudio.
+
+```{r}
+#| label: fig-rep-trayectoria
+#| fig-cap: "Metas de valorización y costo anual de la REP de envases"
+#| fig-width: 7
+#| fig-height: 3.6
+
+ggplot(rep_anual, aes(x = anio)) +
+  geom_ribbon(aes(ymin = costo_min_musd, ymax = costo_max_musd), fill = "#8C564B", alpha = 0.3) +
+  geom_line(aes(y = (costo_min_musd + costo_max_musd) / 2), color = "#8C564B", linewidth = 0.8) +
+  geom_text(aes(y = costo_max_musd, label = paste0(formato_es(100 * meta_valorizacion, 0), " %")),
+            vjust = -0.7, size = 2.8, color = "gray30") +
+  scale_x_continuous(breaks = 2028:2037) +
+  scale_y_continuous(limits = c(0, 270)) +
+  labs(x = NULL, y = "Millones de dólares por año",
+       caption = "La banda indica el rango de costo; las cifras sobre la banda, la meta de valorización.") +
+  tema_grafico() +
+  theme(panel.grid.minor = element_blank())
+```
+
+*Fuente: elaboración propia con datos de residuos del Banco Mundial [@worldbank2026wwaste] y costos del sistema colectivo de envases de Chile [@resimple2023Garantias; @mmaChile2020AGIESEnvases]. Entre los años 1, 5 y 10 la meta se interpola de forma lineal.*
+
+Para un productor, la pregunta práctica es cuánto pagará por lo que vende. Si el sistema debe valorizar una fracción del envase puesto en el mercado y cada tonelada valorizada cuesta lo que cuesta en Chile, la contribución media por tonelada puesta en el mercado es la meta multiplicada por ese costo. Como muestra el @tbl-rep, en el primer año la contribución media sería de entre `r formato_es(ra(2028, "contribucion_min_usd_t"), 0)` y `r formato_es(ra(2028, "contribucion_max_usd_t"), 0)` dólares por tonelada, es decir, entre `r formato_es(ra(2028, "envase20g_min_centavos"), 2)` y `r formato_es(ra(2028, "envase20g_max_centavos"), 2)` centavos por un envase de 20 gramos, y al décimo año llegaría a entre `r formato_es(ra(2037, "envase20g_min_centavos"), 2)` y `r formato_es(ra(2037, "envase20g_max_centavos"), 2)` centavos. Son promedios para todos los materiales, porque en la práctica cada material tiene su propia tarifa, pero muestran que el costo por unidad es pequeño aunque el total sea grande. La OCDE estima que la administración de estos sistemas representa entre 5 % y 10 % del costo total, y que la mayor parte se va en la recolección y la clasificación [@ocde2016EPRPolicyHighlights].
+
+```{r}
+#| label: tbl-rep
+#| tbl-cap: "Trayectoria de la REP de envases y contribución media de los productores"
+
+rep_anual |>
+  filter(anio %in% c(2028, 2030, 2032, 2035, 2037)) |>
+  transmute(
+    Año = as.character(anio),
+    `Meta (%)` = 100 * meta_valorizacion,
+    `Toneladas valorizadas` = toneladas_valorizadas,
+    `Costo total (millones de US$)` = paste(formato_es(costo_min_musd, 0), "a", formato_es(costo_max_musd, 0)),
+    `Contribución por tonelada puesta en el mercado (US$)` = paste(formato_es(contribucion_min_usd_t, 0), "a", formato_es(contribucion_max_usd_t, 0)),
+    `Por envase de 20 g (centavos de US$)` = paste(formato_es(envase20g_min_centavos, 2), "a", formato_es(envase20g_max_centavos, 2))
+  ) |>
+  tabla_ft_es(digitos = 0, enteros = c("Meta (%)", "Toneladas valorizadas"), anchos_cm = c(1.6, 1.8, 2.8, 3.2, 4.2, 3.8), tamano = 7.5)
+```
+
+*Fuente: elaboración propia con base en los mismos datos de la figura anterior. El peso de 20 gramos es ilustrativo, cercano al de una botella plástica pequeña.*
+
+**Riesgos.** Cuatro riesgos requieren atención desde el diseño. Los importadores que no se inscriben, que se controlan con el registro precargado con datos de aduana; la concentración de mercado en los sistemas colectivos, que se controla con licitaciones competitivas de los servicios y con la opinión de ACODECO, como recomienda la OCDE [@ocde2016EPRPolicyHighlights]; que los recursos de la REP terminen cubriendo el déficit del aseo, que se evita porque los administran los sistemas colectivos en lugar de la AAUD y las metas imposibles de verificar, que se evitan con la auditoría independiente.
+
+**Pasos.** Como muestra el @tbl-pasos-rep, la ley y la norma de REP de envases se preparan en el segundo semestre de 2027, los sistemas colectivos se constituyen y se autorizan en el primer semestre de 2028 con la meta de 10 %, las licitaciones de recolección se hacen en el segundo semestre y el primer informe auditado se publica en 2029.
+
+```{r}
+#| label: tbl-pasos-rep
+#| tbl-cap: "Pasos de la REP de envases"
+
+tabla_pasos(3)
+```
+
+*Fuente: elaboración propia.*
+
+## Segunda edición de la taxonomía de finanzas sostenibles
+
+**Qué es y para qué sirve.** La taxonomía es una lista de actividades económicas con criterios técnicos que indican cuándo una actividad contribuye de forma sustancial a un objetivo ambiental, de modo que un banco o un inversionista pueda llamar verde a un crédito o a un bono con fundamento. Sin criterios circulares, la economía circular es invisible para el sistema financiero.
+
+**Cómo funciona en Panamá.** Panamá adoptó su Taxonomía de Finanzas Sostenibles en 2024 e incluyó la transición hacia una economía circular entre sus siete objetivos, pero en esta primera edición solo definió criterios de contribución sustancial para la mitigación del cambio climático y la adaptación a él [@sbp2024TaxonomiaPanama, pp. 43-44]. Por eso, la guía para bancos indica que las operaciones circulares deben marcarse como contingentes hasta que una edición posterior fije los criterios [@sbp2025GuiaTFSBancos]. La segunda edición tiene ya un punto de partida, pues la edición vigente contiene, como requisitos de no causar daño, la recolección segregada, el compostaje y el aprovechamiento de residuos como materia prima en la gestión de residuos y la reutilización o el reciclaje de al menos 20 % de los desechos de obra en la construcción [@sbp2024TaxonomiaPanama, pp. 90, 93 y 100], y su gobernanza incluye un grupo técnico de gestión de residuos [@sbp2024TaxonomiaPanama, p. 29]. Basta convertir esos requisitos en criterios de contribución sustancial.
+
+**Cuánto cuesta y quién paga.** El costo es bajo y lo cubren las superintendencias con apoyo de la cooperación técnica.
+
+**Riesgos.** Criterios demasiado exigentes para las empresas pequeñas, que se evitan con criterios simplificados para pymes, y etiquetas verdes sin sustento, que se evitan con revisión externa.
+
+**Pasos.** Como muestra el @tbl-pasos-taxonomia, los criterios se redactan en el segundo semestre de 2027, la segunda edición se aprueba en el primer semestre de 2028 y el reporte de la cartera alineada empieza en el segundo.
+
+```{r}
+#| label: tbl-pasos-taxonomia
+#| tbl-cap: "Pasos de la segunda edición de la taxonomía"
+
+tabla_pasos(10)
+```
+
+*Fuente: elaboración propia.*
+
+## Depósito y retorno de envases de bebidas
+
+**Qué es y para qué sirve.** En un sistema de depósito y retorno, el consumidor paga un pequeño monto adicional al comprar una bebida envasada y lo recupera al devolver el envase vacío. El depósito es un incentivo para devolver el envase, y lo que se recauda por los envases que no se devuelven ayuda a financiar el sistema. Es el instrumento con la evidencia internacional más sólida, con tasas de recolección superiores a 85 % en los sistemas europeos que operan plenamente [@sidorczuk2025DepositReturn].
+
+**Cómo funciona en Panamá.** El sistema propuesto cubre las botellas de PET, las latas de aluminio y el vidrio de bebidas, y lo operan los productores dentro de la REP de envases, con un administrador único autorizado por la AAUD [@panama2021Ley276, art. 74]. La red de retorno incluye comercios, hoteles y restaurantes, lo que da al turismo un papel activo, y la meta es acercarse al estándar europeo de 90 % de recolección separada de botellas para 2029 [@ue2025Reglamento40, art. 50]. La particularidad de Panamá es su exposición al fraude, porque tiene fronteras terrestres con dos países y una zona libre de comercio. Antes de cobrar el primer depósito, los envases deben llevar una marca que identifique que se pusieron en el mercado panameño, y la aduana debe controlar su entrada. Sin ese control se repetiría el caso de Ecuador, donde se devolvieron más botellas de las que se vendieron [@sri2014IRBPNR].
+
+**Cuánto cuesta y quién paga.** El sistema se autofinancia con los depósitos no reclamados y la venta del material. Un costo de operación igual a 1 % del valor de la producción de bebidas elevaría la canasta de los hogares en `r formato_es(hog("deposito"), 3)` % [@vargas2026Factibilidad].
+
+**Riesgos.** El fraude por envases importados sin depósito y el desplazamiento de los recicladores, que se evitan con el marcaje, el control en frontera y la incorporación de los recicladores a la red de retorno.
+
+**Pasos.** Como muestra el @tbl-pasos-deposito, el diseño y el marcaje se preparan durante 2028, el administrador se autoriza en el segundo semestre de ese año y el cobro del depósito empieza en el primer semestre de 2029.
+
+```{r}
+#| label: tbl-pasos-deposito
+#| tbl-cap: "Pasos del depósito y retorno"
+
+tabla_pasos(5)
+```
+
+*Fuente: elaboración propia.*
+
+## Contenido reciclado
+
+**Qué es y para qué sirve.** Una norma de contenido reciclado obliga a que ciertos productos incorporen un porcentaje mínimo de material recuperado. Crea demanda para lo que recolectan la REP y el depósito, y cierra el círculo.
+
+**Cómo funciona en Panamá.** El MICI elabora los reglamentos técnicos por medio de su Dirección General de Normas y Tecnología Industrial, y ya existe un precedente de obligación, pues la Ley 518 de 2026 obliga a usar caucho reciclado en el asfalto [@panama2026Ley518]. La Hoja de Ruta propone dos normas. La primera es una norma de áridos reciclados para la construcción, que la DGCP puede exigir en los pliegos de obra pública. La segunda es una norma de PET reciclado de grado alimentario con un contenido mínimo gradual en las botellas, hasta 25 %, que es el nivel que la Unión Europea exige desde 2025 [@ue2019Directiva904].
+
+**Cuánto cuesta y quién paga.** No tiene costo fiscal. Lo pagan los productores, en la medida en que el material reciclado sea más caro que el virgen.
+
+**Riesgos.** Que la oferta nacional de material reciclado de calidad no alcance, lo que se evita con metas graduales que empiezan después de que la REP y el depósito aumentan la oferta.
+
+**Pasos.** Como muestra el @tbl-pasos-contenido, las normas técnicas se aprueban en el segundo semestre de 2028, la exigencia en la obra pública empieza en 2029 y el contenido mínimo en botellas se fija en el segundo semestre de ese año.
+
+```{r}
+#| label: tbl-pasos-contenido
+#| tbl-cap: "Pasos del contenido reciclado"
+
+tabla_pasos(6)
+```
+
+*Fuente: elaboración propia.*
+
+## Emisión soberana temática
+
+**Qué es y para qué sirve.** Un bono temático es un título de deuda cuyos fondos se destinan a proyectos con beneficios ambientales o sociales. Una emisión soberana de este tipo daría a los proyectos públicos de residuos y agua acceso a financiamiento de largo plazo y obligaría al Estado a reportar en qué se usaron los recursos.
+
+**Cómo funciona en Panamá.** El marco ya existe. El Marco de Financiamiento Sostenible de la República incluye una categoría de prevención y control de la contaminación con procesos de economía circular, que abarca el reciclaje, la reutilización, la reparación y el reacondicionamiento de residuos, y una evaluación independiente lo calificó de forma favorable [@mef2024MarcoFinanciamientoSostenible; @sustainablefitch2024SPOPanama]. El marco solo financia inversión pública incluida en el presupuesto, de modo que el trabajo previo es identificar los proyectos de residuos y agua que califican. Hasta ahora no se ha emitido un bono bajo ese marco, y la estrategia de deuda de mediano plazo 2025-2029 no menciona los bonos temáticos [@mef2025EstrategiaDeuda], por lo que el primer paso es incluir la emisión en esa estrategia.
+
+**Cuánto cuesta y quién paga.** Lo pagan los contribuyentes como cualquier deuda pública, dentro de los límites de la regla fiscal; el costo adicional de la etiqueta es el de la revisión externa y los informes.
+
+**Riesgos.** Una cartera de proyectos demasiado pequeña, que se evita preparándola desde 2028 con la AAUD y el Ministerio de Ambiente.
+
+**Pasos.** Como muestra el @tbl-pasos-bonos, la cartera de proyectos y la estrategia de deuda se preparan en 2028 y la primera emisión se hace en el segundo semestre de 2029.
+
+```{r}
+#| label: tbl-pasos-bonos
+#| tbl-cap: "Pasos de la emisión soberana temática"
+
+tabla_pasos(11)
+```
+
+*Fuente: elaboración propia.*
+
+## Asociación público-privada de residuos de Panamá y San Miguelito
+
+**Qué es y para qué sirve.** Una asociación público-privada es un contrato de largo plazo en el que una empresa privada financia, construye y opera una infraestructura pública a cambio de pagos que dependen de su desempeño. Permite construir plantas de clasificación y valorización a una escala que el presupuesto de la AAUD no alcanza.
+
+**Cómo funciona en Panamá.** La Ley 93 de 2019 regula estas asociaciones, con un monto mínimo de B/.15 millones salvo en los proyectos municipales [@panama2019Ley93, art. 6]. La AAUD y el MEF pidieron al BID los estudios de prefactibilidad de un proyecto de gestión integral de residuos para Panamá y San Miguelito, que son los distritos más poblados, y la decisión de usar la modalidad corresponde al Consejo de Gabinete [@bid2024TdRResiduosAPP]. El contrato debe incluir pagos por desempeño (por ejemplo, por tonelada valorizada) y cláusulas de inclusión de los recicladores. Su viabilidad depende de la tarifa a costo real, porque el operador privado necesita un flujo de pagos confiable durante todo el contrato y de que el contrato tenga el refrendo de la Contraloría, cuya ausencia hizo que se cuestionaran los contratos de recolección que la AAUD firmó en San Miguelito en 2026 [@prensa2026AAUDSanMiguelito].
+
+**Cuánto cuesta y quién paga.** El capital lo pone el operador privado, con posible apoyo del BID y de la banca local, y lo recupera con los pagos que financia la tasa de gestión.
+
+**Riesgos.** Contratos cuestionados y un flujo de residuos insuficiente, que se previenen con licitación pública, refrendo previo y estudios de flujo.
+
+**Pasos.** Como muestra el @tbl-pasos-app, la prefactibilidad se completa en 2027, la modalidad se decide y se licita en 2028 y el contrato se firma en el primer semestre de 2029.
+
+```{r}
+#| label: tbl-pasos-app
+#| tbl-cap: "Pasos de la APP de residuos"
+
+tabla_pasos(13)
+```
+
+*Fuente: elaboración propia.*
+
+## Ecomodulación de las contribuciones
+
+**Qué es y para qué sirve.** La ecomodulación ajusta la contribución que paga cada productor según qué tan reciclable es su envase. Mantiene el monto total que recauda el sistema y lo redistribuye, de modo que pagan menos quienes usan envases reciclables, de un solo material o con contenido reciclado, y más quienes usan envases difíciles de reciclar. Así la REP financia el reciclaje y además premia el rediseño.
+
+**Cómo funciona en Panamá.** La ecomodulación es el último instrumento de la secuencia porque solo puede operar cuando los sistemas colectivos ya cobran contribuciones. En Chile, el decreto de envases fija la tarifa en proporción a los envases introducidos, con recargos y bonificaciones según su dificultad de recolección y de valorización y según el uso de material reciclado nacional [@mmaChile2020DS12Envases, art. 20]. En Panamá, los criterios de reciclabilidad los definen la AAUD y la Dirección General de Normas y Tecnología Industrial, y los sistemas colectivos los aplican con aprobación de la AAUD.
+
+**Cuánto cuesta y quién paga.** Es neutral en recaudación. Lo que unos productores pagan de más, otros lo pagan de menos.
+
+**Riesgos.** Diferencias de tarifa demasiado pequeñas para cambiar el diseño de los envases, lo que se vigila con una revisión cada dos años.
+
+**Pasos.** Como muestra el @tbl-pasos-ecomodulacion, los criterios se definen en el segundo semestre de 2029, la ecomodulación se aplica desde 2030 y su efecto se revisa en 2032.
+
+```{r}
+#| label: tbl-pasos-ecomodulacion
+#| tbl-cap: "Pasos de la ecomodulación"
+
+tabla_pasos(4)
+```
+
+*Fuente: elaboración propia.*
 
 # Actores y roles
 
-Los instrumentos funcionan solo si cada actor sabe qué le corresponde hacer. La implementación descansa en seis instituciones públicas, con roles que ya les asignan sus leyes. La AAUD es la autoridad de la REP, del depósito y de la tasa de aseo. El Ministerio de Ambiente reglamenta la Ley 502, opera la plataforma de indicadores y coordina el Consejo Nacional de Economía Circular. El Ministerio de Economía y Finanzas reglamenta los incentivos fiscales, emite la deuda temática y administra, junto con el Banco Nacional, el fondo de garantías. La aduana, el Ministerio de Comercio e Industrias y la Autoridad de Protección al Consumidor y Defensa de la Competencia controlan las importaciones y el comercio. La Dirección General de Contrataciones Públicas aplica los criterios de compra. Las superintendencias gobiernan la taxonomía. Del lado privado, los productores e importadores organizan los sistemas colectivos, y la banca, la bolsa y la banca multilateral proveen el financiamiento. Los municipios regulan la separación de residuos y fijan tasas donde prestan el servicio. El @tbl-roles presenta el responsable y la fuente de recursos de cada instrumento.
+## Quién lidera y quién participa
+
+Los instrumentos funcionan solo si cada actor sabe qué le corresponde hacer. La matriz de roles se armó a partir de los pasos de implementación y de las funciones que las leyes asignan a cada institución. Como muestra la @fig-roles, la AAUD lidera cinco de los catorce instrumentos, todos los de residuos, y participa en otros cinco, lo que confirma que su capacidad financiera y operativa es la condición de la que depende la mayor parte de la Hoja de Ruta. El Ministerio de Ambiente y el MEF lideran dos instrumentos cada uno y participan en varios más, y los productores e importadores participan en cinco, siempre en los instrumentos que les imponen obligaciones.
 
 ```{r}
-#| label: tbl-roles
-#| tbl-cap: "Actores y roles por instrumento"
+#| label: fig-roles
+#| fig-cap: "Actores que lideran y participan en cada instrumento"
+#| fig-width: 7
+#| fig-height: 5.2
 
-diseno |>
-  arrange(id) |>
-  transmute(Instrumento = instrumento, `Responsable y actores` = responsable, `Fuente de recursos` = fuente_recursos) |>
-  tabla_ft_es(digitos = 0, anchos_cm = c(5, 7, 5.4), lineas_tenues = TRUE, tamano = 7)
+orden_actores <- roles |> count(actor) |> arrange(n) |> pull(actor)
+roles |>
+  left_join(corto, by = "id") |>
+  mutate(actor = factor(actor, levels = orden_actores),
+         nombre = factor(nombre, levels = corto$nombre[order(diseno$anio_inicio[match(corto$id, diseno$id)], corto$id)])) |>
+  ggplot(aes(x = nombre, y = actor, fill = rol)) +
+  geom_tile(color = "white", linewidth = 0.8) +
+  scale_fill_manual(values = c("Lidera" = "#2E8B57", "Participa" = "#C9E3D1")) +
+  scale_x_discrete(labels = \(x) str_wrap(x, 12)) +
+  labs(x = NULL, y = NULL) +
+  tema_grafico() +
+  theme(axis.text.x = element_text(size = 6.5, angle = 90, hjust = 1, vjust = 0.5),
+        axis.text.y = element_text(size = 7.5), panel.grid = element_blank())
 ```
 
-*Fuente: elaboración propia con base en las funciones legales de cada institución.*
+*Fuente: elaboración propia con base en los pasos de implementación y en las funciones legales de cada institución. Los instrumentos están ordenados por su año de entrada en operación.*
 
-El monitoreo y la evaluación requieren además una instancia de coordinación. La Hoja de Ruta propone que el Consejo Nacional de Economía Circular incorpore al Ministerio de Economía y Finanzas y a la aduana, que hoy no lo integran pese a ser piezas centrales de la recaudación y el control [@panama2025Ley502, art. 9], y que el Ministerio de Ambiente publique el reporte de indicadores que la ley le ordena presentar cada tres años [@panama2025Ley502, art. 11]. La Contraloría General de la República fiscaliza el uso de los fondos públicos y refrenda los contratos de gestión de residuos [@panama1984Ley32].
+## Qué le toca a cada actor
+
+**Autoridad de Aseo Urbano y Domiciliario.** Lidera la tarifa a costo real, la REP, el depósito, la ecomodulación y la formalización de los recicladores. Dicta las normas de REP por flujo, autoriza y fiscaliza los sistemas colectivos y el administrador del depósito, aprueba el pliego tarifario con consulta ciudadana y opera el sistema de información de residuos. Su primera tarea es sanear sus finanzas con la tarifa escalonada, separar en su contabilidad los recursos de la tasa de los que provengan de la REP y reducir la morosidad con el cobro en la factura eléctrica.
+
+**Ministerio de Ambiente.** Reglamenta la Ley 502, opera el registro de productores y la plataforma de indicadores, avala las plantas de reciclaje que reciben incentivos, coordina la formación y publica el reporte trienal. Tiene cinco fondos de destino específico, ninguno de economía circular [@panama2015Ley8], de modo que conviene abrir una subcuenta de economía circular en uno de ellos para financiar el registro y la plataforma.
+
+**Ministerio de Economía y Finanzas.** Reglamenta los incentivos fiscales y reporta su costo, prepara la emisión soberana temática, coordina con el Banco Nacional y el BID la ventana del fondo de garantías y participa en la decisión de la asociación público-privada. La Ley 502 no le asigna ningún papel, de modo que su participación debe asegurarse en el reglamento.
+
+**Aduana, MICI y ACODECO.** Forman la cadena de control que ya funciona para la ley de plásticos, en la que la aduana restringe las importaciones y entrega las estadísticas, el MICI certifica los productos y ACODECO sanciona su comercio; esta última impuso 397 sanciones por la ley de bolsas entre 2019 y junio de 2026 [@estrella2026AcodecoBolsas]. En la Hoja de Ruta, la aduana alimenta el registro y controla en frontera los envases del depósito, el MICI dicta las normas técnicas de contenido reciclado y de reciclabilidad, y ACODECO controla el comercio y opina sobre la competencia en los sistemas colectivos.
+
+**Dirección General de Contrataciones Públicas.** Lidera las compras públicas circulares y exige áridos reciclados en la obra pública. Como es una institución pequeña, su trabajo se apoya en fichas técnicas estándar y en la etiqueta de PanamaCompra.
+
+**Superintendencias.** Las de bancos, mercado de valores y seguros lideran la segunda edición de la taxonomía, y la de bancos pide el reporte de la cartera alineada y reconoce las garantías del fondo.
+
+**AMPYME y Banco Nacional.** Operan la ventana circular del fondo de garantías, el Banco Nacional como fiduciario y la AMPYME con su registro de empresas pequeñas.
+
+**Municipios.** Regulan la separación de residuos, fijan tasas donde prestan el servicio, censan a los recicladores con la AAUD y pueden cobrar cargos por visitante en los destinos turísticos.
+
+**Autoridad de Turismo.** Lanza la certificación de sostenibilidad turística y, desde la Junta Directiva de la AAUD, coordina las tarifas de los destinos.
+
+**Productores e importadores.** Se inscriben en el registro, constituyen los sistemas colectivos, financian la REP y el depósito y marcan sus envases.
+
+**Banca y banca multilateral.** Los bancos otorgan los créditos garantizados y suscriben los bonos; el BID financia el fondo de garantías y la preparación de la asociación público-privada.
+
+## Coordinación, monitoreo y evaluación
+
+La coordinación requiere una instancia que reúna a quienes regulan, recaudan y controlan. La composición del Consejo Nacional de Economía Circular está fijada en la Ley 502 y no incluye al MEF, a la aduana, a ACODECO ni a la DGCP, mientras que la AAUD solo tiene voz [@panama2025Ley502, arts. 8-9]. Como un reglamento no puede cambiar esa composición, la Hoja de Ruta propone que el reglamento de la Ley 502 cree una comisión técnica de financiamiento y control del Consejo, en la que participen de forma permanente esas cinco instituciones. La comisión daría seguimiento semestral al calendario de hitos y prepararía el reporte de indicadores que el Ministerio de Ambiente debe publicar cada tres años [@panama2025Ley502, art. 11]. La Contraloría General de la República fiscaliza el uso de los fondos públicos y refrenda los contratos de gestión de residuos [@panama1984Ley32].
 
 # Fuentes de financiamiento
 
-Una de las ventajas de los instrumentos propuestos es que la mayor parte de los recursos no proviene del presupuesto público. Como muestra el @tbl-fuentes, la REP y el depósito se financian con aportes de los productores y con los depósitos que no se reclaman, la tarifa de aseo con los pagos de quienes usan el servicio, los incentivos fiscales con impuestos que el Estado deja de cobrar, y el crédito y las garantías con recursos de la banca multilateral. El sistema bancario tiene la escala para financiar proyectos circulares, pues su cartera de crédito local supera los 60.000 millones de dólares [@sbp2026IAB092026], pero necesita criterios de clasificación y garantías para atender a negocios que hoy considera de riesgo alto. Entre las fuentes internacionales, el Fondo Verde del Clima tiene un programa para instituciones financieras locales [@gcf2026Panama] y el BID financia la preparación de la asociación público-privada de residuos de Panamá y San Miguelito [@bid2024TdRResiduosAPP].
+La mayor parte de los recursos que movilizan los instrumentos no proviene del presupuesto público. Como muestra el @tbl-montos, los flujos anuales más grandes son los de la REP (que pagan los productores e importadores) y los de la tarifa de aseo y la tasa de obra, que pagan los usuarios; a ellos se suman el fondo de garantías existente y los bonos verdes que ya emite una empresa de reciclaje. Los flujos de la REP crecen con las metas y en el décimo año superarían varias veces la brecha actual del servicio de aseo.
+
+```{r}
+#| label: tbl-montos
+#| tbl-cap: "Montos de referencia por fuente"
+
+montos |>
+  transmute(Fuente = fuente, `Quién paga` = quien_paga, `Monto de referencia` = monto, Naturaleza = naturaleza) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(5, 4, 5, 3.4), lineas_tenues = TRUE, tamano = 7.5)
+```
+
+*Fuente: elaboración propia con base en las secciones anteriores, en la AAUD [@estrella2026AAUDMorosidad], en el Fondo de Garantías [@sbp2025Acuerdo8] y en Latinex [@latinex2026EmisionesSostenibles].*
+
+Las fuentes pueden ordenarse por su origen y por su tipo. Como muestra el @tbl-fuentes, las nacionales privadas (contribuciones de REP, depósitos y bonos corporativos) financian los instrumentos de residuos, las nacionales públicas (tasas, presupuesto, gasto tributario y deuda) financian el servicio de aseo, el registro, las compras y la infraestructura y las internacionales (BID, Fondo Verde del Clima y cooperación técnica) financian las garantías, la preparación de proyectos y el diseño. El sistema bancario tiene la escala para financiar proyectos circulares, pues su cartera de crédito local supera los 60.000 millones de dólares [@sbp2026IAB092026], pero necesita los criterios de la taxonomía y las garantías del fondo para atender a negocios que hoy considera de riesgo alto. Entre las fuentes internacionales, el Fondo Verde del Clima tiene un programa para instituciones financieras locales [@gcf2026Panama].
 
 ```{r}
 #| label: tbl-fuentes
@@ -286,24 +984,79 @@ fuentes |>
 
 # Reformas normativas e institucionales
 
-Las normas que hacen falta se ordenan aquí por su nivel jurídico, desde la ley hasta el acuerdo municipal, porque cada nivel tiene un procedimiento y un plazo distinto. Como muestra el @tbl-reformas, solo una de las reformas requiere una ley: la ley de REP con metas, sistemas colectivos, sanciones y depósito obligatorio. Las demás son reglamentos del Órgano Ejecutivo, resoluciones de instituciones que ya tienen la facultad, acuerdos de las superintendencias y acuerdos municipales. La reforma más urgente es el reglamento de la Ley 502, porque crea el registro de productores sobre el que descansan los instrumentos del segundo paso. Entre las reformas institucionales destacan la ampliación del Consejo Nacional de Economía Circular, un plan de saneamiento financiero de la AAUD que separe en su contabilidad los recursos de la REP y los de la tasa, y convenios de intercambio de datos entre la aduana, el Ministerio de Comercio e Industrias y el Ministerio de Ambiente.
+## Reformas por nivel jurídico
+
+Las normas que hacen falta se ordenan por su nivel jurídico, desde la ley hasta el acuerdo municipal, porque cada nivel tiene un emisor, un procedimiento y un plazo distintos. Una ley la aprueba la Asamblea Nacional, un decreto ejecutivo lo emite el Órgano Ejecutivo, una resolución la dicta la institución que tiene la facultad y un acuerdo municipal lo aprueba el concejo de cada municipio. Como muestra el @tbl-reformas, solo una reforma requiere una ley, la de REP con metas, sistemas colectivos, sanciones y depósito obligatorio. Las demás son reglamentos, resoluciones y acuerdos, y la más urgente es el reglamento de la Ley 502, porque crea el registro de productores sobre el que descansan los instrumentos del segundo paso.
 
 ```{r}
 #| label: tbl-reformas
 #| tbl-cap: "Reformas normativas por nivel jurídico"
 
+nombre_id <- setNames(corto$nombre, corto$id)
 reformas |>
+  mutate(instrumentos = map_chr(str_split(instrumentos, ",\\s*"), \(v) paste(nombre_id[v], collapse = "; "))) |>
   transmute(Nivel = nivel, Reforma = reforma, Emisor = emisor, Instrumentos = instrumentos) |>
-  tabla_ft_es(digitos = 0, anchos_cm = c(2.8, 8, 4.6, 2), lineas_tenues = TRUE, tamano = 7)
+  tabla_ft_es(digitos = 0, anchos_cm = c(2.6, 7.2, 4, 3.6), lineas_tenues = TRUE, tamano = 7)
 ```
 
-*Fuente: elaboración propia con base en la Constitución y en las leyes 502 de 2025, 276 de 2021, 223 de 2021, 51 de 2010 y 22 de 2006. Los números de la última columna identifican a los instrumentos en el orden en que los presentó el estudio sectorial [@vargas2026SectoresPriorizados].*
+*Fuente: elaboración propia con base en la Constitución y en las leyes 502 de 2025, 276 de 2021, 223 de 2021, 51 de 2010 y 22 de 2006.*
 
-La ley de REP requiere una decisión de diseño con consecuencias constitucionales. Si las contribuciones de los productores las cobran y administran los sistemas colectivos, son obligaciones privadas reguladas por el Estado, como las que tienen Chile y Colombia. Si en cambio las cobrara el Estado, serían contribuciones tributarias, y la Constitución exigiría que las propusiera el Ejecutivo con autorización del Consejo de Gabinete o una comisión permanente de la Asamblea [@panama2004Constitucion, arts. 52 y 165]. La Hoja de Ruta recomienda el primer diseño, que es más sencillo de aprobar y mantiene los recursos dentro del sistema de gestión de residuos.
+## Contenido de la ley de REP
+
+La ley de REP es la reforma de mayor jerarquía y conviene que llegue a la Asamblea con un contenido completo. Como muestra el @tbl-ley-rep, la ley debe definir quién es productor, qué productos cubre, qué obligaciones tiene cada productor, cómo se autorizan los sistemas colectivos, quién fija las metas, cómo se cobran las contribuciones, cómo se incluye a los recicladores, cómo funciona el depósito obligatorio, cómo se protege la competencia y quién sanciona. Cada elemento tiene un referente en la experiencia internacional o en la ley panameña vigente.
+
+```{r}
+#| label: tbl-ley-rep
+#| tbl-cap: "Contenido mínimo de la ley de REP"
+
+normas |>
+  filter(norma == "Ley de REP") |>
+  transmute(Elemento = elemento, Contenido = contenido, Referencia = referencia) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(3, 10, 4.4), lineas_tenues = TRUE, tamano = 7.5)
+```
+
+*Fuente: elaboración propia con base en la Ley 20.920 de Chile [@chile2016Ley20920], el decreto de envases de Chile [@mmaChile2020DS12Envases], la guía de la OCDE [@ocde2016EPR], el Reglamento 2025/40 de la Unión Europea [@ue2025Reglamento40] y las leyes 276 de 2021 y 502 de 2025.*
+
+La ley requiere además una decisión de diseño con consecuencias constitucionales. Si las contribuciones de los productores las cobran y administran los sistemas colectivos, son obligaciones privadas reguladas por el Estado, como las que tienen Chile y Colombia. Si en cambio las cobrara el Estado, serían contribuciones tributarias, la Constitución exigiría que las propusiera el Ejecutivo con autorización del Consejo de Gabinete o una comisión permanente de la Asamblea [@panama2004Constitucion, arts. 52 y 165], y los recursos ingresarían al Tesoro y quedarían sujetos al presupuesto y a la regla fiscal. La Hoja de Ruta recomienda el primer diseño, que es más sencillo de aprobar y mantiene los recursos dentro del sistema de gestión de residuos.
+
+## Contenido del reglamento de la Ley 502
+
+El reglamento de la Ley 502 es la reforma más urgente, porque la mayoría de los instrumentos del segundo paso dependen de él. Como muestra el @tbl-reglamento, debe crear el registro de productores, definir la plataforma de indicadores, crear la comisión técnica de financiamiento y control, repartir las funciones entre el Ministerio de Ambiente y la AAUD, y fijar el procedimiento para incorporar esta Hoja de Ruta al Plan Estratégico Nacional. El Ministerio de Ambiente empezó a redactarlo en 2026 [@miambiente2026ReglamentoLey502], y estos contenidos pueden incorporarse a ese trabajo.
+
+```{r}
+#| label: tbl-reglamento
+#| tbl-cap: "Contenido mínimo del reglamento de la Ley 502"
+
+normas |>
+  filter(norma == "Reglamento de la Ley 502") |>
+  transmute(Elemento = elemento, Contenido = contenido, Referencia = referencia) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(3.4, 10, 4), lineas_tenues = TRUE, tamano = 7.5)
+```
+
+*Fuente: elaboración propia con base en la Ley 502 de 2025 [@panama2025Ley502] y la Ley 276 de 2021 [@panama2021Ley276].*
+
+## Reformas institucionales
+
+Tres reformas institucionales acompañan a las normativas. La primera es la comisión técnica de financiamiento y control del Consejo Nacional de Economía Circular. La segunda es un plan de saneamiento financiero de la AAUD que separe en su contabilidad los recursos de la tasa y los de la REP, para que unos no cubran los déficits de los otros. La tercera son los convenios de intercambio de datos entre la aduana, el MICI, la AAUD y el Ministerio de Ambiente, que alimentan el registro.
+
+# Riesgos y medidas de mitigación
+
+Cada instrumento tiene riesgos que se pueden anticipar desde el diseño, y muchos de ellos se han materializado en otros países o en el propio Panamá. Como muestra el @tbl-riesgos, los riesgos más graves son la evasión de productores e importadores, el fraude en el depósito, la colusión en los sistemas colectivos y el rechazo de la tarifa. Casi todas las medidas de mitigación dependen de tres piezas que ya están en el primer paso, que son el registro precargado con datos de aduana, la consulta ciudadana bien preparada y la separación de los recursos de la REP y de la tasa.
+
+```{r}
+#| label: tbl-riesgos
+#| tbl-cap: "Riesgos y medidas de mitigación"
+
+riesgos |>
+  transmute(Riesgo = riesgo, Instrumentos = instrumentos, Mitigación = mitigacion, Responsable = responsable) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(4.6, 3, 6.4, 3.4), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia con base en la experiencia de Ecuador [@sri2014IRBPNR], la guía de la OCDE [@ocde2016EPRPolicyHighlights] y la evaluación de factibilidad [@vargas2026Factibilidad].*
 
 # Articulación con la Ley 502 y otros instrumentos nacionales
 
-La Hoja de Ruta desarrolla las finalidades de la Ley 502 y se apoya en otras políticas nacionales, de modo que puede incorporarse directamente al Plan Estratégico Nacional de Economía Circular que el Consejo debe elaborar [@panama2025Ley502, art. 10]. Como muestra el @tbl-articulacion, cada instrumento responde a un artículo de la Ley 502, a otra ley vigente o a una política nacional ya adoptada, como la Hoja de Ruta de Economía Circular, la Hoja de Ruta de plásticos, el Plan Nacional de Gestión Integral de Residuos, la taxonomía de finanzas sostenibles o el plan maestro de turismo sostenible.
+La Hoja de Ruta desarrolla las finalidades de la Ley 502 y se apoya en otras políticas nacionales, de modo que puede incorporarse directamente al Plan Estratégico Nacional de Economía Circular que el Consejo debe elaborar cada cuatro años [@panama2025Ley502, art. 10]. Como muestra el @tbl-articulacion, cada instrumento responde a un artículo de la Ley 502, a otra ley vigente o a una política nacional ya adoptada, como la Hoja de Ruta de Economía Circular, la Hoja de Ruta de plásticos, el Plan Nacional de Gestión Integral de Residuos, la taxonomía de finanzas sostenibles o el plan maestro de turismo sostenible.
 
 ```{r}
 #| label: tbl-articulacion
@@ -315,8 +1068,10 @@ tribble(
   "Ley 502 de 2025", "Plataforma de indicadores en el SINIA (art. 11)", "Registro de productores, indicadores, reporte trienal",
   "Ley 502 de 2025", "Criterios de economía circular en las compras públicas (art. 12)", "Compras públicas circulares",
   "Ley 276 de 2021", "REP, tasa de gestión, incentivos y facultades de la AAUD (art. 7, 52, 66 y 74)", "REP, depósito, tarifa, incentivos, recicladores",
-  "Ley 33 de 2018", "Programas de recuperación de residuos de manejo especial (art. 6)", "REP por flujo",
+  "Ley 51 de 2010", "Tarifas por nivel socioeconómico, Fondo de Aseo y cobro en la factura eléctrica (art. 8-9, 19-21 y 30-31)", "Tarifa de aseo",
+  "Ley 33 de 2018", "Programas de recuperación de residuos de manejo especial (art. 6) y compras públicas (art. 28)", "REP por flujo, compras públicas",
   "Ley 187 de 2020", "Reemplazo de plásticos de un solo uso y cadena de control", "Registro y control en aduana",
+  "Ley 518 de 2026", "Costo de gestión de neumáticos por unidad importada y caucho reciclado en el asfalto", "REP por flujo, contenido reciclado",
   "Hoja de Ruta de Economía Circular (2024)", "Seis sectores, líneas transversales y prefactibilidad del depósito en la ciudad de Panamá", "Todos",
   "Hoja de Ruta de plásticos (2026)", "Recomendación de una ley de REP", "Ley de REP",
   "Plan Nacional de Gestión Integral de Residuos 2017-2027", "Metas de reutilización y reciclaje; flujos candidatos de REP", "REP, tarifa, APP",
@@ -327,34 +1082,39 @@ tribble(
   tabla_ft_es(digitos = 0, anchos_cm = c(4.6, 7.2, 5.6), lineas_tenues = TRUE, tamano = 7)
 ```
 
-*Fuente: elaboración propia con base en las leyes 502 de 2025 [@panama2025Ley502], 276 de 2021 [@panama2021Ley276], 33 de 2018 [@panama2018Ley33] y 187 de 2020 [@panama2020Ley187], la Hoja de Ruta de Economía Circular [@miambiente2024HojaRutaEC], la Hoja de Ruta de plásticos [@miambiente2026ResDM0351], el Plan Nacional de Gestión Integral de Residuos [@aaud2017PNGIR], la taxonomía [@sbp2024TaxonomiaPanama], el marco de financiamiento [@mef2024MarcoFinanciamientoSostenible] y el plan maestro de turismo [@atp2025PlanMaestro].*
+*Fuente: elaboración propia con base en las leyes 502 de 2025 [@panama2025Ley502], 276 de 2021 [@panama2021Ley276], 51 de 2010 [@panama2010Ley51], 33 de 2018 [@panama2018Ley33], 187 de 2020 [@panama2020Ley187] y 518 de 2026 [@panama2026Ley518], la Hoja de Ruta de Economía Circular [@miambiente2024HojaRutaEC], la Hoja de Ruta de plásticos [@miambiente2026ResDM0351], el Plan Nacional de Gestión Integral de Residuos [@aaud2017PNGIR], la taxonomía [@sbp2024TaxonomiaPanama], el marco de financiamiento [@mef2024MarcoFinanciamientoSostenible] y el plan maestro de turismo [@atp2025PlanMaestro].*
 
 # Indicadores de seguimiento
 
-Un buen sistema de indicadores permite saber si los instrumentos se están aplicando y si producen los resultados esperados. Por eso los indicadores propuestos son de tres tipos. Los indicadores de insumo miden los recursos que se movilizan, como el crédito garantizado. Los de gestión miden si las acciones se realizan, como el número de productores inscritos en el registro. Los de resultado miden el cambio que se busca, como la proporción de envases que se valoriza. Los indicadores se alinean con la plataforma que crea la Ley 502, cuyo contenido y metodología aprueba el Consejo Nacional de Economía Circular [@panama2025Ley502, art. 11]. Como muestra el @tbl-indicadores, cada indicador tiene una línea de base tomada de las estadísticas disponibles, una meta para 2030 y una institución que lo reporta. Que varias líneas de base digan "sin medición" confirma que el registro y la plataforma son la primera prioridad, porque sin ellos no se puede medir la valorización ni evaluar la REP.
+Un buen sistema de indicadores permite saber si los instrumentos se están aplicando y si producen los resultados esperados. Por eso los indicadores propuestos son de tres tipos. Los de insumo miden los recursos que se movilizan, como el crédito garantizado; los de gestión miden si las acciones se realizan, como el número de productores inscritos en el registro y los de resultado miden el cambio que se busca, como la proporción de envases que se valoriza. Los indicadores se alinean con la plataforma que crea la Ley 502, cuyo contenido y metodología aprueba el Consejo Nacional de Economía Circular [@panama2025Ley502, art. 11].
+
+Varias líneas de base dicen "sin medición", y ese dato es en sí mismo un hallazgo. Como muestra el @tbl-indicadores, cada indicador tiene una línea de base tomada de las estadísticas disponibles, una meta para 2030, una institución que lo reporta y una frecuencia. Que la valorización de envases, los residuos de obra o las compras circulares no se midan hoy confirma que el registro y la plataforma son la primera prioridad, porque sin ellos no se puede evaluar la REP ni ningún otro instrumento.
 
 ```{r}
 #| label: tbl-indicadores
 #| tbl-cap: "Indicadores de seguimiento"
 
 indicadores |>
-  transmute(Indicador = indicador, Tipo = tipo, `Línea de base` = linea_base, `Meta 2030` = meta_2030, Fuente = fuente) |>
-  tabla_ft_es(digitos = 0, anchos_cm = c(5, 1.8, 3.6, 3.8, 3.2), lineas_tenues = TRUE, tamano = 7)
+  transmute(Indicador = indicador, Tipo = tipo, `Línea de base` = linea_base, `Meta 2030` = meta_2030, Fuente = fuente, Frecuencia = frecuencia) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(4.4, 1.6, 3.2, 3.4, 2.9, 1.9), lineas_tenues = TRUE, tamano = 7)
 ```
 
 *Fuente: elaboración propia con base en las memorias de cálculo y en las fuentes citadas en el documento.*
 
+Los indicadores se reportan en tres momentos. Los sistemas colectivos, la AAUD, el MEF, la DGCP y el fondo de garantías envían sus datos a la plataforma con la frecuencia indicada; la comisión técnica de financiamiento y control los revisa cada semestre junto con el calendario de hitos y el Ministerio de Ambiente los consolida en el reporte trienal que ordena la ley.
+
 # Conclusiones
 
-Panamá puede financiar su transición hacia la economía circular con instrumentos que ya tienen base legal y con instituciones que ya existen. La ejecución de esta Hoja de Ruta depende de cinco decisiones, que conviene tomar en este orden.
+Panamá puede financiar su transición hacia la economía circular con instrumentos que ya tienen base legal y con instituciones que ya existen. La ejecución de esta Hoja de Ruta depende de seis decisiones, que conviene tomar en este orden.
 
-1. Publicar en 2027 el reglamento de la Ley 502, con el registro de productores e importadores y la plataforma de indicadores, e instalar el Consejo Nacional de Economía Circular con la participación del Ministerio de Economía y Finanzas y de la aduana.
-2. Aprobar en la Junta Directiva de la AAUD, con la consulta ciudadana que exige la ley, un pliego de tarifas a costo real escalonado por nivel socioeconómico y las primeras normas de REP por tipo de producto.
-3. Reglamentar los incentivos fiscales que ya otorgan las leyes 223 y 276, y abrir una ventana de economía circular en el Fondo de Garantías de Panamá.
-4. Presentar una ley de REP con metas, sistemas colectivos de productores, sanciones y depósito obligatorio, para que entre en vigor entre 2028 y 2029.
-5. Preparar una cartera de proyectos de residuos y agua para la primera emisión de bonos soberanos temáticos y para la asociación público-privada de residuos de Panamá y San Miguelito.
+1. Publicar en el primer semestre de 2027 el reglamento de la Ley 502, con el registro de productores e importadores, la plataforma de indicadores y una comisión técnica de financiamiento y control en la que participen el MEF, la aduana, ACODECO, la DGCP y la AAUD.
+2. Aprobar en la Junta Directiva de la AAUD, con la consulta ciudadana que exige la ley, un pliego de tarifas a costo real escalonado por nivel socioeconómico, y separar en su contabilidad los recursos de la tasa y los de la REP.
+3. Reglamentar los incentivos fiscales que ya otorgan las leyes 223 y 276, fijar los criterios de compras públicas circulares y abrir una ventana de economía circular en el Fondo de Garantías de Panamá.
+4. Presentar en el segundo semestre de 2027 una ley de REP con el contenido descrito en esta Hoja de Ruta, y autorizar en 2028 los primeros sistemas colectivos de envases con una meta de 10 %.
+5. Aprobar en 2028 la segunda edición de la taxonomía con criterios circulares y preparar la cartera de proyectos de residuos y agua para la primera emisión soberana temática y para la asociación público-privada de Panamá y San Miguelito.
+6. Marcar los envases de bebidas y controlar su entrada por las fronteras antes de iniciar el cobro del depósito en 2029.
 
-Con esas decisiones, la REP de envases llevaría desde su primer año decenas de millones de dólares de los productores hacia la recolección y la valorización, la tarifa a costo real sanearía el servicio de aseo, y el crédito con garantía haría llegar recursos a los recicladores y a las pequeñas empresas, incluidas las del turismo. El costo para los hogares sería pequeño y estaría protegido por la tarifa escalonada, y los resultados podrían seguirse con los indicadores de la plataforma que la propia Ley 502 ordena.
+Con esas decisiones, la REP de envases llevaría desde su primer año decenas de millones de dólares de los productores hacia la recolección y la valorización, a un costo de fracciones de centavo por envase; la tarifa a costo real sanearía el servicio de aseo y el crédito con garantía haría llegar recursos a los recicladores y a las pequeñas empresas, incluidas las del turismo. El costo para los hogares sería pequeño y estaría protegido por la tarifa escalonada, y los resultados podrían seguirse con los indicadores de la plataforma que la propia Ley 502 ordena.
 
 # Referencias {.unnumbered}
 

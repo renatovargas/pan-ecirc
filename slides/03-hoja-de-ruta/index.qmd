@@ -1,6 +1,6 @@
 ---
 title: "Hoja de Ruta Nacional para el Financiamiento de la Economía Circular en Panamá"
-subtitle: "Diseño de instrumentos, actores, fuentes de financiamiento, reformas e indicadores"
+subtitle: "Diseño de instrumentos, pasos de implementación, actores, fuentes de financiamiento, reformas e indicadores"
 author:
   - name: "Renato Vargas"
     affiliations:
@@ -26,112 +26,556 @@ source("materiales/calculos/scripts/funciones_comunes.R")
 
 diseno <- leer_salida("hoja_ruta_instrumentos")
 rep <- leer_salida("hoja_ruta_rep_trayectoria")
-fuentes <- leer_salida("hoja_ruta_fuentes_financiamiento")
-reformas <- leer_salida("hoja_ruta_reformas")
+rep_anual <- leer_salida("hoja_ruta_rep_anual")
 indicadores <- leer_salida("hoja_ruta_indicadores")
+pasos <- leer_salida("hoja_ruta_pasos")
+roles <- leer_salida("hoja_ruta_roles")
+riesgos <- leer_salida("hoja_ruta_riesgos")
+montos <- leer_salida("hoja_ruta_montos")
+normas <- leer_salida("hoja_ruta_contenido_normas")
+aseo <- leer_salida("hoja_ruta_aseo_finanzas")
 precios_hogares <- leer_salida("incidencia_precios_hogares_mip2018")
+composicion <- leer_salida("residuos_composicion_2021")
 otros_res <- leer_salida("residuos_otros_indicadores")
+
+corto <- tibble(
+  id = 1:14,
+  nombre = c("Registro de productores", "Recicladores de base", "REP de envases", "Ecomodulación",
+             "Depósito y retorno", "Contenido reciclado", "Tarifa de aseo", "Incentivos fiscales",
+             "Compras públicas", "Taxonomía", "Bonos soberanos", "Garantías y crédito",
+             "APP de residuos", "Formación y certificación")
+)
+ejes <- leer_salida("factibilidad_impacto_facilidad") |> left_join(corto, by = "id")
+diseno <- diseno |>
+  left_join(corto, by = "id") |>
+  mutate(etapa = if_else(anio_inicio == 2027, "Primer paso (2027)", "Segundo paso (2028-2030)"))
 
 tabla_slide <- function(x, tamano = 14, ...) tabla_ft_es(x, tamano = tamano, ...)
 hog <- function(esc) precios_hogares$variacion_canasta_pct[precios_hogares$escenario == esc]
 t_rcd <- otros_res |> filter(str_starts(indicador, "Construcción")) |> pull(valor)
+cobertura_rec <- otros_res |> filter(str_detect(indicador, "Cobertura")) |> pull(valor)
+rsm_mt <- sum(composicion$toneladas_anio) / 1e6
+envases <- c("Plástico", "Papel y cartón", "Vidrio", "Metal")
+pct_envases <- 100 * sum(composicion$toneladas_anio[composicion$material %in% envases]) / sum(composicion$toneladas_anio)
+ra <- function(a, v) rep_anual[[v]][rep_anual$anio == a]
+colores_etapa <- c("Primer paso (2027)" = "#2E8B57", "Segundo paso (2028-2030)" = "#009EDB")
+plazo_texto <- function(a, s) paste0(a, "-", if_else(s == 1, "I", "II"))
 ```
 
 ## Contenido {.theme-content}
 
-1.  **Diseño.** Catorce instrumentos, dos pasos, 2027 a 2030.
-2.  **Montos.** Lo que movilizan la REP, la tarifa y la tasa de obra.
-3.  **Actores, fuentes y reformas.** Quién hace qué y con qué recursos.
-4.  **Seguimiento.** Indicadores alineados con la Ley 502.
+1.  **Antecedentes.** Por qué hace falta financiar la economía circular y qué ya existe.
+2.  **Arquitectura.** Dos pasos, tres cadenas y un calendario de hitos.
+3.  **Los catorce instrumentos.** Cómo funciona cada uno, quién hace qué y cuánto cuesta.
+4.  **Actores, fuentes, reformas y riesgos.**
+5.  **Seguimiento.** Indicadores alineados con la Ley 502.
 
 [Documento completo](https://renatovargas.github.io/pan-ecirc/materiales/documentos/a3-hoja-de-ruta/){target="_blank"}
 
-## Tres decisiones de diseño
+# Antecedentes {.theme-content}
 
-- **Usar lo que existe.** La AAUD es la autoridad de la REP y del depósito por la Ley 276; el Ministerio de Ambiente tiene la plataforma de la Ley 502; la DGCP, el mandato de compras circulares.
-- **Empezar por el registro.** Productores e importadores declaran por partida arancelaria; sin registro no hay REP ni metas.
-- **Que pague quien pone el producto y quien usa el servicio.** Contribuciones de REP, depósitos y tasa a costo real, con apoyo multilateral para crédito y garantías.
+Lo que hace falta saber antes de leer la Hoja de Ruta.
 
-# Diseño {.theme-content}
+## Hoy nadie paga lo suficiente por los residuos
 
-## Cronograma
+- Panamá genera **`r formato_es(rsm_mt, 2)` millones de toneladas** de residuos municipales al año; la recolección cubre **`r formato_es(cobertura_rec, 0)` %** del peso [@worldbank2026wwaste].
+- Lo recolectado va casi todo a rellenos: plástico, papel y aluminio **salen de la economía** tras un solo uso.
+- La AAUD recaudó en 2025 **B/.35,2 millones** y gastó **B/.60,6 millones** [@estrella2026AAUDMorosidad].
+- El sistema de residuos **no recibe ningún aporte** de quienes ponen en el mercado los productos que se convierten en residuo [@aaud2017PNGIR].
+- La gráfica siguiente muestra qué materiales contienen esos residuos.
+
+## Los envases son 38 % del peso
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.4
+
+composicion |>
+  mutate(tipo = if_else(material %in% envases, "Material de envase", "Otros materiales"),
+         material = fct_reorder(material, porcentaje)) |>
+  ggplot(aes(x = porcentaje, y = material, fill = tipo)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = formato_es(porcentaje, 1)), hjust = -0.15, size = 5) +
+  scale_fill_manual(values = c("Material de envase" = "#8C564B", "Otros materiales" = "#C8C8C8")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(x = "Porcentaje del peso", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 15))
+```
+
+::: aside
+Plástico, papel y cartón, vidrio y metal suman `r formato_es(pct_envases, 0)` %: es la fracción que la REP y el depósito buscan devolver a la producción.
+:::
+
+## El marco legal ya tiene casi todas las piezas
+
+- **Ley 51 de 2010:** crea la AAUD, con tasas por nivel socioeconómico, fondo propio y cobro en la factura eléctrica.
+- **Ley 33 de 2018:** programas de recuperación de residuos de manejo especial.
+- **Ley 276 de 2021:** REP como principio, tasa a costo real, incentivos y facultad de la AAUD para autorizar sistemas de REP y depósito [@panama2021Ley276, art. 74].
+- **Ley 502 de 2025:** Consejo, Plan Estratégico, plataforma de indicadores y compras circulares [@panama2025Ley502].
+- **Regla constitucional:** todo **tributo** requiere ley; una **tasa** por servicio la fija quien lo presta, con consulta ciudadana [@panama2004Constitucion, art. 52].
+
+## Lo que mostró la evaluación de factibilidad
+
+- **12 de los 14** instrumentos pueden iniciar sin ley nueva.
+- La restricción más repetida: **nadie sabe cuánto se pone en el mercado**.
+- Los cargos tienen **efectos pequeños** en los precios: menos de un cuarto de punto en la canasta de los hogares.
+- La taxonomía **aún no reconoce lo circular**; 99 % de la cartera verde del piloto era de mitigación [@sbp2025GuiaTFSBancos].
+- La AAUD tiene las facultades, pero **no las finanzas**; en el Consejo de Economía Circular solo tiene voz [@panama2025Ley502, arts. 8-9].
+- La gráfica siguiente cruza impacto y facilidad de cada instrumento [@vargas2026Factibilidad].
+
+## Más impacto, más difícil
 
 ```{r}
 #| fig-width: 11
 #| fig-height: 5.6
 
-diseno |>
-  mutate(instrumento = fct_reorder(str_wrap(instrumento, 55), -anio_inicio), fin = 2031) |>
-  ggplot(aes(y = instrumento, x = anio_inicio, xend = fin, color = paso)) +
-  geom_segment(aes(yend = instrumento), linewidth = 6) +
-  scale_color_manual(values = c("Primero" = "#2E8B57", "Segundo" = "#009EDB"), name = "Paso") +
-  scale_x_continuous(breaks = 2027:2031, labels = c(2027:2030, "")) +
-  labs(x = NULL, y = NULL) +
+ggplot(ejes, aes(x = facilidad, y = impacto, color = paso)) +
+  geom_hline(yintercept = mean(ejes$impacto), linetype = "dashed", color = "gray70") +
+  geom_vline(xintercept = mean(ejes$facilidad), linetype = "dashed", color = "gray70") +
+  geom_point(size = 4) +
+  ggrepel::geom_text_repel(aes(label = nombre), size = 4.5, seed = 7, show.legend = FALSE,
+                           box.padding = 0.5, max.overlaps = Inf) +
+  scale_color_manual(values = c(Primero = "#2E8B57", Segundo = "#C0392B"),
+                     labels = c(Primero = "Crea condiciones", Segundo = "Impone metas o cargos")) +
+  scale_y_continuous(breaks = 2:5) +
+  labs(x = "Facilidad de aplicación", y = "Impacto") +
   tema_grafico() +
-  theme(text = element_text(size = 14), legend.title = element_text())
-```
-
-## REP de envases: metas y montos
-
-```{r}
-rep |>
-  transmute(Año = as.character(anio), `Meta (%)` = 100 * meta_valorizacion,
-            `Toneladas` = toneladas_valorizadas,
-            `Mínimo (millones de US$)` = costo_min_musd, `Máximo (millones de US$)` = costo_max_musd) |>
-  tabla_slide(tamano = 18, digitos = 0)
+  theme(text = element_text(size = 15))
 ```
 
 ::: aside
-Costo del sistema colectivo de envases de Chile, de 380.000 a 500.000 pesos por tonelada valorizada [@resimple2023Garantias], a 692 pesos por dólar [@mmaChile2020AGIESEnvases]. Cotas superiores. Lo pagan productores e importadores. Efecto en la canasta: `r formato_es(hog("rep_envases"), 2)` % por cada punto de cargo.
+El registro y el crédito con garantías combinan impacto alto y aplicación fácil: por ahí empieza la Hoja de Ruta.
 :::
 
-## Tarifa, depósito y tasa de obra
+# Arquitectura {.theme-content}
 
-- **Tasa de gestión a costo real:** cierra una brecha de B/.25,4 millones al año, escalonada por nivel socioeconómico, como ordena la Ley 276 [@panama2021Ley276, art. 66].
+Cinco principios, dos pasos y tres cadenas.
+
+## Tres decisiones y cinco principios
+
+- **Usar lo que existe:** la AAUD (Ley 276), el Ministerio de Ambiente (Ley 502) y la DGCP (compras) ya tienen las facultades.
+- **Secuencia:** ningún cargo antes de que el registro y el control funcionen. Ecuador devolvió más botellas de las que vendió y su recaudación neta fue negativa [@sri2014IRBPNR].
+- **Gradualidad:** metas bajas al inicio. Chile pasó de 3 % a 45 % en plástico en doce años [@mmaChile2020DS12Envases, art. 21].
+- **Inclusión:** pago por tonelada a recicladores y tarifa escalonada por nivel socioeconómico.
+- **Que pague quien pone el producto y quien usa el servicio**, no el presupuesto.
+
+## Dos pasos y tres cadenas
+
+- **Primer paso (2027):** siete instrumentos que solo requieren reglamentos y resoluciones; crean información, actores, recursos y demanda.
+- **Segundo paso (2028-2030):** siete instrumentos con metas, cargos o preparaciones largas.
+- **Cadena de la REP:** registro → REP → depósito → ecomodulación.
+- **Cadena de la infraestructura:** tarifa a costo real → APP de residuos.
+- **Cadena del financiamiento:** garantías y taxonomía → bonos y crédito.
+- La tarifa se **adelanta a 2027** aunque es un cargo: la AAUD debe sanear sus finanzas antes de asumir la REP.
+
+## Cada instrumento necesita al anterior
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.8
+
+nodos <- tribble(
+  ~x, ~y, ~nombre, ~etapa,
+  2027, 6, "Registro de\nproductores", "Primer paso (2027)",
+  2028, 6, "REP de\nenvases", "Segundo paso (2028-2030)",
+  2029, 6, "Depósito y\nretorno", "Segundo paso (2028-2030)",
+  2030, 6, "Ecomodulación", "Segundo paso (2028-2030)",
+  2027, 5, "Registro de\nrecicladores", "Primer paso (2027)",
+  2028, 5, "Pago por tonelada\na recicladores", "Segundo paso (2028-2030)",
+  2027, 4, "Tarifa de aseo\na costo real", "Primer paso (2027)",
+  2029, 4, "APP de\nresiduos", "Segundo paso (2028-2030)",
+  2027, 3, "Compras públicas\ncirculares", "Primer paso (2027)",
+  2029, 3, "Contenido\nreciclado", "Segundo paso (2028-2030)",
+  2027, 2, "Ventana del fondo\nde garantías", "Primer paso (2027)",
+  2028, 2, "Taxonomía,\n2.ª edición", "Segundo paso (2028-2030)",
+  2029, 2, "Bonos soberanos\ntemáticos", "Segundo paso (2028-2030)",
+  2027, 1, "Incentivos, formación\ny certificación", "Primer paso (2027)"
+)
+flechas <- tribble(
+  ~x, ~y, ~xend, ~yend,
+  2027.36, 6, 2027.66, 6,
+  2028.34, 6, 2028.66, 6,
+  2027.36, 5, 2027.58, 5,
+  2028, 5.72, 2028, 5.3,
+  2027.3, 4.25, 2027.7, 4.8,
+  2027.38, 4, 2028.7, 4,
+  2027.42, 3, 2028.66, 3,
+  2028.34, 2, 2028.6, 2
+)
+ggplot() +
+  geom_segment(data = flechas, aes(x = x, y = y, xend = xend, yend = yend),
+               arrow = arrow(length = unit(0.12, "in"), type = "closed"), color = "gray45", linewidth = 0.7) +
+  geom_curve(aes(x = 2028.3, y = 6.3, xend = 2029.75, yend = 6.3), curvature = -0.25,
+             arrow = arrow(length = unit(0.12, "in"), type = "closed"), color = "gray45", linewidth = 0.7) +
+  geom_label(data = nodos, aes(x = x, y = y, label = nombre, fill = etapa), size = 3.8, key_glyph = "rect",
+             color = "white", linewidth = 0, lineheight = 0.9, fontface = "bold") +
+  scale_fill_manual(values = colores_etapa) +
+  scale_x_continuous(breaks = 2027:2030, limits = c(2026.6, 2030.4), position = "top") +
+  scale_y_continuous(limits = c(0.5, 6.8)) +
+  labs(x = NULL, y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 15), axis.text.y = element_blank(), panel.grid.major.y = element_blank(), panel.grid.minor = element_blank())
+```
+
+## El calendario
+
+- Cada instrumento tiene una **preparación** (normas y sistemas) y una **operación**.
+- Los `r nrow(pasos)` pasos de la Hoja de Ruta asignan a cada acción un **responsable, un vehículo legal y un semestre**.
+- **2027** concentra los hitos normativos: reglamento de la Ley 502, pliego tarifario, incentivos, compras y fondo de garantías.
+- **2028** arranca la REP y la taxonomía; **2029** el depósito, los bonos y la APP; **2030** la ecomodulación.
+- La gráfica siguiente muestra ambos períodos para los catorce instrumentos.
+
+## Preparación y operación
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.6
+
+pasos |>
+  mutate(t = anio + (semestre - 1) / 2) |>
+  summarize(prep_ini = min(t), .by = id) |>
+  left_join(select(diseno, id, nombre, anio_inicio, etapa), by = "id") |>
+  mutate(
+    op_ini = if_else(anio_inicio == 2027, 2027.5, anio_inicio),
+    prep_ini = if_else(prep_ini >= op_ini, op_ini - 0.5, prep_ini),
+    nombre = fct_reorder(nombre, -op_ini - id / 100)
+  ) |>
+  ggplot(aes(y = nombre)) +
+  geom_segment(aes(x = prep_ini, xend = op_ini, yend = nombre), linewidth = 6, color = "#DDDDDD") +
+  geom_segment(aes(x = op_ini, xend = 2031, yend = nombre, color = etapa), linewidth = 6) +
+  scale_color_manual(values = colores_etapa) +
+  scale_x_continuous(breaks = 2027:2031, labels = c(2027:2030, ""), limits = c(2027, 2031)) +
+  labs(x = NULL, y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 15), panel.grid.minor = element_blank())
+```
+
+::: aside
+Gris: preparación (normas y sistemas). Color: operación. Chile dio 30 meses entre su decreto de envases y las metas; Panamá arranca con una meta baja de 10 % [@mmaChile2020DS12Envases, art. 47].
+:::
+
+## Hitos de 2027
+
+```{r}
+pasos |>
+  filter(hito, anio == 2027) |>
+  left_join(corto, by = "id") |>
+  arrange(semestre, id) |>
+  transmute(Semestre = plazo_texto(anio, semestre), Hito = accion, Responsable = responsable) |>
+  tabla_slide(tamano = 10, digitos = 0)
+```
+
+## Hitos de 2028 a 2030
+
+```{r}
+pasos |>
+  filter(hito, anio > 2027) |>
+  left_join(corto, by = "id") |>
+  arrange(anio, semestre, id) |>
+  transmute(Semestre = plazo_texto(anio, semestre), Hito = accion, Responsable = responsable) |>
+  tabla_slide(tamano = 10, digitos = 0)
+```
+
+# Primer paso (2027) {.theme-content}
+
+Crear las condiciones: información, actores, recursos y demanda.
+
+## Siete instrumentos que crean condiciones {.smaller}
+
+- **Registro de productores e importadores:** en el reglamento de la Ley 502, precargado con los datos de aduana (Ministerio de Ambiente y AAUD).
+- **Recicladores de base:** censo, registro como gestores y pago por tonelada desde la REP (AAUD y municipios).
+- **Tarifa de aseo a costo real:** escalonada por nivel socioeconómico, con consulta ciudadana (Junta Directiva de la AAUD).
+- **Incentivos fiscales vigentes:** reglamento de las leyes 223 y 276 con lista cerrada de equipos (MEF).
+- **Compras públicas circulares:** criterios por categoría y etiqueta en PanamaCompra (DGCP).
+- **Ventana circular del Fondo de Garantías:** dentro del fondo de US$150 millones del BID (MEF y Banco Nacional).
+- **Formación y certificación:** analistas de crédito, compradores, recicladores y turismo sostenible.
+
+## El registro: la base de todo
+
+- Sin saber **cuántas toneladas** pone cada empresa en el mercado no hay metas, contribuciones ni control.
+- La aduana ya registra las importaciones **por partida arancelaria**: el registro se **precarga** con esos datos y las empresas confirman o corrigen.
+- Flujos iniciales: **envases, aparatos eléctricos y electrónicos, neumáticos, aceites y baterías**.
+- Un **umbral** exime a los importadores muy pequeños; los grandes concentran el volumen.
+- Lo opera el Ministerio de Ambiente, pero la AAUD autoriza los sistemas de REP: **deben compartir los datos**.
+- Primera declaración en **2028**, con 2027 como año base.
+
+## La tarifa de aseo: cerrar la brecha
+
+- La Ley 51 ya ordena tarifas que reflejen el **costo del servicio**, con **subsidio cruzado** y revisión cada dos años [@panama2010Ley51, arts. 8-9].
+- **Tasa residencial escalonada:** los hogares de menores ingresos pagan menos.
 - **Pago por generación:** pilotos en comercios, hoteles y restaurantes.
-- **Tasa de obra:** B/.10 por tonelada, hasta B/.`r formato_es(10 * t_rcd / 1e6, 1)` millones al año.
-- **Destinos turísticos:** cargo municipal por visitante para residuos, como en Taboga [@laestrella2025Taboga].
-- **Depósito:** PET, aluminio y vidrio, operado por los productores; meta de 90 % de recolección de botellas.
+- **Tasa de obra:** B/.10 por tonelada, hasta B/.`r formato_es(10 * t_rcd / 1e6, 1)` millones al año, solo donde haya sitios autorizados.
+- **Destinos turísticos:** cargo municipal por visitante, como en Taboga [@laestrella2025Taboga]. La ATP integra la Junta Directiva de la AAUD.
+- La **consulta ciudadana** es obligatoria: su omisión anuló la tasa de San Miguelito en 2016 [@laprensa2016TasaAseoSanMiguelito].
+
+## La morosidad casi duplica el gasto anual
+
+```{r}
+#| fig-width: 11
+#| fig-height: 4
+
+aseo |>
+  mutate(concepto = factor(concepto, levels = rev(concepto))) |>
+  ggplot(aes(x = millones_balboas, y = concepto, fill = concepto)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = formato_es(millones_balboas, 1)), hjust = -0.2, size = 6) +
+  scale_fill_manual(values = c("#C0392B", "#8C564B", "#2E8B57"), guide = "none") +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(x = "Millones de balboas", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 16))
+```
+
+::: aside
+Cerrar la brecha de B/.25,4 millones subiría la canasta de los hogares en `r formato_es(hog("aseo"), 2)` %, aun con traslado completo [@estrella2026AAUDMorosidad; @vargas2026Factibilidad].
+:::
+
+# Segundo paso (2028-2030) {.theme-content}
+
+Metas, cargos e inversión.
+
+## Siete instrumentos que imponen metas o movilizan inversión {.smaller}
+
+- **REP de envases (2028):** sistemas colectivos autorizados por la AAUD; metas de 10 % a 45 % en diez años.
+- **Taxonomía, 2.ª edición (2028):** criterios circulares a partir de los requisitos de residuos y construcción ya existentes.
+- **Depósito y retorno (2029):** PET, aluminio y vidrio; marcaje y control en frontera antes de cobrar.
+- **Contenido reciclado (2029):** áridos reciclados en la obra pública y hasta 25 % de PET reciclado en botellas.
+- **Bonos soberanos (2029):** categoría circular del marco del MEF para residuos y agua.
+- **APP de residuos de Panamá y San Miguelito (2029):** pagos por desempeño, refrendo previo e inclusión de recicladores.
+- **Ecomodulación (2030):** paga menos quien usa envases reciclables.
+
+## Cómo funciona la REP
+
+- Quien pone un producto envasado en el mercado **paga su recolección y reciclaje**, en lugar de los municipios.
+- Los productores **declaran** toneladas en el registro y **pagan** a un **sistema colectivo** sin fines de lucro.
+- El sistema **contrata** a recolectores y recicladores de base y el material va a las plantas.
+- La AAUD **autoriza, fija metas, recibe el informe auditado y sanciona**.
+- La gráfica siguiente muestra los tres flujos que conectan a esos actores: dinero, material e información.
+
+## Dinero, material e información
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.8
+
+nodos_rep <- tribble(
+  ~x, ~y, ~nombre,
+  1.5, 4.6, "Productores e\nimportadores",
+  5, 4.6, "Sistema colectivo\nde gestión",
+  8.5, 4.6, "AAUD",
+  5, 6.6, "Registro de productores\n(plataforma de la Ley 502)",
+  1.5, 1.5, "Hogares, comercios\ny turistas",
+  5, 1.5, "Recolectores y\nrecicladores de base",
+  8.5, 1.5, "Plantas de reciclaje\n(material a la industria)"
+)
+flechas_rep <- tribble(
+  ~x, ~y, ~xend, ~yend, ~tipo, ~etiqueta, ~lx, ~ly,
+  2.75, 4.6, 3.6, 4.6, "Dinero", "Contribución\npor tonelada", 3.2, 5.15,
+  5, 4.1, 5, 2.0, "Dinero", "Pago por tonelada\nrecolectada", 6.2, 3.05,
+  1.5, 2.0, 1.5, 4.1, "Dinero", "Precio que incluye\nla contribución", 2.75, 3.05,
+  2.85, 1.5, 3.65, 1.5, "Material", "Envases\nseparados", 3.27, 2.05,
+  6.35, 1.5, 6.85, 1.5, "Material", "Material\nclasificado", 6.6, 2.05,
+  2.1, 5.05, 3.4, 6.3, "Información y control", "Declaran\ntoneladas", 2.0, 5.95,
+  6.6, 6.3, 8.1, 5.05, "Información y control", "Base para metas\ny control", 8.1, 6.0,
+  8.0, 4.6, 6.4, 4.6, "Información y control", "Autoriza, fiscaliza y\nrecibe el informe", 7.2, 4.0
+)
+ggplot() +
+  geom_segment(data = flechas_rep, aes(x = x, y = y, xend = xend, yend = yend, color = tipo),
+               arrow = arrow(length = unit(0.13, "in"), type = "closed"), linewidth = 1.2) +
+  geom_text(data = flechas_rep, aes(x = lx, y = ly, label = etiqueta, color = tipo),
+            size = 3.8, lineheight = 0.9, show.legend = FALSE) +
+  geom_label(data = nodos_rep, aes(x = x, y = y, label = nombre), size = 4.2,
+             fill = "#F2F2F2", linewidth = 0.3, lineheight = 0.9) +
+  scale_color_manual(values = c("Dinero" = "#2E8B57", "Material" = "#8C564B", "Información y control" = "#009EDB")) +
+  scale_x_continuous(limits = c(-0.3, 10.3)) +
+  scale_y_continuous(limits = c(0.9, 7.2)) +
+  theme_void() +
+  theme(legend.position = "bottom", legend.title = element_blank(), text = element_text(size = 15))
+```
+
+## Cuánto cuesta la REP
+
+- Costo de referencia: el primer sistema colectivo de Chile, **US$549 a 722 por tonelada valorizada** [@resimple2023Garantias; @mmaChile2020AGIESEnvases].
+- Primer año (meta 10 %): **US$`r formato_es(ra(2028, "costo_min_musd"), 0)` a `r formato_es(ra(2028, "costo_max_musd"), 0)` millones**; décimo año (45 %): **US$`r formato_es(ra(2037, "costo_min_musd"), 0)` a `r formato_es(ra(2037, "costo_max_musd"), 0)` millones**.
+- Lo pagan **productores e importadores**; la administración es solo 5 % a 10 % del total [@ocde2016EPRPolicyHighlights].
+- Por un envase de 20 gramos: **`r formato_es(ra(2028, "envase20g_min_centavos"), 2)` a `r formato_es(ra(2028, "envase20g_max_centavos"), 2)` centavos** en el primer año.
+- Son **techos**: la base incluye materiales que no son envases.
+
+## La meta y el costo crecen juntos
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.2
+
+ggplot(rep_anual, aes(x = anio)) +
+  geom_ribbon(aes(ymin = costo_min_musd, ymax = costo_max_musd), fill = "#8C564B", alpha = 0.3) +
+  geom_line(aes(y = (costo_min_musd + costo_max_musd) / 2), color = "#8C564B", linewidth = 1.2) +
+  geom_text(aes(y = costo_max_musd, label = paste0(formato_es(100 * meta_valorizacion, 0), " %")),
+            vjust = -0.7, size = 4.5, color = "gray30") +
+  scale_x_continuous(breaks = 2028:2037) +
+  scale_y_continuous(limits = c(0, 270)) +
+  labs(x = NULL, y = "Millones de dólares por año") +
+  tema_grafico() +
+  theme(text = element_text(size = 15), panel.grid.minor = element_blank())
+```
+
+::: aside
+Banda: rango de costo anual. Cifras: meta de valorización. Efecto en la canasta de los hogares: `r formato_es(hog("rep_envases"), 2)` % por cada punto de cargo.
+:::
+
+## Depósito, taxonomía, bonos y APP {.smaller}
+
+- **Depósito:** Panamá tiene dos fronteras terrestres y una zona libre. Antes del primer cobro hay que **marcar los envases** y controlar su entrada; meta de 90 % de recolección, como en la Unión Europea [@ue2025Reglamento40].
+- **Taxonomía:** ya exige recolección segregada en residuos y reciclar 20 % de los desechos de obra como requisitos de no causar daño; basta convertirlos en **criterios de contribución** [@sbp2024TaxonomiaPanama].
+- **Bonos soberanos:** el marco del MEF tiene categoría circular, pero la estrategia de deuda 2025-2029 **no menciona** bonos temáticos [@mef2025EstrategiaDeuda].
+- **APP de residuos:** depende de la **tarifa a costo real** y del **refrendo previo** de la Contraloría; el BID prepara la prefactibilidad [@bid2024TdRResiduosAPP].
 
 # Actores, fuentes y reformas {.theme-content}
 
-## Fuentes de financiamiento
+## Quién hace qué
+
+- **AAUD:** lidera la tarifa, la REP, el depósito, la ecomodulación y los recicladores.
+- **Ministerio de Ambiente:** reglamento de la Ley 502, registro, plataforma y reporte trienal.
+- **MEF:** incentivos, bonos y fondo de garantías, aunque la Ley 502 no le da papel.
+- **Aduana, MICI y ACODECO:** la cadena de control de la ley de plásticos, aplicada a la REP (397 sanciones por la ley de bolsas) [@estrella2026AcodecoBolsas].
+- **DGCP y superintendencias:** compras circulares y taxonomía.
+- **Coordinación:** una **comisión técnica** del Consejo con el MEF, la aduana, ACODECO, la DGCP y la AAUD.
+
+## La AAUD está en casi todo
 
 ```{r}
-fuentes |>
-  transmute(Fuente = fuente, Origen = origen, Tipo = tipo) |>
-  tabla_slide(tamano = 13)
+#| fig-width: 11
+#| fig-height: 5.8
+
+orden_actores <- roles |> count(actor) |> arrange(n) |> pull(actor)
+orden_inst <- corto$nombre[order(diseno$anio_inicio[match(corto$id, diseno$id)], corto$id)]
+roles |>
+  left_join(corto, by = "id") |>
+  mutate(actor = factor(actor, levels = orden_actores), nombre = factor(nombre, levels = orden_inst)) |>
+  ggplot(aes(x = nombre, y = actor, fill = rol)) +
+  geom_tile(color = "white", linewidth = 0.8) +
+  scale_fill_manual(values = c("Lidera" = "#2E8B57", "Participa" = "#C9E3D1")) +
+  scale_x_discrete(labels = \(x) str_wrap(x, 12)) +
+  labs(x = NULL, y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 13), axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), panel.grid = element_blank())
 ```
 
-## Una ley y varias resoluciones
+::: aside
+La AAUD lidera cinco instrumentos y participa en otros cinco: su saneamiento financiero es la condición de la mayor parte de la Hoja de Ruta.
+:::
+
+## Quién paga
+
+- Casi todos los recursos **no vienen del presupuesto**.
+- **Productores e importadores:** contribuciones de REP y depósitos no reclamados.
+- **Usuarios del servicio:** tarifa a costo real y tasa de obra.
+- **Fisco:** gasto tributario de los incentivos vigentes y deuda temática dentro de la regla fiscal.
+- **Banca multilateral:** el Fondo de Garantías (BID) y la preparación de la APP.
+- El cuadro siguiente resume los montos de referencia.
+
+## Montos de referencia
 
 ```{r}
-reformas |>
-  transmute(Nivel = nivel, Reforma = reforma, Emisor = emisor) |>
-  tabla_slide(tamano = 11)
+montos |>
+  transmute(Fuente = fuente, `Quién paga` = quien_paga, Monto = monto) |>
+  tabla_slide(tamano = 14, digitos = 0)
+```
+
+## Una ley y varios reglamentos
+
+- **Una sola ley:** la de REP, con metas, sistemas colectivos, sanciones y depósito obligatorio.
+- **Contribuciones privadas:** si las cobran los sistemas colectivos, no son tributos y no entran al Tesoro; si las cobrara el Estado, requerirían iniciativa del Ejecutivo y quedarían sujetas a la regla fiscal [@panama2004Constitucion, arts. 52 y 165].
+- **Cuatro decretos:** reglamentos de las leyes 502, 276 (dos) y 223.
+- **Resoluciones:** AAUD (REP y tarifas), DGCP (compras), MICI (normas técnicas), superintendencias (taxonomía).
+- **La más urgente:** el reglamento de la Ley 502, porque crea el registro.
+
+## Contenido mínimo de la ley de REP (1 de 2)
+
+```{r}
+normas |>
+  filter(norma == "Ley de REP") |>
+  slice(1:6) |>
+  transmute(Elemento = elemento, Contenido = contenido) |>
+  tabla_slide(tamano = 13, digitos = 0)
+```
+
+## Contenido mínimo de la ley de REP (2 de 2)
+
+```{r}
+normas |>
+  filter(norma == "Ley de REP") |>
+  slice(7:11) |>
+  transmute(Elemento = elemento, Contenido = contenido) |>
+  tabla_slide(tamano = 13, digitos = 0)
+```
+
+## Contenido mínimo del reglamento de la Ley 502
+
+```{r}
+normas |>
+  filter(norma == "Reglamento de la Ley 502") |>
+  transmute(Elemento = elemento, Contenido = contenido) |>
+  tabla_slide(tamano = 14, digitos = 0)
+```
+
+::: aside
+La composición del Consejo está fijada en la ley; el reglamento puede crear una comisión técnica, pero no cambiar a sus miembros [@panama2025Ley502, arts. 8-9].
+:::
+
+## Lo que puede salir mal
+
+- Muchos riesgos **ya ocurrieron** en otros países o en Panamá.
+- **Ecuador:** botellas importadas para cobrar el reembolso; recaudación neta negativa [@sri2014IRBPNR].
+- **San Miguelito:** tasa anulada por omitir la consulta (2016) y contratos de recolección sin refrendo (2026) [@prensa2026AAUDSanMiguelito].
+- **Sistemas colectivos:** riesgo de concentración; la OCDE recomienda licitar los servicios y consultar a la autoridad de competencia [@ocde2016EPRPolicyHighlights].
+- Casi todas las mitigaciones dependen del **registro precargado**, la **consulta bien hecha** y la **separación de recursos**.
+
+## Riesgos que hay que prevenir
+
+```{r}
+riesgos |>
+  slice(c(1, 2, 3, 5, 7, 12)) |>
+  transmute(Riesgo = riesgo, Mitigación = mitigacion, Responsable = responsable) |>
+  tabla_slide(tamano = 12, digitos = 0)
 ```
 
 # Seguimiento {.theme-content}
 
-## Indicadores alineados con la Ley 502
+## Cómo se mide el avance
+
+- **Tres tipos de indicadores:** insumo (recursos movilizados), gestión (acciones realizadas) y resultado (cambio en los flujos de material).
+- Se alinean con la **plataforma de indicadores** del artículo 11 de la Ley 502 [@panama2025Ley502, art. 11].
+- Varias líneas de base dicen **"sin medición"**: eso confirma que el registro es la primera prioridad.
+- La **comisión técnica** revisa cada semestre los hitos y los indicadores; el Ministerio de Ambiente publica el **reporte trienal**.
+
+## Indicadores alineados con la Ley 502 (1 de 2)
 
 ```{r}
 indicadores |>
-  transmute(Indicador = indicador, `Línea de base` = linea_base, `Meta 2030` = meta_2030) |>
-  tabla_slide(tamano = 11)
+  slice(1:7) |>
+  transmute(Indicador = indicador, `Línea de base` = linea_base, `Meta 2030` = meta_2030, Frecuencia = frecuencia) |>
+  tabla_slide(tamano = 13)
 ```
 
-::: aside
-Plataforma de indicadores del artículo 11 de la Ley 502 y reporte trienal del Ministerio de Ambiente [@panama2025Ley502, art. 11].
-:::
+## Indicadores alineados con la Ley 502 (2 de 2)
 
-## Cinco decisiones, en orden {.theme-content}
+```{r}
+indicadores |>
+  slice(8:14) |>
+  transmute(Indicador = indicador, `Línea de base` = linea_base, `Meta 2030` = meta_2030, Frecuencia = frecuencia) |>
+  tabla_slide(tamano = 13)
+```
 
-1. Reglamento de la Ley 502 con el registro y la plataforma (2027).
-2. Pliego tarifario a costo real y primeras normas de REP de la AAUD.
-3. Reglamento de los incentivos vigentes y ventana circular en el fondo de garantías.
-4. Ley de REP con metas, sistemas colectivos, sanciones y depósito.
-5. Cartera de proyectos para la emisión soberana temática y la APP de residuos.
+## Seis decisiones, en orden {.theme-content}
+
+1. Reglamento de la Ley 502 con registro, plataforma y comisión técnica (2027-I).
+2. Pliego tarifario a costo real escalonado y separación contable de la AAUD (2027-II).
+3. Incentivos vigentes, compras circulares y ventana del fondo de garantías (2027).
+4. Ley de REP (2027-II) y primeros sistemas colectivos con meta de 10 % (2028).
+5. Taxonomía circular (2028) y cartera para bonos soberanos y la APP de residuos.
+6. Marcaje y control en frontera antes del depósito (2029).
 
 ## Referencias
 

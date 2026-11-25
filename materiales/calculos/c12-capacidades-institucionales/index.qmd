@@ -207,13 +207,68 @@ capacidades |>
 
 La lectura es clara. La Autoridad de Aseo Urbano y Domiciliario es la única institución con las cinco primeras funciones de manera expresa para residuos: fija la tasa, cobra en la factura eléctrica, administra un fondo propio, registra y autoriza gestores, sanciona y, desde la Ley 276 de 2021, autoriza los sistemas de depósito y retorno y los sistemas de gestión asociados a la REP [@panama2021Ley276, art. 74]. El Ministerio de Ambiente tiene la reglamentación de la Ley 502 y la plataforma de indicadores, pero no un registro de productores ni un régimen sancionador propio de economía circular. La aduana, la Autoridad de Protección al Consumidor y el Ministerio de Comercio e Industrias ya operan una cadena de control de importaciones y comercio para la Ley 187 que puede extenderse a los productos de la REP. En el sistema financiero, las superintendencias regulan y supervisan, pero solo el Ministerio de Economía y Finanzas y la AMPYME tienen funciones de financiamiento, la segunda con un fondo de garantía.
 
+# Personal de las instituciones
+
+Las facultades legales dicen qué puede hacer una institución; su personal da una idea de cuánto puede hacer. Registramos los funcionarios permanentes y eventuales de las instituciones con funciones en los instrumentos, según la planilla del sector público de julio de 2026 [@cgr2026PlanillaJulio, cuadro 3]. Los municipios, la Secretaría de APP y la Secretaría Nacional de Energía no aparecen por separado.
+
+```{r}
+#| label: personal
+
+personal <- tribble(
+  ~institucion, ~funcionarios,
+  "MEF", 2626,
+  "AAUD", 2405,
+  "MiAMBIENTE", 1745,
+  "Aduanas", 1715,
+  "MICI", 641,
+  "ACODECO", 462,
+  "SBP", 443,
+  "ATP", 257,
+  "AMPYME", 201,
+  "SMV", 122,
+  "DGCP", 110,
+  "SSRP", 81
+) |>
+  mutate(fuente = "Contraloría General, Informe de planilla del sector público, julio de 2026, cuadro 3")
+
+personal
+```
+
+# Cadena institucional por instrumento
+
+La matriz anterior se lee por institución. Para diseñar un instrumento hace falta leerla al revés: para cada instrumento, qué institución cumple cada una de las seis funciones y qué pieza falta para que la cadena funcione. La asignación combina la matriz de funciones con el responsable y la ruta legal de cada ficha (memoria 10).
+
+```{r}
+#| label: cadena
+
+cadena <- tribble(
+  ~instrumento, ~Regular, ~Registrar, ~`Recaudar y administrar fondos`, ~`Controlar y sancionar`, ~`Monitorear y reportar`, ~Financiar, ~pieza_faltante,
+  "Registro de productores", "MiAMBIENTE (reglamento de la Ley 502) y AAUD", "AAUD, con datos de Aduanas", "No aplica", "Aduanas y ACODECO", "MiAMBIENTE (plataforma de indicadores)", "Presupuesto de MiAMBIENTE y AAUD", "Reglamento y convenio de datos con Aduanas",
+  "REP", "AAUD (resoluciones por flujo) y MiAMBIENTE", "AAUD", "Sistemas colectivos de productores", "AAUD; Aduanas en frontera", "AAUD y MiAMBIENTE", "Contribuciones de los productores", "Resolución por flujo con metas; ley de REP para sanciones propias",
+  "Depósito y retorno", "AAUD (autoriza el sistema)", "AAUD", "Administrador del sistema", "Aduanas y ACODECO", "AAUD", "Depósitos no reclamados y venta de material", "Estudio de diseño y red de retorno",
+  "Tarifa de aseo", "Junta Directiva de la AAUD y municipios", "Usuarios de las distribuidoras eléctricas", "AAUD (Fondo de Aseo)", "AAUD (cobro coactivo)", "AAUD", "Usuarios del servicio", "Estudio de costos, escala socioeconómica y consulta ciudadana",
+  "Contenido reciclado", "MICI (DGNTI)", "MICI", "No aplica", "MICI y ACODECO", "MiAMBIENTE", "Productores", "Reglamento técnico y oferta de material",
+  "Compras públicas", "DGCP", "DGCP (registro de proponentes)", "No aplica", "DGCP", "DGCP (PanamaCompra)", "Entidades compradoras", "Resolución con criterios por categoría",
+  "Incentivos fiscales", "MEF", "MiAMBIENTE (aval de plantas)", "MEF (DGI)", "MEF (DGI)", "MEF (gasto tributario)", "Fisco", "Reglamento de las leyes 223 y 276",
+  "Taxonomía", "SBP, SMV y SSRP con MiAMBIENTE y MEF", "SMV (emisiones)", "No aplica", "Superintendencias", "SBP (reporte de cartera)", "Banca e inversionistas", "Criterios técnicos circulares",
+  "Crédito y garantías", "SBP (Acuerdo 8-2025)", "AMPYME (registro de la MIPYME)", "Fondo de Garantías (fiduciario BNP)", "Banco Nacional", "AMPYME y MEF", "BID con el MEF", "Ventana circular en el fondo",
+  "Alianzas público-privadas", "Secretaría de APP", "Secretaría de APP (Registro de APP)", "AAUD y municipios (tasa)", "Secretaría de APP y Contraloría", "Secretaría de APP", "Capital privado, BID y tasa", "Estructuración del proyecto ancla"
+)
+
+cadena
+```
+
 # Exportación
 
 ```{r}
 #| label: exportar
 
+guardar_salida(personal, "capacidades_personal_2026", hoja = "personal")
+guardar_salida(cadena, "capacidades_cadena_instrumento", hoja = "cadena")
+
 guardar_salida(capacidades, "capacidades_institucionales", hoja = "matriz")
 guardar_salida(indice_institucion, "capacidades_indice_institucion", hoja = "indice")
+guardar_salida(cobertura_funcion, "capacidades_cobertura_funcion", hoja = "cobertura")
 ```
 
 # Referencias

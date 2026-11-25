@@ -263,8 +263,9 @@ div.csl-indent {
   <li><a href="#evaluación-de-factibilidad" id="toc-evaluación-de-factibilidad" class="nav-link" data-scroll-target="#evaluación-de-factibilidad"><span class="header-section-number">4</span> Evaluación de factibilidad</a></li>
   <li><a href="#puntaje-con-pesos-iguales" id="toc-puntaje-con-pesos-iguales" class="nav-link" data-scroll-target="#puntaje-con-pesos-iguales"><span class="header-section-number">5</span> Puntaje con pesos iguales</a></li>
   <li><a href="#sensibilidad-a-los-pesos" id="toc-sensibilidad-a-los-pesos" class="nav-link" data-scroll-target="#sensibilidad-a-los-pesos"><span class="header-section-number">6</span> Sensibilidad a los pesos</a></li>
-  <li><a href="#exportación" id="toc-exportación" class="nav-link" data-scroll-target="#exportación"><span class="header-section-number">7</span> Exportación</a></li>
-  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">8</span> Referencias</a></li>
+  <li><a href="#impacto-frente-a-facilidad-de-aplicación" id="toc-impacto-frente-a-facilidad-de-aplicación" class="nav-link" data-scroll-target="#impacto-frente-a-facilidad-de-aplicación"><span class="header-section-number">7</span> Impacto frente a facilidad de aplicación</a></li>
+  <li><a href="#exportación" id="toc-exportación" class="nav-link" data-scroll-target="#exportación"><span class="header-section-number">8</span> Exportación</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">9</span> Referencias</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c10-fichas-instrumentos/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></nav>
     </div>
@@ -508,130 +509,164 @@ div.csl-indent {
 </section>
 <section id="evaluación-de-factibilidad" class="level1" data-number="4">
 <h1 data-number="4"><span class="header-section-number">4</span> Evaluación de factibilidad</h1>
+<p>Antes de calificar fijamos una rúbrica, es decir, lo que significa un puntaje de 1, de 3 y de 5 en cada criterio. Los puntajes 2 y 4 se usan para los casos intermedios. La rúbrica se exporta para que los documentos puedan mostrarla.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rubrica <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>criterio, <span class="sc">~</span>que_mide, <span class="sc">~</span>puntaje_1, <span class="sc">~</span>puntaje_3, <span class="sc">~</span>puntaje_5,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Impacto"</span>, <span class="st">"Efecto esperado en la circularidad de los flujos de material"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Efecto indirecto, que depende de otros instrumentos"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Efecto directo sobre un flujo acotado o un eslabón de la cadena"</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Efecto directo y grande sobre flujos de volumen alto"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Técnica"</span>, <span class="st">"Información, infraestructura y capacidad de medición"</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Faltan los datos y la infraestructura básicos"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Existen bases parciales que hay que completar"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Todo lo necesario existe"</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Institucional"</span>, <span class="st">"Institución con la función legal y los medios"</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Ninguna institución tiene la función"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"La función existe pero es parcial o la institución tiene pocos medios"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Función expresa y medios suficientes"</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Política y regulatoria"</span>, <span class="st">"Vehículo legal, base legal vigente y señales de apoyo"</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Requiere una ley nueva y enfrenta resistencia"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Basta un decreto o resolución, con resistencia previsible"</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Mandato legal vigente que basta con aplicar"</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Financiera"</span>, <span class="st">"Costo fiscal y fuente sostenible de recursos"</span>,</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Costo fiscal alto sin fuente identificada"</span>,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Depende de recursos externos o de otro instrumento"</span>,</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Sin costo fiscal o autofinanciado"</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Tiempo"</span>, <span class="st">"Plazo hasta la entrada en operación"</span>,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Más de tres años o solo después de otros instrumentos"</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Uno a dos años de preparación"</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Puede iniciar de inmediato"</span>,</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Equidad y competitividad"</span>, <span class="st">"Efectos sobre hogares pobres, pymes, empleo y competencia"</span>,</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Efectos regresivos o barreras para pymes sin compensación"</span>,</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Efectos mixtos que pueden compensarse con el diseño"</span>,</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Efectos positivos o neutrales"</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 <p>La evaluación se escribe en una tabla larga, con una fila por cada combinación de instrumento y criterio, es decir, 98 filas. Cada fila tiene el puntaje y una frase que justifica por qué se asignó. Para no repetir la función que arma las filas, la función auxiliar <code>p()</code> recibe el número del instrumento y, en orden, los siete pares de puntaje y justificación.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>criterios <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Impacto"</span>, <span class="st">"Técnica"</span>, <span class="st">"Institucional"</span>, <span class="st">"Política y regulatoria"</span>,</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"Financiera"</span>, <span class="st">"Tiempo"</span>, <span class="st">"Equidad y competitividad"</span>)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="cf">function</span>(id, ...) {</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">list</span>(...)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">id =</span> id, <span class="at">criterio =</span> criterios, <span class="at">puntaje =</span> <span class="fu">unlist</span>(x[<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)]),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">justificacion =</span> <span class="fu">unlist</span>(x[<span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>)]))</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>factibilidad <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="st">"Base de cálculo de toda REP, depósito o meta; sin ella los demás no se sostienen"</span>,</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La aduana ya registra por partida y el MICI certifica importaciones de la Ley 187"</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La AAUD lleva un registro de gestores y un sistema de información por ley (Ley 276, art. 22 y 54)"</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Basta un decreto; la Hoja de Ruta de plásticos adoptada en 2026 pide el registro"</span>,</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Costo bajo: se apoya en sistemas existentes"</span>,</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede reglamentarse en un año"</span>,</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Carga de reporte proporcional; los grandes importadores concentran el volumen"</span>),</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="st">"Los recicladores recuperan la mayor parte del material reciclado del país"</span>,</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El único conteo de recicladores es de 2010; hay que censar"</span>,</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La Ley 276 los define y ordena gradualidad, pero remite al reglamento"</span>,</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Tres leyes reconocen su inclusión (33, 276 y 502)"</span>,</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El pago depende de que exista REP o tasa que lo financie"</span>,</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El registro puede iniciar pronto; el pago, con la REP"</span>,</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Mejora ingresos y protección de una población pobre e informal"</span>),</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="st">"Traslada el costo del final de vida al precio y financia la recolección de flujos grandes"</span>,</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere registro, metas por flujo y red de recolección"</span>,</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La AAUD tiene la facultad de autorizar y fiscalizar sistemas de REP, pero con déficit financiero"</span>,</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Puede iniciar por decreto y resoluciones; las metas con sanción piden una ley de REP"</span>,</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Se autofinancia con contribuciones; la administración cuesta 5 % a 10 % del total (OCDE)"</span>,</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Requiere el registro operativo y un período de preparación de dos a tres años"</span>,</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Un cargo de 1 % sube la canasta de los hogares en 0,2 %; los importadores pagan igual que los productores nacionales"</span>),</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">4</span>, <span class="dv">3</span>, <span class="st">"Incentiva el rediseño solo si la diferencia de tarifa es significativa"</span>,</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Exige criterios de reciclabilidad y datos por producto"</span>,</span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Depende de que existan sistemas de gestión autorizados"</span>,</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Cabe en la REP si la tarifa es privada; ley si la cobra el Estado"</span>,</span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"No tiene costo fiscal"</span>,</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span>, <span class="st">"Solo después de que la REP opere"</span>,</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Puede encarecer envases baratos de productos de consumo popular"</span>),</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">5</span>, <span class="dv">4</span>, <span class="st">"Los sistemas operativos superan 85 % de recolección de envases"</span>,</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere red de retorno y control de envases que entran por frontera"</span>,</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La AAUD puede autorizar sistemas de depósito (Ley 51, art. 6-A num. 14)"</span>,</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Un proyecto de ley de reembolso de envases estaba en segundo debate en 2026"</span>,</span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Lo financian los depósitos no reclamados y la venta de material"</span>,</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Requiere estudio de diseño y red de retorno"</span>,</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El costo de operación de 1 % para las bebidas sube la canasta en 0,01 %; hay que integrar a los recicladores"</span>),</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">6</span>, <span class="dv">3</span>, <span class="st">"Crea demanda estable para el plástico y los áridos recuperados"</span>,</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"La capacidad nacional de reciclaje de calidad es limitada"</span>,</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"El MICI elabora reglamentos técnicos; la Ley 518 de 2026 ya obliga a usar caucho reciclado"</span>,</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Precedente de la Ley 518; los productores pueden objetar el costo"</span>,</span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Sin costo fiscal"</span>,</span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Metas graduales tras desarrollar la oferta"</span>,</span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Puede favorecer a recicladores nacionales; riesgo de costo para pequeños envasadores"</span>),</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">7</span>, <span class="dv">4</span>, <span class="st">"Financia la recolección selectiva y hace más caro mezclar o verter"</span>,</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El cobro en la factura eléctrica ya existe; el pago por generación necesita catastro"</span>,</span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La AAUD y los municipios fijan la tasa por ley (Ley 276, art. 16 y 75)"</span>,</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Exige participación ciudadana; un tribunal anuló una tasa municipal por omitirla"</span>,</span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Cierra la brecha entre lo recaudado (B/.35,2 millones) y lo gastado (B/.60,6 millones)"</span>,</span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La tasa a costo real puede ajustarse pronto; el pago por generación, en pilotos"</span>,</span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Regresiva si no se escalona; la ley ordena considerar el nivel socioeconómico"</span>),</span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">8</span>, <span class="dv">3</span>, <span class="st">"Reduce el costo de capital del reciclaje y el tratamiento"</span>,</span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Requiere lista de bienes elegibles certificada"</span>,</span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"MEF y DGI administran exoneraciones; MiAMBIENTE avala las plantas (Ley 223)"</span>,</span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Las leyes 223 y 276 ya otorgan incentivos; falta su reglamentación"</span>,</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Gasto tributario en un contexto de ingresos tributarios bajos y regla fiscal estricta"</span>,</span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Los incentivos vigentes solo requieren reglamento"</span>,</span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Beneficia a empresas formales con capacidad de invertir"</span>),</span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">9</span>, <span class="dv">3</span>, <span class="st">"Crea demanda para materiales reciclados en la obra pública"</span>,</span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere fichas técnicas y oferta certificada"</span>,</span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La DGCP tiene el mandato expreso desde la Ley 502"</span>,</span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"El mandato ya está en la ley; basta una resolución"</span>,</span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Sin costo adicional si se usa el costo del ciclo de vida"</span>,</span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede iniciar con pliegos piloto en un año"</span>,</span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede exigir formalidad y abrir mercado a pymes de reciclaje"</span>),</span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">10</span>, <span class="dv">3</span>, <span class="st">"Ordena el lenguaje del mercado y permite contar la cartera circular"</span>,</span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Hay puntos de partida en la taxonomía vigente; faltan criterios por actividad"</span>,</span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Tres superintendencias, el MEF y MiAMBIENTE ya gobiernan la taxonomía"</span>,</span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Su uso es voluntario y la guía bancaria anticipa una segunda edición"</span>,</span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Costo bajo"</span>,</span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Una edición técnica toma uno a dos años"</span>,</span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Neutral; conviene criterios simplificados para pymes"</span>),</span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">11</span>, <span class="dv">3</span>, <span class="st">"Moviliza recursos para inversión pública en residuos y agua"</span>,</span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La cartera de proyectos elegibles es el cuello de botella"</span>,</span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"El MEF tiene el marco y la SMV una guía de bonos temáticos"</span>,</span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"El marco está vigente desde 2024"</span>,</span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La deuda está sujeta a la regla fiscal, que baja el déficit a 1,5 % del PIB al 2030"</span>,</span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Una primera emisión requiere preparar proyectos"</span>,</span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Neutral"</span>),</span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">12</span>, <span class="dv">4</span>, <span class="st">"Llega a pymes y recuperadores que la banca no atiende"</span>,</span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La banca no tiene criterios ni historial de crédito circular"</span>,</span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Existe un Fondo de Garantías con el BID, sin ventana circular"</span>,</span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"No requiere ley; basta una ventana en programas existentes"</span>,</span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Depende de recursos multilaterales"</span>,</span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede operar en un año sobre el fondo existente"</span>,</span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Favorece a microempresas, a mujeres en turismo y a recicladores"</span>),</span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">13</span>, <span class="dv">4</span>, <span class="st">"Permite infraestructura de valorización a escala"</span>,</span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere estudios de flujo y de demanda"</span>,</span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Secretaría de APP y AAUD con funciones; contratos recientes cuestionados por falta de refrendo"</span>,</span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Ley de APP vigente; contratos sensibles"</span>,</span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Necesita una tasa que pague el servicio"</span>,</span>
-<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Estructurar una APP toma de dos a tres años"</span>,</span>
-<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Riesgo de desplazar a recicladores si no se integran"</span>),</span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">14</span>, <span class="dv">2</span>, <span class="st">"Efecto indirecto; habilita a los demás"</span>,</span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Existen programas y entidades de formación"</span>,</span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La Ley 502 asigna las funciones"</span>,</span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Mandato legal vigente"</span>,</span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Costo moderado"</span>,</span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Puede iniciar de inmediato"</span>,</span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La certificación en turismo diferencia a pequeños operadores"</span>)</span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(fichas, id, instrumento), <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="fu">factor</span>(criterio, <span class="at">levels =</span> criterios))</span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a><span class="co"># Confianza por instrumento según el tipo de evidencia</span></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>confianza <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">14</span>,</span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>  <span class="at">confianza =</span> <span class="fu">c</span>(<span class="st">"Alta"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Alta"</span>,</span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Alta"</span>, <span class="st">"Alta"</span>, <span class="st">"Alta"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Alta"</span>)</span>
-<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>factibilidad <span class="ot">&lt;-</span> factibilidad <span class="sc">|&gt;</span> <span class="fu">left_join</span>(confianza, <span class="at">by =</span> <span class="st">"id"</span>)</span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">nrow</span>(factibilidad) <span class="sc">==</span> <span class="dv">98</span>, <span class="fu">all</span>(factibilidad<span class="sc">$</span>puntaje <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>criterios <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Impacto"</span>, <span class="st">"Técnica"</span>, <span class="st">"Institucional"</span>, <span class="st">"Política y regulatoria"</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>               <span class="st">"Financiera"</span>, <span class="st">"Tiempo"</span>, <span class="st">"Equidad y competitividad"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="cf">function</span>(id, ...) {</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">list</span>(...)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">id =</span> id, <span class="at">criterio =</span> criterios, <span class="at">puntaje =</span> <span class="fu">unlist</span>(x[<span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>)]),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">justificacion =</span> <span class="fu">unlist</span>(x[<span class="fu">c</span>(<span class="cn">FALSE</span>, <span class="cn">TRUE</span>)]))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>factibilidad <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="st">"Base de cálculo de toda REP, depósito o meta; sin ella los demás no se sostienen"</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La aduana ya registra por partida y el MICI certifica importaciones de la Ley 187"</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La AAUD lleva un registro de gestores y un sistema de información por ley (Ley 276, art. 22 y 54)"</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Basta un decreto; la Hoja de Ruta de plásticos adoptada en 2026 pide el registro"</span>,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Costo bajo: se apoya en sistemas existentes"</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede reglamentarse en un año"</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Carga de reporte proporcional; los grandes importadores concentran el volumen"</span>),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="st">"Los recicladores recuperan la mayor parte del material reciclado del país"</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El único conteo de recicladores es de 2010; hay que censar"</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La Ley 276 los define y ordena gradualidad, pero remite al reglamento"</span>,</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Tres leyes reconocen su inclusión (33, 276 y 502)"</span>,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El pago depende de que exista REP o tasa que lo financie"</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El registro puede iniciar pronto; el pago, con la REP"</span>,</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Mejora ingresos y protección de una población pobre e informal"</span>),</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="st">"Traslada el costo del final de vida al precio y financia la recolección de flujos grandes"</span>,</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere registro, metas por flujo y red de recolección"</span>,</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La AAUD tiene la facultad de autorizar y fiscalizar sistemas de REP, pero con déficit financiero"</span>,</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Puede iniciar por decreto y resoluciones; las metas con sanción piden una ley de REP"</span>,</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Se autofinancia con contribuciones; la administración cuesta 5 % a 10 % del total (OCDE)"</span>,</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Requiere el registro operativo y un período de preparación de dos a tres años"</span>,</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Un cargo de 1 % sube la canasta de los hogares en 0,2 %; los importadores pagan igual que los productores nacionales"</span>),</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">4</span>, <span class="dv">3</span>, <span class="st">"Incentiva el rediseño solo si la diferencia de tarifa es significativa"</span>,</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Exige criterios de reciclabilidad y datos por producto"</span>,</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Depende de que existan sistemas de gestión autorizados"</span>,</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Cabe en la REP si la tarifa es privada; ley si la cobra el Estado"</span>,</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"No tiene costo fiscal"</span>,</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>       <span class="dv">1</span>, <span class="st">"Solo después de que la REP opere"</span>,</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Puede encarecer envases baratos de productos de consumo popular"</span>),</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">5</span>, <span class="dv">4</span>, <span class="st">"Los sistemas operativos superan 85 % de recolección de envases"</span>,</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere red de retorno y control de envases que entran por frontera"</span>,</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La AAUD puede autorizar sistemas de depósito (Ley 51, art. 6-A num. 14)"</span>,</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Un proyecto de ley de reembolso de envases estaba en segundo debate en 2026"</span>,</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Lo financian los depósitos no reclamados y la venta de material"</span>,</span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Requiere estudio de diseño y red de retorno"</span>,</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El costo de operación de 1 % para las bebidas sube la canasta en 0,01 %; hay que integrar a los recicladores"</span>),</span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">6</span>, <span class="dv">3</span>, <span class="st">"Crea demanda estable para el plástico y los áridos recuperados"</span>,</span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"La capacidad nacional de reciclaje de calidad es limitada"</span>,</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"El MICI elabora reglamentos técnicos; la Ley 518 de 2026 ya obliga a usar caucho reciclado"</span>,</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Precedente de la Ley 518; los productores pueden objetar el costo"</span>,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Sin costo fiscal"</span>,</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Metas graduales tras desarrollar la oferta"</span>,</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Puede favorecer a recicladores nacionales; riesgo de costo para pequeños envasadores"</span>),</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">7</span>, <span class="dv">4</span>, <span class="st">"Financia la recolección selectiva y hace más caro mezclar o verter"</span>,</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"El cobro en la factura eléctrica ya existe; el pago por generación necesita catastro"</span>,</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La AAUD y los municipios fijan la tasa por ley (Ley 276, art. 16 y 75)"</span>,</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Exige participación ciudadana; un tribunal anuló una tasa municipal por omitirla"</span>,</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Cierra la brecha entre lo recaudado (B/.35,2 millones) y lo gastado (B/.60,6 millones)"</span>,</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La tasa a costo real puede ajustarse pronto; el pago por generación, en pilotos"</span>,</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Regresiva si no se escalona; la ley ordena considerar el nivel socioeconómico"</span>),</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">8</span>, <span class="dv">3</span>, <span class="st">"Reduce el costo de capital del reciclaje y el tratamiento"</span>,</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Requiere lista de bienes elegibles certificada"</span>,</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"MEF y DGI administran exoneraciones; MiAMBIENTE avala las plantas (Ley 223)"</span>,</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Las leyes 223 y 276 ya otorgan incentivos; falta su reglamentación"</span>,</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Gasto tributario en un contexto de ingresos tributarios bajos y regla fiscal estricta"</span>,</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Los incentivos vigentes solo requieren reglamento"</span>,</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Beneficia a empresas formales con capacidad de invertir"</span>),</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">9</span>, <span class="dv">3</span>, <span class="st">"Crea demanda para materiales reciclados en la obra pública"</span>,</span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere fichas técnicas y oferta certificada"</span>,</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La DGCP tiene el mandato expreso desde la Ley 502"</span>,</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"El mandato ya está en la ley; basta una resolución"</span>,</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Sin costo adicional si se usa el costo del ciclo de vida"</span>,</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede iniciar con pliegos piloto en un año"</span>,</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede exigir formalidad y abrir mercado a pymes de reciclaje"</span>),</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">10</span>, <span class="dv">3</span>, <span class="st">"Ordena el lenguaje del mercado y permite contar la cartera circular"</span>,</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Hay puntos de partida en la taxonomía vigente; faltan criterios por actividad"</span>,</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Tres superintendencias, el MEF y MiAMBIENTE ya gobiernan la taxonomía"</span>,</span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Su uso es voluntario y la guía bancaria anticipa una segunda edición"</span>,</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Costo bajo"</span>,</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Una edición técnica toma uno a dos años"</span>,</span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Neutral; conviene criterios simplificados para pymes"</span>),</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">11</span>, <span class="dv">3</span>, <span class="st">"Moviliza recursos para inversión pública en residuos y agua"</span>,</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La cartera de proyectos elegibles es el cuello de botella"</span>,</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"El MEF tiene el marco y la SMV una guía de bonos temáticos"</span>,</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"El marco está vigente desde 2024"</span>,</span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La deuda está sujeta a la regla fiscal, que baja el déficit a 1,5 % del PIB al 2030"</span>,</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Una primera emisión requiere preparar proyectos"</span>,</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Neutral"</span>),</span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">12</span>, <span class="dv">4</span>, <span class="st">"Llega a pymes y recuperadores que la banca no atiende"</span>,</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"La banca no tiene criterios ni historial de crédito circular"</span>,</span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Existe un Fondo de Garantías con el BID, sin ventana circular"</span>,</span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"No requiere ley; basta una ventana en programas existentes"</span>,</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Depende de recursos multilaterales"</span>,</span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Puede operar en un año sobre el fondo existente"</span>,</span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Favorece a microempresas, a mujeres en turismo y a recicladores"</span>),</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">13</span>, <span class="dv">4</span>, <span class="st">"Permite infraestructura de valorización a escala"</span>,</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Requiere estudios de flujo y de demanda"</span>,</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Secretaría de APP y AAUD con funciones; contratos recientes cuestionados por falta de refrendo"</span>,</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Ley de APP vigente; contratos sensibles"</span>,</span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Necesita una tasa que pague el servicio"</span>,</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>       <span class="dv">2</span>, <span class="st">"Estructurar una APP toma de dos a tres años"</span>,</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>       <span class="dv">3</span>, <span class="st">"Riesgo de desplazar a recicladores si no se integran"</span>),</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">p</span>(<span class="dv">14</span>, <span class="dv">2</span>, <span class="st">"Efecto indirecto; habilita a los demás"</span>,</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Existen programas y entidades de formación"</span>,</span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La Ley 502 asigna las funciones"</span>,</span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Mandato legal vigente"</span>,</span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"Costo moderado"</span>,</span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a>       <span class="dv">5</span>, <span class="st">"Puede iniciar de inmediato"</span>,</span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>       <span class="dv">4</span>, <span class="st">"La certificación en turismo diferencia a pequeños operadores"</span>)</span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(fichas, id, instrumento), <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">criterio =</span> <span class="fu">factor</span>(criterio, <span class="at">levels =</span> criterios))</span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a><span class="co"># Confianza por instrumento según el tipo de evidencia</span></span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a>confianza <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">14</span>,</span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a>  <span class="at">confianza =</span> <span class="fu">c</span>(<span class="st">"Alta"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Alta"</span>,</span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Alta"</span>, <span class="st">"Alta"</span>, <span class="st">"Alta"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Media"</span>, <span class="st">"Alta"</span>)</span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>factibilidad <span class="ot">&lt;-</span> factibilidad <span class="sc">|&gt;</span> <span class="fu">left_join</span>(confianza, <span class="at">by =</span> <span class="st">"id"</span>)</span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">nrow</span>(factibilidad) <span class="sc">==</span> <span class="dv">98</span>, <span class="fu">all</span>(factibilidad<span class="sc">$</span>puntaje <span class="sc">%in%</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Las justificaciones se apoyan en la ruta legal por instrumento <span class="citation" data-cites="panama2021Ley276 panama2010Ley51 panama2025Ley502 panama2021Ley223 panama2026Ley518 panama2002Ley6 miambiente2026ResDM0351 asamblea2026ActaPleno">(<a href="#ref-panama2002Ley6" role="doc-biblioref">Asamblea Legislativa de Panamá, 2002</a>; <a href="#ref-panama2010Ley51" role="doc-biblioref">Asamblea Nacional de Panamá, 2010</a>, <a href="#ref-panama2021Ley276" role="doc-biblioref">2021b</a>, <a href="#ref-panama2021Ley223" role="doc-biblioref">2021a</a>, <a href="#ref-panama2025Ley502" role="doc-biblioref">2025</a>, <a href="#ref-panama2026Ley518" role="doc-biblioref">2026b</a>, <a href="#ref-asamblea2026ActaPleno" role="doc-biblioref">2026a</a>; <a href="#ref-miambiente2026ResDM0351" role="doc-biblioref">Ministerio de Ambiente de Panamá, 2026</a>)</span>, las capacidades institucionales (memoria 12), las finanzas de la Autoridad de Aseo <span class="citation" data-cites="estrella2026AAUDMorosidad">(<a href="#ref-estrella2026AAUDMorosidad" role="doc-biblioref">La Estrella de Panamá, 2026</a>)</span>, el costo administrativo de la REP <span class="citation" data-cites="ocde2016EPRPolicyHighlights">(<a href="#ref-ocde2016EPRPolicyHighlights" role="doc-biblioref">Organización para la Cooperación y el Desarrollo Económicos, 2016</a>)</span>, el desempeño de los sistemas de depósito <span class="citation" data-cites="sidorczuk2025DepositReturn">(<a href="#ref-sidorczuk2025DepositReturn" role="doc-biblioref">Sidorczuk-Pietraszko et&nbsp;al., 2025</a>)</span>, el marco y la guía de bonos <span class="citation" data-cites="mef2024MarcoFinanciamientoSostenible smv2025GuiaBonosTematicos sbp2025GuiaTFSBancos">(<a href="#ref-mef2024MarcoFinanciamientoSostenible" role="doc-biblioref">Ministerio de Economía y Finanzas de Panamá, 2024</a>; <a href="#ref-sbp2025GuiaTFSBancos" role="doc-biblioref">Superintendencia de Bancos de Panamá, 2025b</a>; <a href="#ref-smv2025GuiaBonosTematicos" role="doc-biblioref">Superintendencia del Mercado de Valores de Panamá, 2025</a>)</span>, el Fondo de Garantías <span class="citation" data-cites="sbp2025Acuerdo8">(<a href="#ref-sbp2025Acuerdo8" role="doc-biblioref">Superintendencia de Bancos de Panamá, 2025a</a>)</span>, la regla fiscal <span class="citation" data-cites="laestrella2026ReformaFiscal">(<a href="#ref-laestrella2026ReformaFiscal" role="doc-biblioref">García Armuelles, 2026</a>)</span> y el modelo de precios (memoria 11).</p>
 </section>
@@ -639,12 +674,12 @@ div.csl-indent {
 <h1 data-number="5"><span class="header-section-number">5</span> Puntaje con pesos iguales</h1>
 <p>Para resumir los siete puntajes de cada instrumento en una sola cifra calculamos su promedio simple, lo que equivale a dar a todos los criterios el mismo peso. El resultado ordena los instrumentos de mayor a menor factibilidad.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ranking <span class="ot">&lt;-</span> factibilidad <span class="sc">|&gt;</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">puntaje_medio =</span> <span class="fu">mean</span>(puntaje), <span class="at">.by =</span> <span class="fu">c</span>(id, instrumento)) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(puntaje_medio)) <span class="sc">|&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">posicion =</span> <span class="fu">row_number</span>())</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>ranking</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ranking <span class="ot">&lt;-</span> factibilidad <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">puntaje_medio =</span> <span class="fu">mean</span>(puntaje), <span class="at">.by =</span> <span class="fu">c</span>(id, instrumento)) <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(puntaje_medio)) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">posicion =</span> <span class="fu">row_number</span>())</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ranking</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 14 × 4
       id instrumento                                      puntaje_medio posicion
@@ -670,33 +705,33 @@ div.csl-indent {
 <h1 data-number="6"><span class="header-section-number">6</span> Sensibilidad a los pesos</h1>
 <p>Dar el mismo peso a todos los criterios es un punto de partida razonable, pero un lector puede considerar, por ejemplo, que el impacto importa más que el tiempo de implementación. Para saber si el orden de los instrumentos depende de esa elección hacemos dos pruebas. La primera elimina un criterio a la vez y vuelve a calcular la posición de cada instrumento, lo que muestra si algún criterio por sí solo determina el resultado. La segunda reparte el peso total entre los siete criterios al azar, 10.000 veces, y cuenta en qué proporción de los repartos cada instrumento queda entre los cinco primeros. Los pesos al azar se obtienen de una distribución de Dirichlet con parámetros iguales, que es la forma estándar de sortear proporciones que suman uno sin favorecer a ningún criterio. Un instrumento que queda entre los cinco primeros en casi todos los repartos es una prioridad que no depende de cómo se ponderen los criterios.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>matriz_puntajes <span class="ot">&lt;-</span> factibilidad <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, criterio, puntaje) <span class="sc">|&gt;</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> criterio, <span class="at">values_from =</span> puntaje) <span class="sc">|&gt;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(id)</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(matriz_puntajes[, <span class="sc">-</span><span class="dv">1</span>])</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Quitar un criterio a la vez</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>sin_uno <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(criterios, \(k) {</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">id =</span> matriz_puntajes<span class="sc">$</span>id, <span class="at">criterio_omitido =</span> k,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">posicion =</span> <span class="fu">rank</span>(<span class="sc">-</span><span class="fu">rowMeans</span>(M[, <span class="fu">colnames</span>(M) <span class="sc">!=</span> k]), <span class="at">ties.method =</span> <span class="st">"min"</span>))</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>rango_posiciones <span class="ot">&lt;-</span> sin_uno <span class="sc">|&gt;</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">posicion_min =</span> <span class="fu">min</span>(posicion), <span class="at">posicion_max =</span> <span class="fu">max</span>(posicion), <span class="at">.by =</span> id)</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Pesos al azar</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>n_sorteos <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>pesos <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rexp</span>(n_sorteos <span class="sc">*</span> <span class="dv">7</span>), <span class="at">ncol =</span> <span class="dv">7</span>)</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>pesos <span class="ot">&lt;-</span> pesos <span class="sc">/</span> <span class="fu">rowSums</span>(pesos)</span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>puntajes_sorteo <span class="ot">&lt;-</span> M <span class="sc">%*%</span> <span class="fu">t</span>(pesos)</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>top5 <span class="ot">&lt;-</span> <span class="fu">apply</span>(puntajes_sorteo, <span class="dv">2</span>, \(s) <span class="fu">rank</span>(<span class="sc">-</span>s, <span class="at">ties.method =</span> <span class="st">"min"</span>) <span class="sc">&lt;=</span> <span class="dv">5</span>)</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>sensibilidad <span class="ot">&lt;-</span> ranking <span class="sc">|&gt;</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rango_posiciones, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_top5 =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">rowMeans</span>(top5)[<span class="fu">match</span>(id, matriz_puntajes<span class="sc">$</span>id)])</span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>sensibilidad</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>matriz_puntajes <span class="ot">&lt;-</span> factibilidad <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id, criterio, puntaje) <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> criterio, <span class="at">values_from =</span> puntaje) <span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(id)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(matriz_puntajes[, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Quitar un criterio a la vez</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>sin_uno <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(criterios, \(k) {</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(<span class="at">id =</span> matriz_puntajes<span class="sc">$</span>id, <span class="at">criterio_omitido =</span> k,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">posicion =</span> <span class="fu">rank</span>(<span class="sc">-</span><span class="fu">rowMeans</span>(M[, <span class="fu">colnames</span>(M) <span class="sc">!=</span> k]), <span class="at">ties.method =</span> <span class="st">"min"</span>))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>rango_posiciones <span class="ot">&lt;-</span> sin_uno <span class="sc">|&gt;</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">posicion_min =</span> <span class="fu">min</span>(posicion), <span class="at">posicion_max =</span> <span class="fu">max</span>(posicion), <span class="at">.by =</span> id)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Pesos al azar</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>n_sorteos <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>pesos <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rexp</span>(n_sorteos <span class="sc">*</span> <span class="dv">7</span>), <span class="at">ncol =</span> <span class="dv">7</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>pesos <span class="ot">&lt;-</span> pesos <span class="sc">/</span> <span class="fu">rowSums</span>(pesos)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>puntajes_sorteo <span class="ot">&lt;-</span> M <span class="sc">%*%</span> <span class="fu">t</span>(pesos)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>top5 <span class="ot">&lt;-</span> <span class="fu">apply</span>(puntajes_sorteo, <span class="dv">2</span>, \(s) <span class="fu">rank</span>(<span class="sc">-</span>s, <span class="at">ties.method =</span> <span class="st">"min"</span>) <span class="sc">&lt;=</span> <span class="dv">5</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>sensibilidad <span class="ot">&lt;-</span> ranking <span class="sc">|&gt;</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(rango_posiciones, <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">pct_top5 =</span> <span class="dv">100</span> <span class="sc">*</span> <span class="fu">rowMeans</span>(top5)[<span class="fu">match</span>(id, matriz_puntajes<span class="sc">$</span>id)])</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>sensibilidad</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 14 × 7
       id instrumento   puntaje_medio posicion posicion_min posicion_max pct_top5
@@ -717,17 +752,92 @@ div.csl-indent {
 14     4 Ecomodulació…          2.57       14           14           14     0   </code></pre>
 </div>
 </div>
-</section>
-<section id="exportación" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Exportación</h1>
+<p>Guardamos también la posición de cada instrumento al omitir cada criterio, que muestra qué criterio mueve a cada instrumento hacia arriba o hacia abajo.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(fichas, <span class="st">"fichas_instrumentos"</span>, <span class="at">hoja =</span> <span class="st">"fichas"</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(factibilidad, <span class="st">"factibilidad_instrumentos"</span>, <span class="at">hoja =</span> <span class="st">"factibilidad"</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(sensibilidad, <span class="st">"factibilidad_ranking_sensibilidad"</span>, <span class="at">hoja =</span> <span class="st">"ranking"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>posiciones_omision <span class="ot">&lt;-</span> sin_uno <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(ranking, id, instrumento, <span class="at">posicion_base =</span> posicion), <span class="at">by =</span> <span class="st">"id"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cambio =</span> posicion_base <span class="sc">-</span> posicion)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>posiciones_omision <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="fu">abs</span>(cambio) <span class="sc">&gt;=</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20 × 6
+      id criterio_omitido         posicion instrumento      posicion_base cambio
+   &lt;dbl&gt; &lt;chr&gt;                       &lt;int&gt; &lt;chr&gt;                    &lt;int&gt;  &lt;int&gt;
+ 1     3 Impacto                        10 Responsabilidad…             8     -2
+ 2     6 Impacto                        10 Contenido recic…            12      2
+ 3    10 Impacto                         4 Criterios de ec…             6      2
+ 4    11 Impacto                         8 Bonos temáticos…            10      2
+ 5     7 Técnica                         7 Tarifa de aseo …             9      2
+ 6     9 Técnica                         1 Compras pública…             3      2
+ 7    11 Técnica                         7 Bonos temáticos…            10      3
+ 8     5 Institucional                   9 Depósito y reto…            11      2
+ 9     7 Política y regulatoria          5 Tarifa de aseo …             9      4
+10     8 Financiera                      5 Incentivos fisc…             7      2
+11    11 Financiera                      7 Bonos temáticos…            10      3
+12    13 Financiera                     10 Alianzas públic…            13      3
+13     5 Tiempo                          8 Depósito y reto…            11      3
+14    10 Tiempo                          4 Criterios de ec…             6      2
+15    11 Tiempo                          8 Bonos temáticos…            10      2
+16     2 Equidad y competitividad        8 Formalización e…             5     -3
+17     7 Equidad y competitividad        5 Tarifa de aseo …             9      4
+18     8 Equidad y competitividad        5 Incentivos fisc…             7      2
+19    10 Equidad y competitividad        4 Criterios de ec…             6      2
+20    11 Equidad y competitividad        8 Bonos temáticos…            10      2</code></pre>
+</div>
 </div>
 </section>
-<section id="referencias" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Referencias</h1>
+<section id="impacto-frente-a-facilidad-de-aplicación" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Impacto frente a facilidad de aplicación</h1>
+<p>El puntaje medio mezcla dos preguntas distintas: cuánto cambia el instrumento los flujos de material (el criterio de impacto) y qué tan fácil es ponerlo en marcha (los criterios técnico, institucional, político y regulatorio, financiero y de tiempo). Separarlas muestra la disyuntiva central de la política. El criterio de equidad y competitividad no entra en ninguno de los dos ejes, porque describe a quién beneficia o perjudica el instrumento.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>impacto_facilidad <span class="ot">&lt;-</span> factibilidad <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">impacto =</span> puntaje[criterio <span class="sc">==</span> <span class="st">"Impacto"</span>],</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">facilidad =</span> <span class="fu">mean</span>(puntaje[criterio <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Técnica"</span>, <span class="st">"Institucional"</span>, <span class="st">"Política y regulatoria"</span>, <span class="st">"Financiera"</span>, <span class="st">"Tiempo"</span>)]),</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">equidad =</span> puntaje[criterio <span class="sc">==</span> <span class="st">"Equidad y competitividad"</span>],</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> <span class="fu">c</span>(id, instrumento)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">select</span>(fichas, id, familia, paso), <span class="at">by =</span> <span class="st">"id"</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(impacto_facilidad<span class="sc">$</span>impacto, impacto_facilidad<span class="sc">$</span>facilidad)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.4309915</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>impacto_facilidad <span class="sc">|&gt;</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(impacto))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 14 × 7
+      id instrumento                     impacto facilidad equidad familia paso 
+   &lt;dbl&gt; &lt;chr&gt;                             &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;
+ 1     3 Responsabilidad extendida del …       5       3         3 Normat… Segu…
+ 2     1 Registro de productores e impo…       4       4         4 Habili… Prim…
+ 3     2 Formalización e inclusión de r…       4       3.2       5 Habili… Prim…
+ 4     5 Depósito y retorno de envases …       4       3         3 Tribut… Segu…
+ 5     7 Tarifa de aseo a costo real, p…       4       3.4       2 Tribut… Segu…
+ 6    12 Crédito verde, garantías y fin…       4       3.4       5 Financ… Prim…
+ 7    13 Alianzas público-privadas y me…       4       2.8       3 Promoc… Prim…
+ 8     4 Ecomodulación de las contribuc…       3       2.4       3 Normat… Segu…
+ 9     6 Contenido reciclado y normas p…       3       3         3 Normat… Segu…
+10     8 Incentivos fiscales a la inver…       3       3.6       3 Tribut… Prim…
+11     9 Compras públicas circulares           3       4         4 Promoc… Prim…
+12    10 Criterios de economía circular…       3       3.8       3 Financ… Prim…
+13    11 Bonos temáticos y marco sobera…       3       3.4       3 Financ… Prim…
+14    14 Información, formación y certi…       2       4.4       4 Capaci… Prim…</code></pre>
+</div>
+</div>
+</section>
+<section id="exportación" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Exportación</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(fichas, <span class="st">"fichas_instrumentos"</span>, <span class="at">hoja =</span> <span class="st">"fichas"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(factibilidad, <span class="st">"factibilidad_instrumentos"</span>, <span class="at">hoja =</span> <span class="st">"factibilidad"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(sensibilidad, <span class="st">"factibilidad_ranking_sensibilidad"</span>, <span class="at">hoja =</span> <span class="st">"ranking"</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(rubrica, <span class="st">"factibilidad_rubrica"</span>, <span class="at">hoja =</span> <span class="st">"rubrica"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(posiciones_omision, <span class="st">"factibilidad_posiciones_omision"</span>, <span class="at">hoja =</span> <span class="st">"omision"</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(impacto_facilidad, <span class="st">"factibilidad_impacto_facilidad"</span>, <span class="at">hoja =</span> <span class="st">"ejes"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="referencias" class="level1" data-number="9">
+<h1 data-number="9"><span class="header-section-number">9</span> Referencias</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
 <div id="ref-panama2002Ley6" class="csl-entry" role="listitem">
 Asamblea Legislativa de Panamá. (2002). <em>Ley 6 de 22 de enero de 2002, que dicta normas para la transparencia en la gestión pública, establece la acción de Hábeas Data y dicta otras disposiciones</em>. Gaceta Oficial No. 24476, 23 de enero de 2002. <a href="https://participacionciudadana.contraloria.gob.pa/wp-content/uploads/2024/05/Ley-No.-6-de-22-enero-2002-2.pdf">https://participacionciudadana.contraloria.gob.pa/wp-content/uploads/2024/05/Ley-No.-6-de-22-enero-2002-2.pdf</a>

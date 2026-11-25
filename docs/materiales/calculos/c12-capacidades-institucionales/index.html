@@ -263,8 +263,10 @@ div.csl-indent {
   <li><a href="#preámbulo" id="toc-preámbulo" class="nav-link" data-scroll-target="#preámbulo"><span class="header-section-number">2</span> Preámbulo</a></li>
   <li><a href="#matriz-de-funciones" id="toc-matriz-de-funciones" class="nav-link" data-scroll-target="#matriz-de-funciones"><span class="header-section-number">3</span> Matriz de funciones</a></li>
   <li><a href="#lectura-por-institución-y-por-función" id="toc-lectura-por-institución-y-por-función" class="nav-link" data-scroll-target="#lectura-por-institución-y-por-función"><span class="header-section-number">4</span> Lectura por institución y por función</a></li>
-  <li><a href="#exportación" id="toc-exportación" class="nav-link" data-scroll-target="#exportación"><span class="header-section-number">5</span> Exportación</a></li>
-  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">6</span> Referencias</a></li>
+  <li><a href="#personal-de-las-instituciones" id="toc-personal-de-las-instituciones" class="nav-link" data-scroll-target="#personal-de-las-instituciones"><span class="header-section-number">5</span> Personal de las instituciones</a></li>
+  <li><a href="#cadena-institucional-por-instrumento" id="toc-cadena-institucional-por-instrumento" class="nav-link" data-scroll-target="#cadena-institucional-por-instrumento"><span class="header-section-number">6</span> Cadena institucional por instrumento</a></li>
+  <li><a href="#exportación" id="toc-exportación" class="nav-link" data-scroll-target="#exportación"><span class="header-section-number">7</span> Exportación</a></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias"><span class="header-section-number">8</span> Referencias</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/renatovargas/pan-ecirc/blob/main/materiales/calculos/c12-capacidades-institucionales/index.qmd" class="toc-action"><i class="bi bi-github"></i>Ver el código</a></li></ul></div></nav>
     </div>
@@ -530,15 +532,100 @@ Tabla&nbsp;1: Matriz de funciones por institución
 </div>
 <p>La lectura es clara. La Autoridad de Aseo Urbano y Domiciliario es la única institución con las cinco primeras funciones de manera expresa para residuos: fija la tasa, cobra en la factura eléctrica, administra un fondo propio, registra y autoriza gestores, sanciona y, desde la Ley 276 de 2021, autoriza los sistemas de depósito y retorno y los sistemas de gestión asociados a la REP <span class="citation" data-cites="panama2021Ley276">(<a href="#ref-panama2021Ley276" role="doc-biblioref">Asamblea Nacional de Panamá, 2021</a>, art. 74)</span>. El Ministerio de Ambiente tiene la reglamentación de la Ley 502 y la plataforma de indicadores, pero no un registro de productores ni un régimen sancionador propio de economía circular. La aduana, la Autoridad de Protección al Consumidor y el Ministerio de Comercio e Industrias ya operan una cadena de control de importaciones y comercio para la Ley 187 que puede extenderse a los productos de la REP. En el sistema financiero, las superintendencias regulan y supervisan, pero solo el Ministerio de Economía y Finanzas y la AMPYME tienen funciones de financiamiento, la segunda con un fondo de garantía.</p>
 </section>
-<section id="exportación" class="level1" data-number="5">
-<h1 data-number="5"><span class="header-section-number">5</span> Exportación</h1>
+<section id="personal-de-las-instituciones" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Personal de las instituciones</h1>
+<p>Las facultades legales dicen qué puede hacer una institución; su personal da una idea de cuánto puede hacer. Registramos los funcionarios permanentes y eventuales de las instituciones con funciones en los instrumentos, según la planilla del sector público de julio de 2026 <span class="citation" data-cites="cgr2026PlanillaJulio">(<a href="#ref-cgr2026PlanillaJulio" role="doc-biblioref">Contraloría General de la República de Panamá, 2026</a>, cuadro 3)</span>. Los municipios, la Secretaría de APP y la Secretaría Nacional de Energía no aparecen por separado.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(capacidades, <span class="st">"capacidades_institucionales"</span>, <span class="at">hoja =</span> <span class="st">"matriz"</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(indice_institucion, <span class="st">"capacidades_indice_institucion"</span>, <span class="at">hoja =</span> <span class="st">"indice"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>personal <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>institucion, <span class="sc">~</span>funcionarios,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MEF"</span>, <span class="dv">2626</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AAUD"</span>, <span class="dv">2405</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MiAMBIENTE"</span>, <span class="dv">1745</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Aduanas"</span>, <span class="dv">1715</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"MICI"</span>, <span class="dv">641</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ACODECO"</span>, <span class="dv">462</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SBP"</span>, <span class="dv">443</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"ATP"</span>, <span class="dv">257</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"AMPYME"</span>, <span class="dv">201</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SMV"</span>, <span class="dv">122</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="st">"DGCP"</span>, <span class="dv">110</span>,</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">"SSRP"</span>, <span class="dv">81</span></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">fuente =</span> <span class="st">"Contraloría General, Informe de planilla del sector público, julio de 2026, cuadro 3"</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>personal</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 12 × 3
+   institucion funcionarios fuente                                              
+   &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;                                               
+ 1 MEF                 2626 Contraloría General, Informe de planilla del sector…
+ 2 AAUD                2405 Contraloría General, Informe de planilla del sector…
+ 3 MiAMBIENTE          1745 Contraloría General, Informe de planilla del sector…
+ 4 Aduanas             1715 Contraloría General, Informe de planilla del sector…
+ 5 MICI                 641 Contraloría General, Informe de planilla del sector…
+ 6 ACODECO              462 Contraloría General, Informe de planilla del sector…
+ 7 SBP                  443 Contraloría General, Informe de planilla del sector…
+ 8 ATP                  257 Contraloría General, Informe de planilla del sector…
+ 9 AMPYME               201 Contraloría General, Informe de planilla del sector…
+10 SMV                  122 Contraloría General, Informe de planilla del sector…
+11 DGCP                 110 Contraloría General, Informe de planilla del sector…
+12 SSRP                  81 Contraloría General, Informe de planilla del sector…</code></pre>
+</div>
 </div>
 </section>
-<section id="referencias" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Referencias</h1>
+<section id="cadena-institucional-por-instrumento" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Cadena institucional por instrumento</h1>
+<p>La matriz anterior se lee por institución. Para diseñar un instrumento hace falta leerla al revés: para cada instrumento, qué institución cumple cada una de las seis funciones y qué pieza falta para que la cadena funcione. La asignación combina la matriz de funciones con el responsable y la ruta legal de cada ficha (memoria 10).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cadena <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="sc">~</span>instrumento, <span class="sc">~</span>Regular, <span class="sc">~</span>Registrar, <span class="sc">~</span><span class="st">`</span><span class="at">Recaudar y administrar fondos</span><span class="st">`</span>, <span class="sc">~</span><span class="st">`</span><span class="at">Controlar y sancionar</span><span class="st">`</span>, <span class="sc">~</span><span class="st">`</span><span class="at">Monitorear y reportar</span><span class="st">`</span>, <span class="sc">~</span>Financiar, <span class="sc">~</span>pieza_faltante,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Registro de productores"</span>, <span class="st">"MiAMBIENTE (reglamento de la Ley 502) y AAUD"</span>, <span class="st">"AAUD, con datos de Aduanas"</span>, <span class="st">"No aplica"</span>, <span class="st">"Aduanas y ACODECO"</span>, <span class="st">"MiAMBIENTE (plataforma de indicadores)"</span>, <span class="st">"Presupuesto de MiAMBIENTE y AAUD"</span>, <span class="st">"Reglamento y convenio de datos con Aduanas"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"REP"</span>, <span class="st">"AAUD (resoluciones por flujo) y MiAMBIENTE"</span>, <span class="st">"AAUD"</span>, <span class="st">"Sistemas colectivos de productores"</span>, <span class="st">"AAUD; Aduanas en frontera"</span>, <span class="st">"AAUD y MiAMBIENTE"</span>, <span class="st">"Contribuciones de los productores"</span>, <span class="st">"Resolución por flujo con metas; ley de REP para sanciones propias"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Depósito y retorno"</span>, <span class="st">"AAUD (autoriza el sistema)"</span>, <span class="st">"AAUD"</span>, <span class="st">"Administrador del sistema"</span>, <span class="st">"Aduanas y ACODECO"</span>, <span class="st">"AAUD"</span>, <span class="st">"Depósitos no reclamados y venta de material"</span>, <span class="st">"Estudio de diseño y red de retorno"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Tarifa de aseo"</span>, <span class="st">"Junta Directiva de la AAUD y municipios"</span>, <span class="st">"Usuarios de las distribuidoras eléctricas"</span>, <span class="st">"AAUD (Fondo de Aseo)"</span>, <span class="st">"AAUD (cobro coactivo)"</span>, <span class="st">"AAUD"</span>, <span class="st">"Usuarios del servicio"</span>, <span class="st">"Estudio de costos, escala socioeconómica y consulta ciudadana"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Contenido reciclado"</span>, <span class="st">"MICI (DGNTI)"</span>, <span class="st">"MICI"</span>, <span class="st">"No aplica"</span>, <span class="st">"MICI y ACODECO"</span>, <span class="st">"MiAMBIENTE"</span>, <span class="st">"Productores"</span>, <span class="st">"Reglamento técnico y oferta de material"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Compras públicas"</span>, <span class="st">"DGCP"</span>, <span class="st">"DGCP (registro de proponentes)"</span>, <span class="st">"No aplica"</span>, <span class="st">"DGCP"</span>, <span class="st">"DGCP (PanamaCompra)"</span>, <span class="st">"Entidades compradoras"</span>, <span class="st">"Resolución con criterios por categoría"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Incentivos fiscales"</span>, <span class="st">"MEF"</span>, <span class="st">"MiAMBIENTE (aval de plantas)"</span>, <span class="st">"MEF (DGI)"</span>, <span class="st">"MEF (DGI)"</span>, <span class="st">"MEF (gasto tributario)"</span>, <span class="st">"Fisco"</span>, <span class="st">"Reglamento de las leyes 223 y 276"</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Taxonomía"</span>, <span class="st">"SBP, SMV y SSRP con MiAMBIENTE y MEF"</span>, <span class="st">"SMV (emisiones)"</span>, <span class="st">"No aplica"</span>, <span class="st">"Superintendencias"</span>, <span class="st">"SBP (reporte de cartera)"</span>, <span class="st">"Banca e inversionistas"</span>, <span class="st">"Criterios técnicos circulares"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Crédito y garantías"</span>, <span class="st">"SBP (Acuerdo 8-2025)"</span>, <span class="st">"AMPYME (registro de la MIPYME)"</span>, <span class="st">"Fondo de Garantías (fiduciario BNP)"</span>, <span class="st">"Banco Nacional"</span>, <span class="st">"AMPYME y MEF"</span>, <span class="st">"BID con el MEF"</span>, <span class="st">"Ventana circular en el fondo"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Alianzas público-privadas"</span>, <span class="st">"Secretaría de APP"</span>, <span class="st">"Secretaría de APP (Registro de APP)"</span>, <span class="st">"AAUD y municipios (tasa)"</span>, <span class="st">"Secretaría de APP y Contraloría"</span>, <span class="st">"Secretaría de APP"</span>, <span class="st">"Capital privado, BID y tasa"</span>, <span class="st">"Estructuración del proyecto ancla"</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>cadena</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 8
+   instrumento   Regular Registrar Recaudar y administr…¹ Controlar y sanciona…²
+   &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;                  &lt;chr&gt;                 
+ 1 Registro de … MiAMBI… AAUD, co… No aplica              Aduanas y ACODECO     
+ 2 REP           AAUD (… AAUD      Sistemas colectivos d… AAUD; Aduanas en fron…
+ 3 Depósito y r… AAUD (… AAUD      Administrador del sis… Aduanas y ACODECO     
+ 4 Tarifa de as… Junta … Usuarios… AAUD (Fondo de Aseo)   AAUD (cobro coactivo) 
+ 5 Contenido re… MICI (… MICI      No aplica              MICI y ACODECO        
+ 6 Compras públ… DGCP    DGCP (re… No aplica              DGCP                  
+ 7 Incentivos f… MEF     MiAMBIEN… MEF (DGI)              MEF (DGI)             
+ 8 Taxonomía     SBP, S… SMV (emi… No aplica              Superintendencias     
+ 9 Crédito y ga… SBP (A… AMPYME (… Fondo de Garantías (f… Banco Nacional        
+10 Alianzas púb… Secret… Secretar… AAUD y municipios (ta… Secretaría de APP y C…
+# ℹ abbreviated names: ¹​`Recaudar y administrar fondos`,
+#   ²​`Controlar y sancionar`
+# ℹ 3 more variables: `Monitorear y reportar` &lt;chr&gt;, Financiar &lt;chr&gt;,
+#   pieza_faltante &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="exportación" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Exportación</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(personal, <span class="st">"capacidades_personal_2026"</span>, <span class="at">hoja =</span> <span class="st">"personal"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(cadena, <span class="st">"capacidades_cadena_instrumento"</span>, <span class="at">hoja =</span> <span class="st">"cadena"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(capacidades, <span class="st">"capacidades_institucionales"</span>, <span class="at">hoja =</span> <span class="st">"matriz"</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(indice_institucion, <span class="st">"capacidades_indice_institucion"</span>, <span class="at">hoja =</span> <span class="st">"indice"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">guardar_salida</span>(cobertura_funcion, <span class="st">"capacidades_cobertura_funcion"</span>, <span class="at">hoja =</span> <span class="st">"cobertura"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="referencias" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Referencias</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
 <div id="ref-panama1998Ley97" class="csl-entry" role="listitem">
 Asamblea Legislativa de Panamá. (1998). <em>Ley 97 de 21 de diciembre de 1998, por la cual se crea el Ministerio de Economía y Finanzas y se dictan otras disposiciones</em>. Gaceta Oficial No. 23698, 23 de diciembre de 1998. <a href="https://docs.panama.justia.com/federales/leyes/97-de-1998-dec-23-1998.pdf">https://docs.panama.justia.com/federales/leyes/97-de-1998-dec-23-1998.pdf</a>
@@ -581,6 +668,9 @@ Asamblea Nacional de Panamá. (2025). <em>Ley 502 de 25 de noviembre de 2025, qu
 </div>
 <div id="ref-panama1984Ley32" class="csl-entry" role="listitem">
 Contraloría General de la República de Panamá. (1984). <em>Ley 32 de 8 de noviembre de 1984, por la cual se adopta la Ley Orgánica de la Contraloría General de la República (versión revisada y anotada)</em>. <a href="https://participacionciudadana.contraloria.gob.pa/wp-content/uploads/2024/02/ley-32-de-8-de-noviembre-de-1984-version-revisada2-1.pdf">https://participacionciudadana.contraloria.gob.pa/wp-content/uploads/2024/02/ley-32-de-8-de-noviembre-de-1984-version-revisada2-1.pdf</a>
+</div>
+<div id="ref-cgr2026PlanillaJulio" class="csl-entry" role="listitem">
+Contraloría General de la República de Panamá. (2026). <em>Informe de la planilla del sector público, julio de 2026</em>. Contraloría General de la República, Dirección Nacional de Asesoría Económica y Financiera. <a href="https://www.contraloria.gob.pa/wp-content/uploads/2026/08/Informe-Planilla-del-Sector-Publico-Julio-2026.pdf">https://www.contraloria.gob.pa/wp-content/uploads/2026/08/Informe-Planilla-del-Sector-Publico-Julio-2026.pdf</a>
 </div>
 <div id="ref-panama2022DE9" class="csl-entry" role="listitem">
 Ministerio de Ambiente de Panamá. (2022). <em>Decreto Ejecutivo No. 9 de 6 de mayo de 2022, que reglamenta la Ley 187 de 2 de diciembre de 2020, que regula la reducción y el reemplazo progresivo de los plásticos de un solo uso</em>. Gaceta Oficial Digital No. 29532-A, 9 de mayo de 2022. <a href="https://www.gacetaoficial.gob.pa/storage/gacetas/2022/05/29532_A/91521.pdf">https://www.gacetaoficial.gob.pa/storage/gacetas/2022/05/29532_A/91521.pdf</a>

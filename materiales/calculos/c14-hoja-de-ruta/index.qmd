@@ -72,6 +72,26 @@ rep_trayectoria <- tibble(
 rep_trayectoria
 ```
 
+Para mostrar la trayectoria año por año interpolamos linealmente la meta entre los tres puntos. Además calculamos lo que pagaría en promedio un productor por cada tonelada de envases que pone en el mercado: si el sistema debe valorizar una fracción $m$ de lo puesto en el mercado y cada tonelada valorizada cuesta $c$, la contribución por tonelada puesta en el mercado es $m \times c$. Es un promedio para todos los materiales; en la práctica cada material tiene su tarifa. Para hacerlo tangible lo expresamos también por un envase de 20 gramos, que es un peso ilustrativo de una botella plástica pequeña.
+
+```{r}
+#| label: rep-anual
+
+rep_anual <- tibble(anio = 2028:2037) |>
+  mutate(
+    meta_valorizacion = approx(rep_trayectoria$anio, rep_trayectoria$meta_valorizacion, xout = anio)$y,
+    toneladas_valorizadas = t_envases * meta_valorizacion,
+    costo_min_musd = toneladas_valorizadas * costo_t["minimo"] / 1e6,
+    costo_max_musd = toneladas_valorizadas * costo_t["maximo"] / 1e6,
+    contribucion_min_usd_t = meta_valorizacion * costo_t["minimo"],
+    contribucion_max_usd_t = meta_valorizacion * costo_t["maximo"],
+    envase20g_min_centavos = contribucion_min_usd_t * 0.020 / 1000 * 100,
+    envase20g_max_centavos = contribucion_max_usd_t * 0.020 / 1000 * 100
+  )
+
+rep_anual |> select(anio, meta_valorizacion, costo_min_musd, costo_max_musd, envase20g_min_centavos, envase20g_max_centavos)
+```
+
 ## Tarifa de aseo a costo real
 
 En 2025 la Autoridad de Aseo recaudó B/.35,2 millones y gastó B/.60,6 millones, con una morosidad acumulada de B/.118,8 millones [@estrella2026AAUDMorosidad]. La brecha anual que una tarifa a costo real debe cerrar es la diferencia.
@@ -81,6 +101,12 @@ En 2025 la Autoridad de Aseo recaudó B/.35,2 millones y gastó B/.60,6 millones
 
 brecha_aseo <- 60.6 - 35.2
 brecha_aseo
+
+aseo_finanzas <- tibble(
+  concepto = c("Recaudación por tasa de aseo (2025)", "Gasto total (2025)", "Morosidad acumulada"),
+  millones_balboas = c(35.2, 60.6, 118.8),
+  fuente = "La Estrella de Panamá (2026), con datos de la AAUD"
+)
 ```
 
 ## Tasa de disposición final de residuos de construcción
@@ -215,6 +241,201 @@ indicadores <- tribble(
   "Crédito garantizado a negocios circulares (millones de US$)", "Insumo", "Sin ventana", "Ventana en operación", "Fondo de Garantías",
   "Establecimientos turísticos con certificación de sostenibilidad", "Resultado", "Sin programa nacional", "Programa en operación", "ATP",
   "Reporte trienal de indicadores de economía circular", "Gestión", "Sin reporte", "Primer reporte publicado", "MiAMBIENTE"
+) |>
+  mutate(frecuencia = c("Anual", "Anual", "Anual", "Anual", "Anual", "Anual", "Anual", "Anual",
+                        "Semestral", "Anual", "Anual", "Semestral", "Anual", "Trienal"))
+```
+
+# Pasos de implementación
+
+Cada instrumento se descompone en pasos concretos, con la acción, la institución responsable, el vehículo legal o administrativo y el plazo. El plazo se expresa en año y semestre; los pasos marcados como hito son los que se muestran en el calendario general de la Hoja de Ruta.
+
+```{r}
+#| label: pasos
+
+pasos <- tribble(
+  ~id, ~orden, ~accion, ~responsable, ~vehiculo, ~anio, ~semestre, ~hito,
+  # 1 Registro
+  1, 1, "Incluir el registro en el reglamento de la Ley 502: obligados, datos por partida arancelaria y material, declaración anual y umbral para pequeños importadores", "MiAMBIENTE", "Decreto ejecutivo", 2027, 1, TRUE,
+  1, 2, "Firmar el convenio para que la aduana entregue las importaciones por partida de los flujos iniciales", "MiAMBIENTE, Aduanas, AAUD y MICI", "Convenio interinstitucional", 2027, 1, FALSE,
+  1, 3, "Publicar la tabla que asigna cada partida a un flujo y un material, y abrir el formulario en la plataforma de indicadores", "MiAMBIENTE", "Resolución ministerial", 2027, 2, FALSE,
+  1, 4, "Recibir la primera declaración de productores e importadores, con 2027 como año base", "MiAMBIENTE y AAUD", "Plataforma de la Ley 502", 2028, 1, TRUE,
+  1, 5, "Cruzar las declaraciones con los datos de aduana y publicar las toneladas por flujo", "MiAMBIENTE y AAUD", "Plataforma de la Ley 502", 2028, 2, FALSE,
+  # 2 Recicladores
+  2, 1, "Censar a los recicladores de base en los distritos con mayor generación de residuos", "AAUD y municipios", "Resolución de la AAUD", 2027, 1, FALSE,
+  2, 2, "Fijar requisitos graduales para que los recicladores se registren como gestores", "Órgano Ejecutivo", "Reglamento de la Ley 276", 2027, 2, TRUE,
+  2, 3, "Inscribir a los recicladores en el sistema de información de la AAUD y certificar sus competencias", "AAUD e INADEH", "Sistema de información de residuos", 2027, 2, FALSE,
+  2, 4, "Pagar por tonelada recuperada con las contribuciones de la REP y la tasa de aseo", "Sistemas colectivos y AAUD", "Contratos de los sistemas colectivos", 2028, 2, FALSE,
+  2, 5, "Incluir a los recicladores en la red de retorno del depósito y en la APP de residuos", "AAUD y Secretaría de APP", "Pliegos y autorizaciones", 2029, 1, FALSE,
+  # 3 REP
+  3, 1, "Presentar la ley de REP con flujos, metas, sistemas colectivos, sanciones y depósito obligatorio", "Órgano Ejecutivo, con MiAMBIENTE y AAUD", "Proyecto de ley", 2027, 2, TRUE,
+  3, 2, "Dictar la norma de REP de envases y los requisitos para autorizar sistemas colectivos (plan de gestión, garantía y auditoría)", "Junta Directiva de la AAUD", "Resolución", 2027, 2, FALSE,
+  3, 3, "Constituir los sistemas colectivos y presentar sus planes de gestión", "Productores e importadores", "Plan de gestión", 2028, 1, FALSE,
+  3, 4, "Autorizar los sistemas colectivos y fijar la meta del primer año (10 %)", "AAUD", "Resolución", 2028, 1, TRUE,
+  3, 5, "Licitar la recolección y la clasificación, con participación de los recicladores registrados", "Sistemas colectivos", "Licitación privada", 2028, 2, FALSE,
+  3, 6, "Publicar el primer informe auditado de cumplimiento y revisar la senda de metas", "Sistemas colectivos y AAUD", "Informe anual", 2029, 1, FALSE,
+  # 4 Ecomodulación
+  4, 1, "Definir criterios de reciclabilidad por tipo de envase", "AAUD y MICI (DGNTI)", "Resolución", 2029, 2, FALSE,
+  4, 2, "Aplicar recargos y bonificaciones en las contribuciones de los sistemas colectivos", "Sistemas colectivos, con aprobación de la AAUD", "Tarifas de los sistemas", 2030, 1, TRUE,
+  4, 3, "Revisar cada dos años si la diferencia de tarifa cambia el diseño de los envases", "AAUD", "Informe de evaluación", 2032, 1, FALSE,
+  # 5 Depósito
+  5, 1, "Diseñar el sistema: envases cubiertos, monto del depósito, red de retorno y marcaje", "AAUD con los productores de bebidas", "Estudio de diseño", 2028, 1, FALSE,
+  5, 2, "Marcar los envases y registrar las bebidas puestas en el mercado; controlar la entrada por fronteras y zona libre", "Productores, Aduanas y AAUD", "Ley de REP y resolución", 2028, 2, FALSE,
+  5, 3, "Autorizar al administrador del sistema", "AAUD", "Resolución", 2028, 2, FALSE,
+  5, 4, "Instalar la red de retorno en comercios, hoteles y restaurantes e iniciar el cobro del depósito", "Administrador del sistema", "Plan de operación", 2029, 1, TRUE,
+  # 6 Contenido reciclado
+  6, 1, "Aprobar normas técnicas de áridos reciclados y de PET reciclado de grado alimentario", "MICI (DGNTI)", "Reglamento técnico", 2028, 2, FALSE,
+  6, 2, "Exigir áridos reciclados en los pliegos de obra pública", "DGCP", "Resolución", 2029, 1, TRUE,
+  6, 3, "Fijar un contenido mínimo gradual de PET reciclado en botellas, hasta 25 %", "Órgano Ejecutivo", "Decreto ejecutivo", 2029, 2, FALSE,
+  # 7 Tarifa
+  7, 1, "Estudiar el costo del servicio por fase y por distrito, y definir la escala socioeconómica", "AAUD", "Estudio tarifario", 2027, 1, FALSE,
+  7, 2, "Someter el pliego tarifario a consulta ciudadana", "AAUD", "Consulta de la Ley 6 de 2002", 2027, 1, FALSE,
+  7, 3, "Aprobar y publicar el pliego a costo real escalonado", "Junta Directiva de la AAUD", "Resolución", 2027, 2, TRUE,
+  7, 4, "Extender el cobro en la factura eléctrica y aplicar un plan de recuperación de la morosidad", "AAUD con las distribuidoras", "Convenios", 2027, 2, FALSE,
+  7, 5, "Probar el pago por generación en comercios, hoteles y restaurantes", "AAUD y municipios", "Resolución", 2028, 1, FALSE,
+  7, 6, "Aplicar la tasa de disposición de residuos de obra donde existan sitios autorizados", "AAUD y municipios", "Resolución o acuerdo municipal", 2029, 1, FALSE,
+  7, 7, "Revisar el pliego cada dos años según el costo del servicio", "Junta Directiva de la AAUD", "Resolución", 2029, 2, FALSE,
+  # 8 Incentivos
+  8, 1, "Reglamentar los incentivos de la Ley 223 y del artículo 52 de la Ley 276, con una lista de equipos por partida", "MEF", "Decreto ejecutivo", 2027, 1, TRUE,
+  8, 2, "Establecer el procedimiento de aval de las plantas de reciclaje", "MiAMBIENTE", "Resolución", 2027, 1, FALSE,
+  8, 3, "Publicar cada año el gasto tributario y la inversión acogida", "MEF", "Informe anual", 2028, 2, FALSE,
+  8, 4, "Evaluar los incentivos a los cinco años", "MEF y MiAMBIENTE", "Evaluación", 2032, 1, FALSE,
+  # 9 Compras
+  9, 1, "Fijar criterios de economía circular por categoría de compra (obra, papel, mobiliario y equipos)", "DGCP", "Resolución", 2027, 1, TRUE,
+  9, 2, "Incorporar los criterios en las fichas técnicas y los convenios marco", "DGCP", "Fichas técnicas", 2027, 2, FALSE,
+  9, 3, "Crear una etiqueta en PanamaCompra para medir las compras circulares", "DGCP", "Sistema PanamaCompra", 2027, 2, FALSE,
+  9, 4, "Licitar obras piloto con materiales reciclados", "Entidades compradoras", "Pliegos", 2028, 1, FALSE,
+  # 10 Taxonomía
+  10, 1, "Redactar criterios de contribución sustancial para residuos, reciclaje, construcción y manufactura", "Superintendencias con MiAMBIENTE y MEF", "Grupo técnico de la taxonomía", 2027, 2, FALSE,
+  10, 2, "Aprobar la segunda edición de la taxonomía", "Superintendencias", "Acuerdo", 2028, 1, TRUE,
+  10, 3, "Pedir a los bancos que reporten su cartera alineada, de forma progresiva", "SBP", "Acuerdo", 2028, 2, FALSE,
+  # 11 Bonos
+  11, 1, "Identificar los proyectos presupuestados de residuos y agua que califican", "MEF con AAUD y MiAMBIENTE", "Cartera de proyectos", 2028, 1, FALSE,
+  11, 2, "Incluir la emisión temática en la estrategia de deuda", "MEF", "Estrategia de deuda", 2028, 2, FALSE,
+  11, 3, "Emitir el primer bono y publicar su informe de asignación", "MEF", "Resolución del MEF", 2029, 2, TRUE,
+  # 12 Garantías
+  12, 1, "Abrir la ventana circular en el reglamento del fondo: elegibilidad, cobertura y prima", "MEF, Banco Nacional y BID", "Reglamento del fideicomiso", 2027, 1, TRUE,
+  12, 2, "Capacitar a los analistas de crédito de los bancos participantes", "MiAMBIENTE y Banco Nacional", "Programa de formación", 2027, 2, FALSE,
+  12, 3, "Garantizar las primeras operaciones y reportar cada semestre", "Banco Nacional", "Informe del fiduciario", 2027, 2, FALSE,
+  # 13 APP
+  13, 1, "Completar la prefactibilidad de la APP de residuos de Panamá y San Miguelito", "AAUD y MEF con el BID", "Estudio", 2027, 2, FALSE,
+  13, 2, "Decidir la modalidad de APP", "Consejo de Gabinete", "Resolución de Gabinete", 2028, 1, FALSE,
+  13, 3, "Licitar con pagos por desempeño y cláusulas de inclusión de recicladores", "Secretaría de APP y AAUD", "Licitación de la Ley 93", 2028, 2, FALSE,
+  13, 4, "Firmar el contrato con refrendo de la Contraloría", "AAUD y Contraloría", "Contrato", 2029, 1, TRUE,
+  # 14 Formación
+  14, 1, "Formar a analistas de crédito y compradores públicos en criterios circulares", "MiAMBIENTE, DGCP y superintendencias", "Programa de formación", 2027, 1, TRUE,
+  14, 2, "Certificar las competencias de los recicladores", "INADEH", "Programa de certificación", 2027, 2, FALSE,
+  14, 3, "Lanzar la certificación de sostenibilidad turística", "ATP", "Resolución", 2028, 1, FALSE,
+  14, 4, "Publicar el primer reporte trienal de indicadores de economía circular", "MiAMBIENTE", "Plataforma de la Ley 502", 2029, 1, TRUE
+) |>
+  left_join(select(diseno, id, instrumento), by = "id")
+
+stopifnot(all(1:14 %in% pasos$id))
+count(pasos, anio)
+```
+
+# Roles por institución
+
+La matriz siguiente indica, para cada instrumento, qué actor lo lidera y cuáles participan. Se deriva de los pasos anteriores y de la matriz de funciones de la memoria 12.
+
+```{r}
+#| label: roles
+
+actores_lista <- c("MiAMBIENTE", "AAUD", "MEF", "Aduanas", "MICI", "ACODECO", "DGCP",
+                   "Superintendencias", "AMPYME y Banco Nacional", "Secretaría de APP", "Municipios",
+                   "ATP", "Contraloría", "Productores e importadores", "Banca", "Banca multilateral")
+
+roles <- tribble(
+  ~id, ~lidera, ~participa,
+  1, "MiAMBIENTE", "AAUD; Aduanas; MICI; Productores e importadores",
+  2, "AAUD", "Municipios",
+  3, "AAUD", "MiAMBIENTE; Aduanas; ACODECO; Productores e importadores",
+  4, "AAUD", "MICI; Productores e importadores",
+  5, "AAUD", "Aduanas; ACODECO; Productores e importadores",
+  6, "MICI", "DGCP; MiAMBIENTE; Productores e importadores",
+  7, "AAUD", "Municipios; MEF",
+  8, "MEF", "MiAMBIENTE; AAUD",
+  9, "DGCP", "MICI",
+  10, "Superintendencias", "MiAMBIENTE; MEF; Banca",
+  11, "MEF", "AAUD; MiAMBIENTE; Superintendencias; Banca",
+  12, "AMPYME y Banco Nacional", "MEF; Superintendencias; Banca; Banca multilateral",
+  13, "Secretaría de APP", "AAUD; MEF; Municipios; Contraloría; Banca multilateral",
+  14, "MiAMBIENTE", "ATP; AAUD; MICI; DGCP; Superintendencias"
+) |>
+  mutate(participa = str_split(participa, "; ")) |>
+  unnest(participa) |>
+  pivot_longer(c(lidera, participa), names_to = "rol", values_to = "actor") |>
+  distinct() |>
+  mutate(rol = recode(rol, lidera = "Lidera", participa = "Participa")) |>
+  left_join(select(diseno, id, instrumento), by = "id")
+
+stopifnot(all(roles$actor %in% actores_lista))
+count(roles, actor, rol) |> pivot_wider(names_from = rol, values_from = n, values_fill = 0)
+```
+
+# Riesgos y mitigación
+
+```{r}
+#| label: riesgos
+
+riesgos <- tribble(
+  ~riesgo, ~instrumentos, ~mitigacion, ~responsable,
+  "Productores e importadores que no se inscriben y no pagan", "Registro, REP", "Precargar el registro con los datos de aduana y sancionar la omisión", "AAUD y Aduanas",
+  "Envases que entran sin depósito y se cobran al devolverlos", "Depósito y retorno", "Marcar los envases y controlar la entrada por fronteras y zona libre antes de iniciar el cobro", "Aduanas y AAUD",
+  "Concentración de mercado o colusión en los sistemas colectivos", "REP, depósito", "Licitar los servicios de forma competitiva y pedir la opinión de ACODECO al autorizar los sistemas", "AAUD y ACODECO",
+  "Intermediarios que se quedan con el pago a los recicladores", "Recicladores de base", "Pagar directamente a recicladores registrados y trazar las toneladas", "AAUD y sistemas colectivos",
+  "Rechazo de la tarifa o anulación por omitir la consulta", "Tarifa de aseo", "Consulta ciudadana completa, escala socioeconómica y mejora visible del servicio", "AAUD",
+  "Vertido ilegal cuando sube el costo de disposición", "Tarifa, tasa de obra", "Aplicar la tasa de obra solo donde existan sitios autorizados y reforzar la fiscalización municipal", "AAUD y municipios",
+  "Recursos de la REP que terminan cubriendo el déficit del aseo", "REP, tarifa", "Recursos de la REP administrados por los sistemas colectivos y separación contable en la AAUD", "AAUD y Contraloría",
+  "Metas que no se pueden verificar", "REP, ecomodulación", "Registro con datos de aduana y auditoría independiente de los sistemas", "MiAMBIENTE y AAUD",
+  "Licitaciones desiertas por falta de material reciclado", "Compras públicas, contenido reciclado", "Criterios graduales y pilotos antes de la obligación", "DGCP y MICI",
+  "Incentivos que premian inversiones que se harían de todas formas", "Incentivos fiscales", "Lista cerrada de equipos elegibles y evaluación a los cinco años", "MEF",
+  "Etiquetas verdes sin sustento (lavado verde)", "Taxonomía, bonos", "Criterios técnicos, revisión externa e informes de asignación", "Superintendencias y MEF",
+  "Contratos cuestionados por falta de refrendo", "APP de residuos", "Licitación pública con refrendo previo de la Contraloría", "Secretaría de APP y Contraloría"
+)
+```
+
+# Montos anuales de referencia y contenido de las normas
+
+```{r}
+#| label: montos-normas
+
+montos <- tribble(
+  ~fuente, ~quien_paga, ~monto, ~naturaleza,
+  "REP de envases, primer año", "Productores e importadores",
+  paste0("US$", formato_es(rep_trayectoria$costo_min_musd[1], 0), " a ", formato_es(rep_trayectoria$costo_max_musd[1], 0), " millones"), "Flujo anual privado",
+  "REP de envases, quinto año", "Productores e importadores",
+  paste0("US$", formato_es(rep_trayectoria$costo_min_musd[2], 0), " a ", formato_es(rep_trayectoria$costo_max_musd[2], 0), " millones"), "Flujo anual privado",
+  "REP de envases, décimo año", "Productores e importadores",
+  paste0("US$", formato_es(rep_trayectoria$costo_min_musd[3], 0), " a ", formato_es(rep_trayectoria$costo_max_musd[3], 0), " millones"), "Flujo anual privado",
+  "Tarifa de aseo a costo real", "Usuarios del servicio",
+  paste0("B/.", formato_es(brecha_aseo, 1), " millones adicionales"), "Flujo anual público",
+  "Tasa de disposición de residuos de obra", "Empresas de construcción",
+  paste0("Hasta B/.", formato_es(recaudo_rcd, 1), " millones"), "Flujo anual público",
+  "Fondo de Garantías de Panamá", "BID, por medio del MEF",
+  "US$150 millones (fondo total, no solo circular)", "Fondo existente",
+  "Bonos verdes de una empresa de reciclaje", "Inversionistas",
+  "US$16,5 millones vigentes", "Emisiones existentes"
+)
+
+contenido_normas <- tribble(
+  ~norma, ~elemento, ~contenido, ~referencia,
+  "Ley de REP", "Ámbito", "Envases y embalajes primero; después aparatos eléctricos y electrónicos, neumáticos (en coordinación con la Ley 518), aceites y baterías", "Chile, Ley 20.920, art. 10",
+  "Ley de REP", "Productor", "Fabricante o importador que pone el producto por primera vez en el mercado panameño, incluidas las ventas a distancia", "OCDE (2016)",
+  "Ley de REP", "Obligaciones", "Inscribirse en el registro, declarar lo que pone en el mercado, financiar la gestión y cumplir metas", "Chile, Ley 20.920",
+  "Ley de REP", "Sistemas de gestión", "Colectivos o individuales, sin fines de lucro, autorizados por la AAUD, con plan de gestión, garantía financiera y auditoría independiente", "Chile, D.S. 12, arts. 20-23",
+  "Ley de REP", "Metas", "Senda de diez años fijada por decreto, con metas iniciales bajas y flexibilidad entre materiales en los primeros años", "Chile, D.S. 12, art. 21",
+  "Ley de REP", "Contribuciones", "Cobradas por los sistemas por tonelada puesta en el mercado, con ecomodulación; no ingresan al Tesoro", "OCDE (2016)",
+  "Ley de REP", "Recicladores de base", "Participación en la recolección y en la mitad de las instalaciones de recepción, con precio no inferior al de otros proveedores", "Chile, D.S. 12, art. 41",
+  "Ley de REP", "Depósito obligatorio", "Envases de bebidas cubiertos, depósito mínimo, administrador único y devolución en el punto de venta", "UE, Reglamento 2025/40, art. 50",
+  "Ley de REP", "Competencia", "Licitación competitiva de los servicios y opinión de ACODECO al autorizar los sistemas", "OCDE (2016)",
+  "Ley de REP", "Control y sanciones", "La AAUD fiscaliza y sanciona; la aduana controla en frontera; multas escalonadas por gravedad", "Ley 276, arts. 71-74",
+  "Ley de REP", "Transparencia", "Informe anual auditado de cada sistema, publicado en la plataforma de la Ley 502", "Ley 502, art. 11",
+  "Reglamento de la Ley 502", "Registro de productores", "Obligados, datos por partida arancelaria y material, declaración anual, umbral para pequeños importadores y uso de los datos de aduana", "Ley 502, arts. 11 y 13",
+  "Reglamento de la Ley 502", "Plataforma de indicadores", "Indicadores, metodología, calendario de reporte y reporte trienal", "Ley 502, art. 11",
+  "Reglamento de la Ley 502", "Coordinación", "Comisión técnica de financiamiento y control con el MEF, la aduana, ACODECO, la DGCP y la AAUD", "Ley 502, arts. 8-9",
+  "Reglamento de la Ley 502", "Reparto de funciones", "MiAMBIENTE opera el registro y la plataforma; la AAUD autoriza y fiscaliza los sistemas de gestión", "Ley 502, art. 13; Ley 276, art. 74",
+  "Reglamento de la Ley 502", "Plan Estratégico Nacional", "Procedimiento para incorporar esta Hoja de Ruta al Plan Estratégico cuatrienal", "Ley 502, art. 10"
 )
 ```
 
@@ -228,6 +449,13 @@ guardar_salida(rep_trayectoria, "hoja_ruta_rep_trayectoria", hoja = "rep")
 guardar_salida(fuentes, "hoja_ruta_fuentes_financiamiento", hoja = "fuentes")
 guardar_salida(reformas, "hoja_ruta_reformas", hoja = "reformas")
 guardar_salida(indicadores, "hoja_ruta_indicadores", hoja = "indicadores")
+guardar_salida(rep_anual, "hoja_ruta_rep_anual", hoja = "rep_anual")
+guardar_salida(aseo_finanzas, "hoja_ruta_aseo_finanzas", hoja = "aseo")
+guardar_salida(pasos, "hoja_ruta_pasos", hoja = "pasos")
+guardar_salida(roles, "hoja_ruta_roles", hoja = "roles")
+guardar_salida(riesgos, "hoja_ruta_riesgos", hoja = "riesgos")
+guardar_salida(montos, "hoja_ruta_montos", hoja = "montos")
+guardar_salida(contenido_normas, "hoja_ruta_contenido_normas", hoja = "normas")
 ```
 
 # Referencias

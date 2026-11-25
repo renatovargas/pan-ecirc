@@ -27,27 +27,44 @@ source("materiales/calculos/scripts/funciones_comunes.R")
 fichas <- leer_salida("fichas_instrumentos")
 factibilidad <- leer_salida("factibilidad_instrumentos")
 ranking <- leer_salida("factibilidad_ranking_sensibilidad")
+rubrica <- leer_salida("factibilidad_rubrica")
 precios_sector <- leer_salida("incidencia_precios_sector_mip2018")
 precios_hogares <- leer_salida("incidencia_precios_hogares_mip2018")
+precios_act <- leer_salida("incidencia_precios_actividad_mip2018")
 capacidades <- leer_salida("capacidades_institucionales")
 indice_inst <- leer_salida("capacidades_indice_institucion")
+cobertura <- leer_salida("capacidades_cobertura_funcion")
+cadena <- leer_salida("capacidades_cadena_instrumento")
 cartera <- leer_salida("cartera_credito_sbp_2025_2026")
 cartera_pol <- leer_salida("cartera_credito_sector_politica_2026")
 tematicos <- leer_salida("emisiones_tematicas_latinex_2026")
 
+corto <- tibble(
+  id = 1:14,
+  nombre = c("Registro de productores", "Recicladores de base", "REP", "Ecomodulación",
+             "Depósito y retorno", "Contenido reciclado", "Tarifa de aseo", "Incentivos fiscales",
+             "Compras públicas", "Taxonomía", "Bonos temáticos", "Crédito y garantías",
+             "Alianzas público-privadas", "Formación y certificación")
+)
+ejes <- leer_salida("factibilidad_impacto_facilidad") |> left_join(corto, by = "id")
+
 tabla_slide <- function(x, tamano = 16, ...) tabla_ft_es(x, tamano = tamano, ...)
 hog <- function(esc) precios_hogares$variacion_canasta_pct[precios_hogares$escenario == esc]
 pm <- function(i) ranking$puntaje_medio[ranking$id == i]
+top5 <- function(i) ranking$pct_top5[ranking$id == i]
 cvab <- function(s) cartera_pol$credito_sobre_vab[cartera_pol$sector_principal == s]
+act_ind <- function(esc, cod) precios_act$variacion_pct[precios_act$escenario == esc & precios_act$cod_mip == cod]
+cob <- function(f) cobertura$instituciones_si[cobertura$funcion == f]
 monto_tem <- sum(tematicos$monto_serie_usd, na.rm = TRUE) / 1e6
 monto_circ <- sum(tematicos$monto_serie_usd[str_starts(tematicos$relacion_economia_circular, "Directa")], na.rm = TRUE) / 1e6
+colores_puntaje <- c("5" = "#2E8B57", "4" = "#8CC7A1", "3" = "#E3EFE6", "2" = "#F2C9A0", "1" = "#D9773A")
 ```
 
 ## Contenido {.theme-content}
 
-1.  **Factibilidad.** Qué tan aplicables son los catorce instrumentos y por qué vía legal.
+1.  **Factibilidad.** Qué tan aplicables son los catorce instrumentos, por qué vía legal y en qué orden.
 2.  **Efectos por sector.** Cuánto suben los precios cuando un instrumento opera como cargo.
-3.  **Capacidades institucionales.** Quién tiene la función legal de aplicarlos.
+3.  **Capacidades institucionales.** Quién tiene la función legal de aplicarlos y qué le falta.
 4.  **Sistema financiero.** Por dónde pueden llegar los recursos.
 
 [Documento completo](https://renatovargas.github.io/pan-ecirc/materiales/documentos/a2-factibilidad-capacidades/){target="_blank"}
@@ -59,9 +76,64 @@ monto_circ <- sum(tematicos$monto_serie_usd[str_starts(tematicos$relacion_econom
 - La Ley 276 crea una tasa de gestión que debe cubrir el costo total del servicio, y la Ley 223 de 2021 exonera a las plantas de reciclaje [@panama2021Ley223].
 - Lo que falta son reglamentos: los de las leyes 33, 276 y 502 no se han publicado.
 
+## Los catorce instrumentos evaluados {.smaller}
+
+- **Habilitantes:** registro de productores e importadores; formalización de los recicladores de base.
+- **Normativos:** responsabilidad extendida del productor (REP) con metas por flujo; ecomodulación de las contribuciones según qué tan reciclable es el envase; contenido mínimo de material reciclado.
+- **Tributarios y tarifarios:** depósito y retorno de envases; tarifa de aseo a costo real con tasa de disposición final; incentivos fiscales a la inversión circular.
+- **Financieros:** criterios circulares en la taxonomía; bonos temáticos; crédito con garantías.
+- **Promoción de inversiones:** compras públicas circulares; alianzas público-privadas (APP).
+- **Capacidades:** información, formación y certificación.
+
+Se ordenan en **dos pasos**: primero los que crean condiciones, después los que imponen metas o cargos.
+
 # Factibilidad {.theme-content}
 
-Siete criterios, escala de 1 a 5, pesos iguales y prueba de sensibilidad.
+Siete criterios, rúbrica de 1 a 5, 98 puntajes con justificación y prueba de sensibilidad.
+
+## Cómo evaluamos la factibilidad
+
+- Factible significa que **se puede aplicar** con los recursos legales, institucionales, técnicos y financieros del país, y que **vale la pena**.
+- Separamos esa pregunta en **siete criterios**: impacto, técnica, institucional, política y regulatoria, financiera, tiempo, equidad y competitividad.
+- Una **rúbrica** fija qué significa 1, 3 y 5 en cada criterio, para que los instrumentos sean comparables.
+- Cada uno de los **98 puntajes** (14 × 7) se apoya en una ley, un dato oficial o una experiencia internacional, con su justificación escrita.
+- Primero miramos **dónde se concentran los puntajes bajos**, luego cada criterio y al final el orden de prioridad.
+
+## Las restricciones están en los datos y los plazos
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.2
+
+factibilidad |>
+  mutate(criterio = factor(criterio, levels = rev(rubrica$criterio)),
+         puntaje = factor(puntaje, levels = 5:1)) |>
+  count(criterio, puntaje) |>
+  ggplot(aes(x = n, y = criterio, fill = puntaje)) +
+  geom_col(width = 0.7, color = "white") +
+  geom_text(aes(label = n), position = position_stack(vjust = 0.5), size = 5) +
+  scale_fill_manual(values = colores_puntaje, name = "Puntaje", drop = FALSE) +
+  labs(x = "Número de instrumentos", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 15), legend.title = element_text()) +
+  guides(fill = guide_legend(reverse = TRUE))
+```
+
+::: aside
+Ningún instrumento obtiene 5 en factibilidad técnica: falta saber cuánto ponen en el mercado productores e importadores. Memoria [C10](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c10-fichas-instrumentos/){target="_blank"}.
+:::
+
+## Qué revela cada criterio (1 de 2)
+
+- **Impacto:** la REP es la única con 5; mueve el dinero hacia la recolección de los envases, que son hasta 38 % del peso de los residuos municipales.
+- **Técnica e institucional:** casi todo depende de un dato que nadie reúne (cuánto se pone en el mercado). La AAUD tiene la facultad legal para la REP y el depósito, pero no los medios financieros.
+- **Política y regulatoria:** 12 de los 14 pueden iniciar sin ley nueva. La tarifa de aseo obtiene el puntaje más bajo porque exige consulta ciudadana.
+
+## Qué revela cada criterio (2 de 2)
+
+- **Financiera:** los instrumentos de más impacto **se pagan solos** (productores o usuarios); los incentivos fiscales son los más caros para el fisco.
+- **Tiempo:** es el criterio más bajo, porque cada instrumento de impacto **espera a otro**.
+- **Equidad:** recicladores y crédito con garantías obtienen 5; la tarifa, 2, salvo que se escalone por nivel socioeconómico.
 
 ## Los instrumentos del primer paso son los más factibles
 
@@ -74,27 +146,91 @@ ranking |>
 ```
 
 ::: aside
-Siete criterios con pesos iguales; sensibilidad con 10.000 pesos al azar. Memoria [C10](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c10-fichas-instrumentos/){target="_blank"}.
+Siete criterios con pesos iguales; sensibilidad con 10.000 repartos de pesos al azar.
 :::
 
-## El impacto y la facilidad no coinciden
+## ¿Depende el orden de cómo se ponderen los criterios?
+
+- El puntaje medio da **el mismo peso** a los siete criterios, pero un ministerio de finanzas puede valorar más lo financiero y una autoridad ambiental, el impacto.
+- **Prueba 1:** quitamos un criterio a la vez y recalculamos el orden. ¿Algún criterio decide solo el resultado?
+- **Prueba 2:** repartimos el peso **al azar 10.000 veces** y contamos cuántas veces cada instrumento queda entre los cinco primeros.
+- Si un instrumento queda arriba en casi todos los repartos, es una prioridad **que no depende de los pesos**.
+
+## El orden resiste cambios en los pesos
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.4
+
+ranking |>
+  left_join(corto, by = "id") |>
+  mutate(nombre = fct_reorder(nombre, -posicion)) |>
+  ggplot(aes(y = nombre)) +
+  geom_segment(aes(x = posicion_min, xend = posicion_max, yend = nombre),
+               linewidth = 5, color = "#C9E3D1", lineend = "round") +
+  geom_point(aes(x = posicion), color = "#2E8B57", size = 4) +
+  geom_text(aes(x = 15.3, label = paste0(formato_es(pct_top5, 0), " %")), hjust = 0, size = 4.5) +
+  scale_x_continuous(breaks = 1:14, limits = c(1, 16.5)) +
+  labs(x = "Posición con pesos iguales (punto) y al omitir un criterio (barra); a la derecha, % de veces entre los cinco primeros", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 15), panel.grid.minor = element_blank())
+```
+
+::: aside
+La tarifa de aseo es la más sensible: sube del 9.º al 5.º lugar si se omite la equidad o el criterio político. Su freno es de diseño y aceptación.
+:::
+
+## Dos preguntas distintas: impacto y facilidad
+
+- El puntaje medio mezcla dos preguntas que conviene separar.
+- **¿Cuánto cambia los flujos de material?** Es el criterio de impacto.
+- **¿Qué tan fácil es ponerlo en marcha?** Es el promedio de los criterios técnico, institucional, político, financiero y de tiempo.
+- La equidad queda fuera: describe a quién beneficia, no qué tan fácil es.
+- En la gráfica siguiente, arriba está lo que más impacta y a la derecha lo más fácil.
+
+## Impacto y facilidad van en direcciones opuestas
 
 ```{r}
 #| fig-width: 11
 #| fig-height: 5.6
 
-factibilidad |>
-  mutate(instrumento = factor(instrumento, levels = rev(ranking$instrumento))) |>
-  ggplot(aes(x = criterio, y = instrumento, fill = puntaje)) +
-  geom_tile(color = "white") +
-  geom_text(aes(label = puntaje), size = 4) +
-  scale_fill_gradient(low = "#F2F2F2", high = "#2E8B57", limits = c(1, 5)) +
-  scale_y_discrete(labels = \(x) str_wrap(x, 50)) +
-  scale_x_discrete(labels = \(x) str_wrap(x, 12)) +
-  labs(x = NULL, y = NULL) +
+ggplot(ejes, aes(x = facilidad, y = impacto, color = paso)) +
+  geom_hline(yintercept = mean(ejes$impacto), linetype = "dashed", color = "gray70") +
+  geom_vline(xintercept = mean(ejes$facilidad), linetype = "dashed", color = "gray70") +
+  geom_point(size = 4) +
+  ggrepel::geom_text_repel(aes(label = nombre), size = 4.5, seed = 7, show.legend = FALSE,
+                           box.padding = 0.5, max.overlaps = Inf) +
+  scale_color_manual(values = c(Primero = "#2E8B57", Segundo = "#C0392B"),
+                     labels = c(Primero = "Primer paso", Segundo = "Segundo paso")) +
+  scale_y_continuous(breaks = 2:5) +
+  labs(x = "Facilidad de aplicación (técnica, institucional, política, financiera y tiempo)", y = "Impacto") +
   tema_grafico() +
-  theme(legend.position = "none", text = element_text(size = 13))
+  theme(text = element_text(size = 15))
 ```
+
+::: aside
+Correlación de `r formato_es(cor(ejes$impacto, ejes$facilidad), 2)`. El registro y el crédito con garantías combinan impacto alto y aplicación fácil: por ahí se empieza.
+:::
+
+## Cada instrumento de impacto espera a otro
+
+```{r}
+tribble(
+  ~Instrumento, ~`Requiere antes`,
+  "REP con metas", "Registro de productores e importadores",
+  "Ecomodulación", "REP con sistemas colectivos en operación",
+  "Depósito y retorno", "Registro y control en frontera",
+  "Pago a recicladores", "Censo de recicladores; REP o tarifa",
+  "Contenido reciclado", "Oferta nacional de material recuperado",
+  "Alianzas público-privadas", "Tarifa de aseo a costo real",
+  "Bonos y crédito verde", "Criterios circulares en la taxonomía"
+) |>
+  tabla_slide(tamano = 16, digitos = 0)
+```
+
+::: aside
+El registro, la tarifa y la taxonomía son la raíz de tres cadenas: la REP, la infraestructura de residuos y el financiamiento.
+:::
 
 ## Doce de catorce pueden iniciar sin ley nueva
 
@@ -109,7 +245,59 @@ Todo tributo requiere ley; las tasas por servicio las fija quien lo presta [@pan
 
 # Efectos por sector {.theme-content}
 
-Modelo de precios con la matriz insumo-producto de 2018 y traslado completo.
+Modelo de precios con la matriz insumo-producto de 2018 (76 actividades) y traslado completo.
+
+## Tres canales hacia los sectores
+
+- **Cargo** (REP, depósito, tarifa de aseo y tasa de disposición): sube costos que viajan por la cadena de compras. Se mide con el modelo de precios de Leontief [@millerblair2022].
+- **Capital y demanda** (incentivos, compras públicas, taxonomía, bonos, crédito con garantías, APP): baja el costo del capital o crea demanda. Análisis cualitativo: quién gana, quién paga, por qué canal y en qué sector.
+- **Condiciones** (registro, recicladores, ecomodulación, contenido reciclado, formación): su efecto pasa por los demás instrumentos.
+
+## Cómo medimos el traslado de un cargo
+
+- Un cargo no se queda en quien lo paga: si la fábrica de bebidas paga por sus envases, **el restaurante que le compra** también ve subir su costo y lo traslada.
+- La **matriz insumo-producto de 2018** registra cuánto compra cada una de las 76 actividades a las demás, y permite seguir el cargo de proveedor en proveedor [@inec2024mip].
+- **Cuatro escenarios:** REP de 1 % sobre alimentos, bebidas, químicos y farmacéuticos; depósito de 1 % sobre bebidas; tarifa de aseo +72 % (brecha de la AAUD en 2025); tasa de B/.10 por tonelada de residuos de obra.
+- Supone **traslado completo** y que nadie cambia de envase ni de práctica: las cifras son un **techo** de corto plazo.
+
+## Por dónde viaja un cargo
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5.6
+
+precios_act |>
+  filter(escenario %in% c("rep_envases", "aseo"), !directo) |>
+  slice_max(variacion_pct, n = 6, by = escenario) |>
+  mutate(
+    panel = factor(recode(escenario, rep_envases = "REP de envases (1 %)", aseo = "Tarifa de aseo (+72 %)"),
+                   levels = c("REP de envases (1 %)", "Tarifa de aseo (+72 %)")),
+    sector_principal = factor(sector_principal, levels = sectores_politica)
+  ) |>
+  arrange(panel, variacion_pct) |>
+  mutate(etiqueta = factor(paste0(panel, "|", actividad_mip), levels = unique(paste0(panel, "|", actividad_mip)))) |>
+  ggplot(aes(x = variacion_pct, y = etiqueta, fill = sector_principal)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = formato_es(variacion_pct, 2)), hjust = -0.15, size = 4.5) +
+  facet_wrap(~panel, ncol = 2, scales = "free") +
+  scale_y_discrete(labels = \(x) str_wrap(str_remove(x, "^.*\\|"), 28)) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.25))) +
+  scale_fill_manual(values = colores_sector) +
+  labs(x = "Aumento indirecto de precio (%)", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 14))
+```
+
+::: aside
+Fuera de quienes pagan el cargo. Se excluyen las actividades obligadas, cuyo precio sube en torno al tamaño del cargo.
+:::
+
+## Dos lecciones de diseño
+
+- **La REP debe cobrarse por tonelada de envase**, no sobre el valor de la producción. Si no, grava insumos sin envase de consumo, como el alimento para aves (`r formato_es(act_ind("rep_envases", "AE10"), 2)` %) y cerdos (`r formato_es(act_ind("rep_envases", "AE09"), 2)` %).
+- Los restaurantes (`r formato_es(act_ind("rep_envases", "AE55"), 2)` %) y hoteles reciben el cargo por sus compras de alimentos y bebidas: así llega al **turismo**.
+- **La tarifa de aseo** sube un poco el precio de muchas actividades, sobre todo agua potable (`r formato_es(act_ind("aseo", "AE39"), 2)` %), administración pública, salud y enseñanza: **el propio Estado paga una parte** y debe preverlo en su presupuesto.
+- La tabla siguiente suma los efectos por sector de política.
 
 ## Los cargos tienen efectos pequeños en el agregado
 
@@ -128,9 +316,26 @@ precios_sector |>
 Canasta de los hogares: REP `r formato_es(hog("rep_envases"), 2)` %, aseo `r formato_es(hog("aseo"), 2)` %, depósito `r formato_es(hog("deposito"), 3)` %. Cotas superiores: sin cambios de comportamiento. Memoria [C11](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c11-modelo-precios/){target="_blank"}.
 :::
 
+## Instrumentos financieros y de promoción {.smaller}
+
+Seis instrumentos actúan sobre el **costo del capital, el riesgo o la demanda**, en lugar de imponer un cargo: incentivos fiscales, compras públicas, taxonomía, bonos temáticos, crédito con garantías y APP.
+
+- **Compras públicas → construcción:** el Estado es el mayor comprador de obra y puede exigir áridos y materiales reciclados.
+- **Bonos y marco soberano → residuos y agua:** inversión pública de plazo largo.
+- **Incentivos fiscales → plantas de reciclaje:** empresas formales que invierten, a costa del gasto tributario.
+- **Crédito con garantía → pymes, recicladores y turismo:** el único que llega a las empresas pequeñas (el turismo tiene más de 11.000, casi todas micro).
+
 # Capacidades institucionales {.theme-content}
 
-Seis funciones por institución, con su base legal.
+Seis funciones por institución, con su base legal en quince instituciones.
+
+## Cómo medimos las capacidades
+
+- Para que funcione la REP, alguien tiene que **regular** (fijar metas), **registrar** (lista de obligados), **recaudar** (cobrar contribuciones), **controlar** (sancionar la evasión) y **monitorear** (medir lo recuperado); en los financieros, además, **financiar**.
+- Revisamos las leyes de **15 instituciones** y las de residuos, contrataciones, APP y finanzas sostenibles.
+- Cada función se califica como **Sí** (asignada de forma expresa), **Parcial** (general o pendiente de reglamento) o **No**.
+- Un **índice de capacidad legal** suma 2 puntos por cada Sí y 1 por cada Parcial.
+- El índice mide **facultades**; por eso lo completamos con personal y finanzas.
 
 ## La AAUD tiene todas las piezas, pero no las finanzas
 
@@ -147,34 +352,161 @@ indice_inst |>
 - La AAUD regula, registra, recauda, controla y monitorea por ley.
 - En 2025 recaudó B/.35,2 millones y gastó B/.60,6 millones; su morosidad es de B/.118,8 millones [@estrella2026AAUDMorosidad].
 - Aduana, MICI y ACODECO ya controlan la ley de plásticos.
-- El Consejo de Economía Circular no incluye al MEF ni a la aduana.
+- En el Consejo de Economía Circular la AAUD solo tiene voz, y el MEF, la aduana, ACODECO y la DGCP no participan [@panama2025Ley502, arts. 8-9].
 :::
 ::::
+
+## El Estado vigila más de lo que cobra y paga
+
+```{r}
+#| fig-width: 11
+#| fig-height: 4.8
+
+cobertura |>
+  mutate(No = 15L - instituciones_si - instituciones_parcial) |>
+  rename(`Sí, de forma expresa` = instituciones_si, Parcial = instituciones_parcial) |>
+  pivot_longer(-funcion, names_to = "valoracion", values_to = "n") |>
+  mutate(
+    funcion = factor(funcion, levels = rev(levels(capacidades$funcion))),
+    valoracion = factor(valoracion, levels = c("No", "Parcial", "Sí, de forma expresa"))
+  ) |>
+  ggplot(aes(x = n, y = funcion, fill = valoracion)) +
+  geom_col(width = 0.7, color = "white") +
+  geom_text(aes(label = if_else(n > 0, as.character(n), "")), position = position_stack(vjust = 0.5), size = 5) +
+  scale_fill_manual(values = c("No" = "#E5E5E5", "Parcial" = "#C9E3D1", "Sí, de forma expresa" = "#2E8B57")) +
+  labs(x = "Número de instituciones (de 15)", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 15)) +
+  guides(fill = guide_legend(reverse = TRUE))
+```
+
+::: aside
+`r cob("Monitorear y reportar")` instituciones pueden monitorear, `r cob("Financiar")` pueden financiar. Seis registran, pero ninguna a productores e importadores. Memoria [C12](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c12-capacidades-institucionales/){target="_blank"}.
+:::
+
+## Particularidades que importan (1 de 2)
+
+- **AAUD:** fija tarifas por nivel socioeconómico, tiene un fondo propio, cobra por vía coactiva y en la factura eléctrica y puede multar hasta B/.1 millón.
+- Pero su presupuesto 2026 se recortó de B/.93,3 a B/.66,0 millones [@tvn2025AAUDPresupuesto2026]. La Autoridad de Turismo integra su Junta Directiva.
+- **Ministerio de Ambiente:** reglamenta la Ley 502 y tiene cinco fondos de destino específico, ninguno de economía circular.
+- **MEF:** recauda, fiscaliza y emite deuda, pero la Ley 502 no le da ningún papel.
+
+## Particularidades que importan (2 de 2)
+
+- **Cadena de plásticos:** aduana en frontera, MICI certifica y ACODECO sanciona (397 sanciones por la ley de bolsas) [@estrella2026AcodecoBolsas]. Es un modelo replicable para la REP.
+- **Instituciones pequeñas:** la DGCP tiene 110 funcionarios para fijar criterios en todas las compras del Estado [@cgr2026PlanillaJulio].
+- La siguiente tabla lee la matriz al revés: **para cada instrumento, quién cumple cada función**.
+
+## Quién hace qué y qué falta
+
+```{r}
+cadena |>
+  filter(instrumento %in% c("Registro de productores", "REP", "Tarifa de aseo", "Compras públicas", "Taxonomía", "Crédito y garantías")) |>
+  transmute(Instrumento = instrumento, Regula = Regular, Recauda = `Recaudar y administrar fondos`,
+            Controla = `Controlar y sancionar`, `Pieza que falta` = pieza_faltante) |>
+  tabla_slide(tamano = 11, digitos = 0)
+```
+
+::: aside
+La pieza que falta es casi siempre un reglamento, un convenio o un estudio. La AAUD está en cinco de diez cadenas.
+:::
 
 # Sistema financiero {.theme-content}
 
 Crédito, taxonomía y mercado de valores.
 
-## La banca es grande, pero no financia lo circular
+## Tres preguntas al sistema financiero
 
-- La cartera local es de `r formato_es(sum(cartera$saldo_musd[cartera$fecha == max(cartera$fecha)]), 0)` millones de dólares, concentrada en hipotecas, consumo y comercio [@sbp2026IAB092026].
-- Agricultura y alimentos recibe `r formato_es(cvab("Agricultura y alimentos"), 1)` veces y la construcción `r formato_es(cvab("Ciudades y construcción"), 1)` veces su peso en el valor agregado.
-- La taxonomía tiene el objetivo circular, pero sin criterios: las operaciones circulares se marcan como contingentes [@sbp2025GuiaTFSBancos].
-- De `r formato_es(monto_tem, 0)` millones de dólares en bonos temáticos vigentes, `r formato_es(monto_circ, 0)` millones financian a una empresa de reciclaje [@latinex2026EmisionesSostenibles].
+- **¿Hacia dónde va el crédito?** Cartera local por sector de la Superintendencia de Bancos (septiembre de 2026), llevada a los sectores de política y comparada con su peso en el valor agregado.
+- **¿Qué reglas reconocen una inversión como circular?** Taxonomía de Finanzas Sostenibles, guía para bancos, marco soberano del MEF y evaluación del Banco Mundial.
+- **¿Qué financia la bolsa con etiqueta verde?** Las 40 series temáticas vigentes en Latinex, clasificadas por su relación con la economía circular.
+- Panamá está dolarizado y no tiene banco central ni banca de desarrollo: los programas públicos operan por **fideicomisos con recursos multilaterales**.
 
-## Cinco palancas inmediatas
+## La banca tiene recursos, pero no financia lo circular
 
-- Segunda edición de la taxonomía con criterios circulares.
+- La cartera local privada es de `r formato_es(sum(cartera$saldo_musd[cartera$fecha == max(cartera$fecha)]), 0)` millones de dólares, concentrada en hipotecas, consumo y comercio; la liquidez legal es de 54 % [@sbp2026IAB092026].
+- La taxonomía tiene el objetivo circular, pero sin criterios de contribución sustancial: las operaciones circulares se marcan como contingentes [@sbp2025GuiaTFSBancos].
+- En el piloto con siete bancos, 99 % de la cartera verde elegible era de mitigación climática.
+- El marco soberano tiene una categoría circular, pero no se ha emitido ningún bono bajo él [@mef2024MarcoFinanciamientoSostenible].
+
+## La construcción recibe poco crédito para su tamaño
+
+```{r}
+#| fig-width: 11
+#| fig-height: 4.6
+
+cartera_pol |>
+  mutate(sector_principal = factor(sector_principal, levels = rev(sectores_politica))) |>
+  ggplot(aes(x = credito_sobre_vab, y = sector_principal, fill = sector_principal)) +
+  geom_col(width = 0.6) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "gray40") +
+  geom_text(aes(label = formato_es(credito_sobre_vab, 2)), hjust = -0.2, size = 5) +
+  scale_fill_manual(values = colores_sector, guide = "none") +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(x = "Participación en el crédito / participación en el valor agregado", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 15))
+```
+
+::: aside
+Si un sector produce 10 % del valor agregado y recibe 5 % del crédito, el cociente es 0,5. La línea punteada marca el crédito proporcional al tamaño.
+:::
+
+## Qué significa para los instrumentos
+
+- **Industrias** recibe `r formato_es(cvab("Industrias"), 1)` veces su peso en el crédito: ya es cliente de la banca, y sus proyectos de reciclaje y ecodiseño pueden pasar por esas relaciones **si existen criterios para reconocerlos**.
+- **Ciudades y construcción** recibe `r formato_es(cvab("Ciudades y construcción"), 1)` veces, aunque genera más de un millón de toneladas de residuos de obra al año: ahí las **compras públicas y las garantías** hacen más diferencia.
+- El **turismo** no tiene una línea propia en las estadísticas bancarias.
+- En el mercado de valores, los **bonos temáticos** destinan sus fondos a proyectos ambientales o sociales. La gráfica siguiente muestra cuáles cotizan hoy y cuáles tienen relación con la economía circular.
+
+## Un solo emisor de bonos es circular
+
+```{r}
+#| fig-width: 11
+#| fig-height: 5
+
+tematicos |>
+  mutate(relacion = case_when(
+    str_starts(relacion_economia_circular, "Directa") ~ "Directa",
+    str_starts(relacion_economia_circular, "Parcial") ~ "Parcial",
+    TRUE ~ "Ninguna explícita"
+  ), emisor = case_when(
+    str_detect(emisor, "BG METAL") ~ "Empresa de reciclaje",
+    str_detect(emisor, "TOABRE") ~ "Parque eólico",
+    TRUE ~ str_to_title(str_remove(emisor, ",.*$| \\(.*$"))
+  )) |>
+  summarize(monto = sum(monto_serie_usd, na.rm = TRUE) / 1e6, series = n(), .by = c(emisor, relacion)) |>
+  mutate(emisor = fct_reorder(emisor, monto),
+         relacion = factor(relacion, levels = c("Directa", "Parcial", "Ninguna explícita"))) |>
+  ggplot(aes(x = monto, y = emisor, fill = relacion)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = paste0(formato_es(monto, 1), " (", series, ")")), hjust = -0.08, size = 4.2) +
+  scale_fill_manual(values = c("Directa" = "#8C564B", "Parcial" = "#D2B48C", "Ninguna explícita" = "#C8C8C8")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.25))) +
+  labs(x = "Millones de dólares (número de series)", y = NULL) +
+  tema_grafico() +
+  theme(text = element_text(size = 14))
+```
+
+::: aside
+De `r formato_es(monto_tem, 0)` millones de dólares en bonos temáticos vigentes, `r formato_es(monto_circ, 0)` millones financian a una empresa de reciclaje, en series pequeñas y repetidas [@latinex2026EmisionesSostenibles]. Memoria [C13](https://renatovargas.github.io/pan-ecirc/materiales/calculos/c13-sistema-financiero/){target="_blank"}.
+:::
+
+## Cinco palancas inmediatas, sin ley nueva
+
+- Segunda edición de la taxonomía con criterios circulares, a partir de los requisitos de residuos y construcción que ya contiene.
 - Ventana circular en el Fondo de Garantías de Panamá, reconocido como mitigante de riesgo [@sbp2025Acuerdo8].
-- Categoría circular del marco soberano para residuos y agua [@mef2024MarcoFinanciamientoSostenible].
+- Categoría circular del marco soberano para inversión pública en residuos y agua.
 - APP de residuos de Panamá y San Miguelito como proyecto ancla [@bid2024TdRResiduosAPP].
-- Bonos verdes de empresas de reciclaje en la bolsa local.
+- Bonos verdes de empresas de reciclaje, con apoyo para la revisión externa.
 
 ## Conclusiones {.theme-content}
 
-- Las facultades legales existen; faltan los reglamentos.
-- El registro de productores e importadores es la pieza que habilita a los demás.
-- Los efectos de precio son pequeños y protegibles con tarifas escalonadas.
+- Las facultades legales existen; faltan los reglamentos, sobre todo el de la Ley 502.
+- Las restricciones están en los datos y los plazos: el registro de productores destraba a los demás.
+- Los instrumentos de más impacto se pagan solos, pero son lentos: por eso, dos pasos.
+- Los efectos de precio son pequeños; la REP debe cobrarse por tonelada de envase y la tarifa, escalonada.
+- El Estado vigila mejor de lo que cobra y paga; la AAUD es el cuello de botella.
 - El turismo gana sobre todo con crédito con garantía, certificación y tarifa por generación.
 
 ## Referencias

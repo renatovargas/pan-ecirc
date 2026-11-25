@@ -222,6 +222,44 @@ nrow(fichas)
 
 # Evaluación de factibilidad
 
+Antes de calificar fijamos una rúbrica, es decir, lo que significa un puntaje de 1, de 3 y de 5 en cada criterio. Los puntajes 2 y 4 se usan para los casos intermedios. La rúbrica se exporta para que los documentos puedan mostrarla.
+
+```{r}
+#| label: rubrica
+
+rubrica <- tribble(
+  ~criterio, ~que_mide, ~puntaje_1, ~puntaje_3, ~puntaje_5,
+  "Impacto", "Efecto esperado en la circularidad de los flujos de material",
+  "Efecto indirecto, que depende de otros instrumentos",
+  "Efecto directo sobre un flujo acotado o un eslabón de la cadena",
+  "Efecto directo y grande sobre flujos de volumen alto",
+  "Técnica", "Información, infraestructura y capacidad de medición",
+  "Faltan los datos y la infraestructura básicos",
+  "Existen bases parciales que hay que completar",
+  "Todo lo necesario existe",
+  "Institucional", "Institución con la función legal y los medios",
+  "Ninguna institución tiene la función",
+  "La función existe pero es parcial o la institución tiene pocos medios",
+  "Función expresa y medios suficientes",
+  "Política y regulatoria", "Vehículo legal, base legal vigente y señales de apoyo",
+  "Requiere una ley nueva y enfrenta resistencia",
+  "Basta un decreto o resolución, con resistencia previsible",
+  "Mandato legal vigente que basta con aplicar",
+  "Financiera", "Costo fiscal y fuente sostenible de recursos",
+  "Costo fiscal alto sin fuente identificada",
+  "Depende de recursos externos o de otro instrumento",
+  "Sin costo fiscal o autofinanciado",
+  "Tiempo", "Plazo hasta la entrada en operación",
+  "Más de tres años o solo después de otros instrumentos",
+  "Uno a dos años de preparación",
+  "Puede iniciar de inmediato",
+  "Equidad y competitividad", "Efectos sobre hogares pobres, pymes, empleo y competencia",
+  "Efectos regresivos o barreras para pymes sin compensación",
+  "Efectos mixtos que pueden compensarse con el diseño",
+  "Efectos positivos o neutrales"
+)
+```
+
 La evaluación se escribe en una tabla larga, con una fila por cada combinación de instrumento y criterio, es decir, 98 filas. Cada fila tiene el puntaje y una frase que justifica por qué se asignó. Para no repetir la función que arma las filas, la función auxiliar `p()` recibe el número del instrumento y, en orden, los siete pares de puntaje y justificación.
 
 ```{r}
@@ -404,6 +442,38 @@ sensibilidad <- ranking |>
 sensibilidad
 ```
 
+Guardamos también la posición de cada instrumento al omitir cada criterio, que muestra qué criterio mueve a cada instrumento hacia arriba o hacia abajo.
+
+```{r}
+#| label: omision
+
+posiciones_omision <- sin_uno |>
+  left_join(select(ranking, id, instrumento, posicion_base = posicion), by = "id") |>
+  mutate(cambio = posicion_base - posicion)
+
+posiciones_omision |> filter(abs(cambio) >= 2)
+```
+
+# Impacto frente a facilidad de aplicación
+
+El puntaje medio mezcla dos preguntas distintas: cuánto cambia el instrumento los flujos de material (el criterio de impacto) y qué tan fácil es ponerlo en marcha (los criterios técnico, institucional, político y regulatorio, financiero y de tiempo). Separarlas muestra la disyuntiva central de la política. El criterio de equidad y competitividad no entra en ninguno de los dos ejes, porque describe a quién beneficia o perjudica el instrumento.
+
+```{r}
+#| label: impacto-facilidad
+
+impacto_facilidad <- factibilidad |>
+  summarize(
+    impacto = puntaje[criterio == "Impacto"],
+    facilidad = mean(puntaje[criterio %in% c("Técnica", "Institucional", "Política y regulatoria", "Financiera", "Tiempo")]),
+    equidad = puntaje[criterio == "Equidad y competitividad"],
+    .by = c(id, instrumento)
+  ) |>
+  left_join(select(fichas, id, familia, paso), by = "id")
+
+cor(impacto_facilidad$impacto, impacto_facilidad$facilidad)
+impacto_facilidad |> arrange(desc(impacto))
+```
+
 # Exportación
 
 ```{r}
@@ -412,6 +482,9 @@ sensibilidad
 guardar_salida(fichas, "fichas_instrumentos", hoja = "fichas")
 guardar_salida(factibilidad, "factibilidad_instrumentos", hoja = "factibilidad")
 guardar_salida(sensibilidad, "factibilidad_ranking_sensibilidad", hoja = "ranking")
+guardar_salida(rubrica, "factibilidad_rubrica", hoja = "rubrica")
+guardar_salida(posiciones_omision, "factibilidad_posiciones_omision", hoja = "omision")
+guardar_salida(impacto_facilidad, "factibilidad_impacto_facilidad", hoja = "ejes")
 ```
 
 # Referencias

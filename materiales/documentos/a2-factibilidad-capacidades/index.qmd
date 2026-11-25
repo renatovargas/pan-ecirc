@@ -76,6 +76,53 @@ var_sbp <- function(s) {
 cvab <- function(s) cartera_pol$credito_sobre_vab[cartera_pol$sector_principal == s]
 monto_tem <- sum(tematicos$monto_serie_usd, na.rm = TRUE) / 1e6
 monto_circ <- sum(tematicos$monto_serie_usd[str_starts(tematicos$relacion_economia_circular, "Directa")], na.rm = TRUE) / 1e6
+n_circ <- sum(str_starts(tematicos$relacion_economia_circular, "Directa"))
+n_emisores <- n_distinct(tematicos$emisor)
+
+# Factibilidad: rúbrica, ejes de impacto y facilidad, nombres cortos
+rubrica <- leer_salida("factibilidad_rubrica")
+corto <- tibble(
+  id = 1:14,
+  nombre = c("Registro de productores", "Recicladores de base", "REP", "Ecomodulación",
+             "Depósito y retorno", "Contenido reciclado", "Tarifa de aseo", "Incentivos fiscales",
+             "Compras públicas", "Taxonomía", "Bonos temáticos", "Crédito y garantías",
+             "Alianzas público-privadas", "Formación y certificación")
+)
+ejes <- leer_salida("factibilidad_impacto_facilidad") |> left_join(corto, by = "id")
+cor_if <- cor(ejes$impacto, ejes$facilidad)
+media_crit <- function(k) mean(factibilidad$puntaje[factibilidad$criterio == k])
+n_conf_alta <- factibilidad |> distinct(id, confianza) |> filter(confianza == "Alta") |> nrow()
+colores_puntaje <- c("5" = "#2E8B57", "4" = "#8CC7A1", "3" = "#E3EFE6", "2" = "#F2C9A0", "1" = "#D9773A")
+
+# Precios: efecto indirecto por actividad y tamaño de la tasa de obra
+act_ind <- function(esc, cod) precios_act$variacion_pct[precios_act$escenario == esc & precios_act$cod_mip == cod]
+n_aseo <- sum(precios_act$escenario == "aseo" & precios_act$variacion_pct > 0.01)
+monto_rcd <- leer_salida("residuos_otros_indicadores") |>
+  filter(str_starts(indicador, "Construcción")) |>
+  pull(valor) * 10 / 1e6
+
+# Capacidades: cobertura por función, personal y cadena por instrumento
+cobertura <- leer_salida("capacidades_cobertura_funcion")
+cob <- function(f) cobertura$instituciones_si[cobertura$funcion == f]
+personal <- leer_salida("capacidades_personal_2026")
+pers <- function(i) formato_es(personal$funcionarios[personal$institucion == i], 0)
+cadena <- leer_salida("capacidades_cadena_instrumento")
+
+# Nombres cortos de los emisores de bonos temáticos
+emisor_corto <- function(x) case_when(
+  str_detect(x, "PROMERICA") ~ "Banco Promerica (Costa Rica)",
+  str_detect(x, "TOABRE") ~ "Parque Eólico Toabré",
+  str_detect(x, "UNI LEASING") ~ "Uni Leasing",
+  str_detect(x, "CIFI") ~ "CIFI",
+  str_detect(x, "MICROSERFIN") ~ "Microserfin",
+  str_detect(x, "BONOS AZULES") ~ "Fideicomiso de Bonos Azules BDA",
+  str_detect(x, "GREEN SILVESTER") ~ "Green Silvester",
+  str_detect(x, "BICSA") ~ "BICSA Factoring",
+  str_detect(x, "BANISTMO") ~ "Banistmo",
+  str_detect(x, "BG METAL") ~ "BG Metal Trade",
+  str_detect(x, "VAREEN") ~ "Vareen Assets",
+  TRUE ~ str_to_title(x)
+)
 ```
 
 # Resumen ejecutivo {.unnumbered}
@@ -92,23 +139,36 @@ La conclusión práctica es que la secuencia en dos pasos propuesta por el estud
 
 **Cuadros**
 
-- @tbl-criterios: Criterios de factibilidad
-- @tbl-ranking: Factibilidad de los instrumentos con pesos iguales y sensibilidad
+- @tbl-siglas: Glosario de siglas
+- @tbl-criterios: Criterios de factibilidad y rúbrica de calificación
 - @tbl-ruta: Ruta legal de los instrumentos
+- @tbl-dependencias: Dependencias entre instrumentos
+- @tbl-ranking: Factibilidad de los instrumentos con pesos iguales y sensibilidad
+- @tbl-canales: Canales por los que los instrumentos llegan a los sectores de política
+- @tbl-escenarios: Escenarios del modelo de precios
 - @tbl-precios-sector: Aumento de precios por sector de política según el instrumento
 - @tbl-precios-hogares: Aumento del costo de la canasta de consumo de los hogares
 - @tbl-financieros: Efectos esperados de los instrumentos financieros y de promoción
 - @tbl-capacidades: Funciones legales de las instituciones
-- @tbl-cartera: Cartera de crédito local por sector económico
-- @tbl-credito-vab: Crédito y valor agregado por sector de política
+- @tbl-personal: Funcionarios de las instituciones con funciones en los instrumentos
+- @tbl-cadena: Institución que cumple cada función en cada instrumento
+- @tbl-necesidades: Brechas institucionales y acciones de fortalecimiento
+- @tbl-cartera: Cartera de crédito local al sector privado por sector económico
 - @tbl-tematicos: Emisiones temáticas vigentes en la bolsa de valores
 - @tbl-actores: Actores del sistema financiero
-- @tbl-siglas: Glosario de siglas
+- @tbl-oportunidades: Oportunidades para movilizar recursos hacia la economía circular
 - @tbl-anexo-factibilidad: Puntajes y justificaciones por instrumento y criterio (anexo)
 
 **Figuras**
 
+- @fig-distribucion: Número de instrumentos según su puntaje en cada criterio
 - @fig-factibilidad: Puntajes de factibilidad por instrumento y criterio
+- @fig-sensibilidad: Posición de cada instrumento y rango al omitir un criterio
+- @fig-impacto-facilidad: Impacto y facilidad de aplicación de los instrumentos
+- @fig-traslado: Actividades con mayor aumento indirecto de precio
+- @fig-cobertura: Número de instituciones según cómo tienen asignada cada función
+- @fig-credito-vab: Crédito sobre valor agregado por sector de política
+- @fig-tematicos: Series temáticas vigentes por emisor y relación con la economía circular
 
 # Glosario de siglas {.unnumbered}
 
@@ -126,16 +186,24 @@ tribble(
   "APP", "Asociación público-privada",
   "ATP", "Autoridad de Turismo de Panamá",
   "BID", "Banco Interamericano de Desarrollo",
+  "BNP", "Banco Nacional de Panamá",
   "CEPAL", "Comisión Económica para América Latina y el Caribe",
   "DGCP", "Dirección General de Contrataciones Públicas",
+  "DGI", "Dirección General de Ingresos",
   "DGNTI", "Dirección General de Normas y Tecnología Industrial",
+  "INADEH", "Instituto Nacional de Formación Profesional y Capacitación para el Desarrollo Humano",
+  "INEC", "Instituto Nacional de Estadística y Censo",
   "ITBMS", "Impuesto de transferencia de bienes muebles y servicios",
+  "MEDUCA", "Ministerio de Educación",
   "MEF", "Ministerio de Economía y Finanzas",
   "MiAMBIENTE", "Ministerio de Ambiente",
   "MICI", "Ministerio de Comercio e Industrias",
   "MINSA", "Ministerio de Salud",
   "MIP", "Matriz insumo-producto",
+  "MIPYME", "Micro, pequeña y mediana empresa",
+  "MITRADEL", "Ministerio de Trabajo y Desarrollo Laboral",
   "OCDE", "Organización para la Cooperación y el Desarrollo Económicos",
+  "PET", "Tereftalato de polietileno",
   "REP", "Responsabilidad extendida del productor",
   "SBP", "Superintendencia de Bancos de Panamá",
   "SMV", "Superintendencia del Mercado de Valores",
@@ -194,83 +262,143 @@ El estudio sectorial incorporó el turismo como séptimo sector de política, de
 
 La política de turismo ya reconoce los problemas de residuos de los destinos. El plan maestro de turismo sostenible 2020-2025 describía la gestión de residuos como inexistente o mala en destinos como Bocas del Toro, Taboga y Pedasí [@atp2020PlanMaestro, p. 56], y su actualización para 2025-2030 incluye acciones de reducción de plásticos, apoyo al programa Bandera Azul Ecológica y medición de la huella de carbono de las empresas turísticas [@atp2025PlanMaestro]. Existen además dos fuentes de recursos vinculadas al turismo. El hospedaje paga un ITBMS de 10 %, cuya recaudación se transfiere a la Autoridad de Turismo [@dgi2026Formulario430], y el municipio de Taboga cobra desde 2025 un dólar por visitante con destino a la limpieza de la isla [@laestrella2025Taboga].
 
-# Método
+# Factibilidad de los instrumentos {#sec-factibilidad}
 
-Esta sección explica, en términos sencillos, cómo se hizo cada uno de los cuatro análisis. Los cálculos completos se documentan en las memorias de cálculo.
+Decir que un instrumento es factible significa que puede aplicarse con los recursos legales, institucionales, técnicos y financieros del país y que vale la pena hacerlo. Esas condiciones son de naturaleza distinta, y un mismo instrumento puede cumplir unas y fallar en otras. La REP, por ejemplo, tiene un efecto grande sobre los flujos de material y se financia sola, pero toma años ponerla en marcha. Por eso la evaluación separa la factibilidad en siete criterios, califica cada uno por separado y solo al final los combina en un orden de prioridad.
 
-## Calificación de la factibilidad
-
-Decir que un instrumento es factible significa que puede aplicarse con los recursos legales, institucionales, técnicos y financieros del país y que vale la pena hacerlo. Como esas condiciones son de naturaleza distinta, la evaluación las separa en siete criterios y califica cada uno por separado. El @tbl-criterios muestra los siete criterios, que van desde el efecto esperado del instrumento sobre la circularidad hasta su efecto sobre la equidad y la competitividad, y lo que significa el puntaje más alto en cada uno.
+Para que las calificaciones fueran comparables entre instrumentos, antes de calificar se fijó una rúbrica que define qué significa un puntaje de 1, de 3 y de 5 en cada criterio, y los puntajes 2 y 4 se reservaron para los casos intermedios. Como muestra el @tbl-criterios, los criterios van desde el efecto esperado sobre la circularidad hasta los efectos sobre la equidad y la competitividad, y en todos ellos un puntaje más alto indica una condición más favorable para aplicar el instrumento.
 
 ```{r}
 #| label: tbl-criterios
-#| tbl-cap: "Criterios de factibilidad"
+#| tbl-cap: "Criterios de factibilidad y rúbrica de calificación"
 
-tribble(
-  ~Criterio, ~`Qué mide`, ~`Puntaje 5`,
-  "Impacto", "Efecto esperado en la circularidad de los flujos de material", "Efecto directo y grande sobre flujos de volumen alto",
-  "Técnica", "Información, infraestructura y capacidad de medición", "Todo lo necesario existe",
-  "Institucional", "Institución con la función legal y los medios", "Función expresa y medios suficientes",
-  "Política y regulatoria", "Vehículo legal, base legal vigente y señales de apoyo", "Mandato legal vigente que basta con aplicar",
-  "Financiera", "Costo fiscal y fuente sostenible de recursos", "Sin costo fiscal o autofinanciado",
-  "Tiempo", "Plazo hasta la entrada en operación", "Puede iniciar de inmediato",
-  "Equidad y competitividad", "Efectos sobre hogares pobres, pymes, empleo y competencia", "Efectos positivos o neutrales"
-) |>
-  tabla_ft_es(digitos = 0, anchos_cm = c(3.6, 7, 6.8))
+rubrica |>
+  transmute(
+    Criterio = criterio, `Qué mide` = que_mide,
+    `Puntaje 1` = puntaje_1, `Puntaje 3` = puntaje_3, `Puntaje 5` = puntaje_5
+  ) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(2.8, 3.8, 3.6, 3.6, 3.6), lineas_tenues = TRUE, tamano = 7)
 ```
 
 *Fuente: elaboración propia.*
 
-Cada instrumento recibe un puntaje de 1 a 5 en cada criterio. El puntaje se asigna con base en evidencia concreta, que puede ser el texto de una ley, un dato estadístico o la experiencia documentada de otro país, y cada uno viene acompañado de una justificación escrita y de una bandera de confianza (alta, media o baja) que indica qué tan sólida es esa evidencia. El anexo reproduce los 98 puntajes con sus justificaciones, de modo que el lector puede revisar cada calificación y discrepar de ella con fundamento.
+Cada uno de los 98 puntajes, que resultan de calificar 14 instrumentos en 7 criterios, se asignó con base en evidencia concreta, que puede ser el artículo de una ley vigente, un dato estadístico o la experiencia documentada de otro país. Cada puntaje lleva una justificación escrita y una bandera de confianza. La confianza es alta cuando la calificación del instrumento descansa sobre todo en textos legales y datos oficiales, y media cuando depende de la experiencia internacional o de supuestos de diseño que todavía no se han fijado. De los catorce instrumentos, `r n_conf_alta` tienen confianza alta y `r 14 - n_conf_alta`, confianza media. El anexo reproduce los 98 puntajes con sus justificaciones, de modo que el lector puede revisar cada calificación y discrepar de ella con fundamento.
 
-Para resumir los siete puntajes de un instrumento en una sola cifra se calcula su promedio, lo que equivale a dar el mismo peso a todos los criterios. Esa decisión es razonable como punto de partida, pero distintos lectores pueden considerar que algunos criterios importan más que otros. Por eso se hicieron dos pruebas de sensibilidad, que verifican si el orden de los instrumentos depende de los pesos elegidos. La primera prueba elimina un criterio a la vez y vuelve a calcular el orden, para ver si algún criterio por sí solo determina el resultado. La segunda reparte al azar el peso total entre los siete criterios, 10.000 veces, y cuenta en qué proporción de esos repartos cada instrumento queda entre los cinco primeros. Un instrumento que aparece entre los cinco primeros en casi todos los repartos es una prioridad que no depende de cómo se ponderen los criterios.
-
-## Ruta legal
-
-Un instrumento puede requerir una ley aprobada por la Asamblea, un decreto ejecutivo, una resolución de una institución o un acuerdo municipal. Cuanto más alta es la jerarquía de la norma, más tiempo y consenso político requiere. Por eso, para cada instrumento se buscó la norma de menor jerarquía que basta para aplicarlo sin exceder lo que permiten las leyes vigentes, la institución que tiene la facultad de emitirla y la ley que respalda esa facultad. La revisión se hizo sobre los textos publicados en la Gaceta Oficial y en la base de datos legislativa Legispan de la Asamblea Nacional.
-
-## Efecto de los cargos sobre los precios
-
-Algunos instrumentos funcionan como un cargo. La REP obliga a los fabricantes de bienes envasados a pagar por la gestión de sus envases, la tarifa de aseo a costo real sube el precio del servicio de recolección y una tasa de disposición encarece verter los residuos de obra. Ese cargo no se queda en quien lo paga, porque sus clientes también ven subir sus costos. Por ejemplo, si una fábrica de bebidas paga una contribución por sus envases y la traslada a su precio, los restaurantes que compran esas bebidas también enfrentan un costo mayor, y lo trasladan a sus propios clientes.
-
-Para medir esa cadena de traslados se usó la matriz insumo-producto de 2018, que registra cuánto compra cada una de las 76 actividades de la economía a cada una de las demás [@inec2024mip]. Con esa matriz se puede seguir un aumento de costo de proveedor en proveedor hasta sumar todos los efectos indirectos, un procedimiento que la literatura llama modelo de precios de Leontief [@millerblair2022]. En notación matricial, el aumento de los precios es $\Delta \mathbf{p}' = \Delta \mathbf{c}' \mathbf{L}$, donde $\Delta \mathbf{c}$ es el aumento de costo por unidad producida en las actividades que pagan el cargo y $\mathbf{L}$ es la inversa de Leontief, que resume todas las rondas de compras entre actividades.
-
-El modelo supone que cada actividad traslada por completo el aumento de sus costos a su precio y que nadie cambia lo que compra ni cómo produce. En la realidad, parte del cargo la absorben los márgenes y, con el tiempo, productores y consumidores cambian de envase o de material, que es precisamente lo que el instrumento busca. Por eso los resultados deben leerse como el efecto máximo de corto plazo. Para los hogares se calculó cuánto sube el costo de su canasta de consumo, ponderando el aumento de cada producto por lo que los hogares gastan en él. Los instrumentos financieros y de promoción no imponen cargos y su efecto se analizó de forma cualitativa, preguntando quién se beneficia, quién paga y por qué canal llega el efecto.
-
-## Capacidades institucionales
-
-Para aplicar un instrumento hacen falta instituciones que cumplan seis funciones. Alguien tiene que regular, es decir, dictar las normas, y alguien tiene que registrar a los obligados. También hay que recaudar y administrar los fondos, controlar el cumplimiento y sancionar a quien incumple, monitorear y reportar los resultados y, por último, financiar los proyectos. Se revisaron las leyes de creación de 15 instituciones y las leyes de residuos, contrataciones y finanzas para establecer, en cada caso, si la función está asignada de forma expresa, de forma parcial (con un objeto más general o pendiente de un reglamento) o si no se encontró una base legal. Con esas valoraciones se calculó un índice de capacidad legal por institución, igual a la proporción de los puntos posibles que alcanza cuando una función expresa vale dos puntos y una parcial vale uno.
-
-## Sistema financiero
-
-El sistema financiero se analizó con tres fuentes. Las estadísticas de la Superintendencia de Bancos muestran hacia qué sectores se dirige el crédito, el registro de emisiones temáticas de la Bolsa Latinoamericana de Valores (Latinex) muestra qué tipo de proyectos financia el mercado de valores con etiquetas verdes o sostenibles, y los marcos de finanzas sostenibles muestran qué reglas existen para reconocer una inversión como circular.
-
-# Factibilidad de los instrumentos
-
-## Resultado general
-
-Los instrumentos del primer paso obtienen los puntajes más altos, porque se apoyan en mandatos legales vigentes, cuestan poco y pueden iniciar pronto. Como muestra el @tbl-ranking, el registro de productores e importadores encabeza la lista con `r formato_es(pm(1), 2)` puntos de 5, seguido de la información, formación y certificación, las compras públicas circulares y el crédito verde con garantías. Los instrumentos del segundo paso, como la REP, la tarifa de aseo a costo real y el depósito de envases, tienen el mayor impacto potencial, pero obtienen puntajes menores en tiempo y en factibilidad política. La ecomodulación queda al final porque solo puede operar cuando la REP ya existe. Las dos pruebas de sensibilidad confirman el resultado, pues el registro aparece entre los cinco primeros en `r formato_es(top5(1), 0)` % de los repartos de pesos al azar y nunca baja del segundo lugar al eliminar un criterio. Este orden coincide con la secuencia en dos pasos que propuso el estudio sectorial.
+Una primera mirada a los puntajes, antes de entrar en cada criterio, muestra dónde están las restricciones del país. Como muestra la @fig-distribucion, el tiempo de implementación y la factibilidad técnica concentran los puntajes más bajos, con medias de `r formato_es(media_crit("Tiempo"), 1)` y `r formato_es(media_crit("Técnica"), 1)`, y ningún instrumento obtiene 5 en factibilidad técnica; es decir, ninguno encuentra hoy toda la información y la infraestructura que necesita. La factibilidad financiera y la política y regulatoria tienen las medias más altas (`r formato_es(media_crit("Financiera"), 1)` y `r formato_es(media_crit("Política y regulatoria"), 1)`). Esa distribución anticipa el hallazgo principal de esta sección, según el cual las restricciones de Panamá están menos en las leyes y en el dinero que en los datos, en los plazos y en la operación de las instituciones.
 
 ```{r}
-#| label: tbl-ranking
-#| tbl-cap: "Factibilidad de los instrumentos con pesos iguales y sensibilidad a los pesos"
+#| label: fig-distribucion
+#| fig-cap: "Número de instrumentos según su puntaje en cada criterio"
+#| fig-width: 7
+#| fig-height: 3.4
 
-ranking |>
-  left_join(select(fichas, id, paso), by = "id") |>
-  transmute(
-    Posición = posicion,
-    Instrumento = instrumento,
-    Paso = paso,
-    `Puntaje medio` = puntaje_medio,
-    `Rango de posiciones al omitir un criterio` = paste(posicion_min, "a", posicion_max),
-    `Entre los cinco primeros con pesos al azar (%)` = pct_top5
-  ) |>
-  tabla_ft_es(digitos = 1, enteros = "Posición", anchos_cm = c(1.6, 6.4, 1.8, 2, 2.8, 2.8), lineas_tenues = TRUE)
+factibilidad |>
+  mutate(criterio = factor(criterio, levels = rev(rubrica$criterio)),
+         puntaje = factor(puntaje, levels = 5:1)) |>
+  count(criterio, puntaje) |>
+  ggplot(aes(x = n, y = criterio, fill = puntaje)) +
+  geom_col(width = 0.7, color = "white") +
+  geom_text(aes(label = n), position = position_stack(vjust = 0.5), size = 3) +
+  scale_fill_manual(values = colores_puntaje, name = "Puntaje", drop = FALSE) +
+  scale_x_continuous(breaks = seq(0, 14, 2)) +
+  labs(x = "Número de instrumentos", y = NULL) +
+  tema_grafico() +
+  theme(legend.title = element_text()) +
+  guides(fill = guide_legend(reverse = TRUE))
 ```
 
-*Fuente: elaboración propia. El puntaje medio da el mismo peso a los siete criterios. La última columna resulta de repartir el peso entre los criterios al azar 10.000 veces.*
+*Fuente: elaboración propia.*
 
-El orden se explica por un patrón que conviene hacer explícito, porque es una disyuntiva central de la política. Como muestra la @fig-factibilidad, los instrumentos con más impacto sobre los flujos de material, como la REP, el depósito y la tarifa de aseo, son también los que más tiempo toman y los que enfrentan más resistencia, mientras que los instrumentos más fáciles de aplicar, como las compras públicas o la formación, tienen un efecto más indirecto. Esa disyuntiva es la razón de fondo para avanzar en dos pasos, empezando por lo que es fácil y habilita lo demás.
+Las subsecciones siguientes recorren los criterios uno por uno. En cada una se explica cómo se calificó y qué revela el resultado. Al final, los siete criterios se combinan en un orden de prioridad y se prueba qué tan estable es ese orden cuando cambia la importancia que se da a cada criterio.
+
+## Impacto sobre los flujos de material
+
+El criterio de impacto pregunta cuánto cambiaría el instrumento la cantidad de material que vuelve a la producción en lugar de terminar en un relleno sanitario. Para calificarlo se hicieron dos preguntas. La primera es si el instrumento actúa directamente sobre un flujo de material o solo a través de otros instrumentos, y la segunda es qué tan grande es el flujo sobre el que actúa. El tamaño de los flujos proviene de las estadísticas de residuos del estudio sectorial, y el efecto esperado, de la experiencia de los países que ya aplican cada instrumento.
+
+La REP es el único instrumento con el puntaje máximo, porque traslada al precio de los productos el costo de gestionar sus residuos y financia la recolección de los flujos más grandes. Los materiales de envase representan hasta 38 % del peso de los residuos municipales [@vargas2026SectoresPriorizados], y en Chile el estudio de impacto del decreto de envases estimó que los beneficios del sistema superan sus costos en 19 % [@mmaChile2020AGIESEnvases]. Seis instrumentos obtienen 4 puntos. El depósito y retorno alcanza tasas de recolección superiores a 85 % en los sistemas europeos que operan plenamente [@sidorczuk2025DepositReturn]; la tarifa de aseo a costo real financia la recolección selectiva y encarece mezclar o verter; los recicladores de base recuperan la mayor parte del material que hoy se recicla en el país; el crédito con garantías llega a pymes y recuperadores que la banca no atiende; las alianzas público-privadas permiten construir infraestructura de valorización a escala y el registro de productores es la base de cálculo de cualquier meta o contribución. En el otro extremo, la información, la formación y la certificación obtienen 2 puntos, porque su efecto sobre los flujos es indirecto.
+
+El impacto se concentra, entonces, en los instrumentos que mueven dinero hacia la recolección y el reciclaje o que crean la información para hacerlo. Los criterios siguientes muestran que ese mismo rasgo los hace más difíciles de aplicar.
+
+## Factibilidad técnica e institucional
+
+La factibilidad técnica pregunta si existen la información, la infraestructura y la capacidad de medición que el instrumento necesita desde el primer día. La factibilidad institucional pregunta si alguna institución tiene la función legal de aplicarlo y los medios para hacerlo. Conviene leer ambos criterios juntos, porque se condicionan entre sí. Un registro sin una institución que lo opere no existe, y una institución sin datos no puede cobrar ni controlar. La calificación institucional se apoya en la revisión de las leyes de creación de quince instituciones que se presenta en la @sec-capacidades.
+
+En lo técnico, la carencia que más se repite es la información sobre lo que se pone en el mercado. Hoy nadie sabe cuántas toneladas de envases, aparatos o neumáticos venden los productores e importadores, y sin ese dato no se pueden fijar metas, calcular contribuciones ni verificar el cumplimiento. El registro de productores obtiene 4 puntos porque puede construirse sobre sistemas que ya funcionan. Las importaciones se declaran en aduana por partida arancelaria, que es el código que identifica cada tipo de producto; el reglamento de la ley de plásticos ya exige una certificación previa del MICI para ciertas importaciones, y la Ley 276 encarga a la AAUD un sistema de información sobre la gestión de residuos [@panama2022DE9, arts. 7-13; @panama2021Ley276, arts. 22-23]. La formalización de los recicladores enfrenta una carencia parecida, pues el único conteo disponible de esa población es de 2010. Los puntajes más bajos (2) corresponden a la ecomodulación, que exige criterios de reciclabilidad y datos por producto, y al contenido reciclado, porque la capacidad nacional de producir material reciclado de calidad es limitada.
+
+En lo institucional, la situación es mejor de lo que suele suponerse. Ocho instrumentos obtienen 4 puntos porque una institución ya tiene la función expresa, como la DGCP para las compras públicas, el MICI para las normas técnicas de contenido reciclado o la AAUD y los municipios para la tarifa de aseo. La REP y el depósito obtienen 3 puntos por una razón particular. La AAUD tiene la facultad legal de autorizar y fiscalizar los sistemas de REP y de depósito [@panama2021Ley276, art. 74], pero gasta mucho más de lo que recauda, de modo que la facultad existe y los medios para ejercerla todavía no. La ecomodulación obtiene 2 puntos porque necesita sistemas colectivos de productores que aún no existen.
+
+La lectura conjunta de los dos criterios revela una dependencia en cadena. Casi todos los instrumentos del segundo paso necesitan saber cuánto ponen en el mercado los productores e importadores, y esa información hoy no la reúne nadie, aunque las piezas para reunirla están repartidas entre la aduana, el MICI y la AAUD. El registro aparece así como la pieza que destraba a los demás.
+
+## Factibilidad política y regulatoria: la ruta legal
+
+El criterio político y regulatorio reúne tres elementos, que son la norma legal mínima que hace falta para aplicar el instrumento, la existencia de una ley vigente que la respalde y las señales de apoyo o de resistencia. Un instrumento puede requerir una ley aprobada por la Asamblea, un decreto ejecutivo, una resolución de una institución o un acuerdo municipal, y cuanto más alta es la jerarquía de la norma, más tiempo y consenso político requiere. Por eso, para cada instrumento se buscó la norma de menor jerarquía que basta para aplicarlo sin exceder lo que permiten las leyes vigentes, la institución que tiene la facultad de emitirla y la ley que respalda esa facultad. La búsqueda se hizo sobre los textos publicados en la Gaceta Oficial y en la base de datos legislativa Legispan de la Asamblea Nacional, y aplicó la distinción constitucional entre tributos, que requieren ley, y tasas por un servicio, que fija quien lo presta. Las señales políticas se tomaron de los proyectos de ley en trámite, de la Hoja de Ruta de plásticos y de los precedentes judiciales.
+
+La revisión legal arroja una buena noticia, pues el marco vigente permite iniciar doce de los catorce instrumentos sin aprobar una ley nueva. Como muestra el @tbl-ruta, el registro, la formalización de recicladores, la tarifa a costo real, las compras públicas, los criterios de la taxonomía, los bonos, el crédito con garantía y las alianzas público-privadas se apoyan en decretos, resoluciones o acuerdos de instituciones que ya tienen la facultad. La REP y el depósito pueden empezar con resoluciones de la AAUD, porque la Ley 276 la faculta para proponer normas de REP y autorizar los sistemas de gestión y de depósito [@panama2021Ley276, art. 74]. Sin embargo, las metas cuantitativas con sanciones propias y un depósito obligatorio cobrado al consumidor tendrían una base más sólida en una ley específica, que reduce el riesgo de que un tribunal las anule por exceder la ley que reglamentan. Los incentivos fiscales nuevos requieren una ley, como todo beneficio tributario, pero los que ya otorgan las leyes 223 y 276 solo necesitan su reglamento [@panama2021Ley223; @panama2021Ley276, art. 52].
+
+```{r}
+#| label: tbl-ruta
+#| tbl-cap: "Ruta legal de los instrumentos"
+
+fichas |>
+  transmute(
+    Instrumento = instrumento,
+    `Vehículo legal mínimo` = vehiculo_legal,
+    `Base legal vigente` = gancho_legal,
+    Responsable = responsable
+  ) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(3.6, 4.6, 4.6, 4.6), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia con base en la Constitución, las leyes 502 de 2025, 276 de 2021, 223 de 2021, 518 de 2026, 51 de 2010, 33 de 2018, 187 de 2020, 22 de 2006 y 93 de 2019, y la taxonomía y el marco de financiamiento sostenible.*
+
+Los puntajes políticos reflejan esa ruta. Las compras públicas y la formación obtienen 5 puntos porque el mandato ya está en la ley y basta con aplicarlo; la Ley 502 modificó la ley de contrataciones para que la DGCP establezca criterios de economía circular en las compras de todas las entidades [@panama2025Ley502, art. 12], y la Ley 276 ordena fomentar la compra de productos con material reciclado en el país [@panama2021Ley276, art. 53]. La tarifa de aseo obtiene el puntaje político más bajo (2), aunque su vía legal es una simple resolución, porque cualquier alza de tarifas es sensible y debe pasar por consulta ciudadana, cuya omisión llevó a anular la tasa de aseo de San Miguelito en 2016 [@laprensa2016TasaAseoSanMiguelito].
+
+La experiencia legislativa reciente indica que la vía reglamentaria es la más rápida, aunque tampoco es automática. Los reglamentos de las leyes 33 de 2018 y 276 de 2021 todavía no se han publicado, y el de la Ley 502 se empezó a redactar en 2026 [@miambiente2026ReglamentoLey502]. La Asamblea, en cambio, aprueba con rapidez prohibiciones y plazos cuando hay consenso, como lo muestran las leyes de bolsas y de plásticos de un solo uso [@panama2018Ley1; @panama2020Ley187]. Las ideas del depósito y de la REP ya tienen promotores en el órgano legislativo, pues a febrero de 2026 estaba en segundo debate un proyecto de ley de máquinas de reembolso de envases de PET, aluminio y vidrio, y se había presentado un anteproyecto sobre envases de poliestireno que incluye REP y aportes diferenciados según el tipo de envase [@asamblea2026ActaPleno].
+
+## Factibilidad financiera
+
+El criterio financiero hace dos preguntas, cuánto le cuesta el instrumento al fisco y si tiene una fuente de recursos propia y sostenible. Un instrumento que se paga con las contribuciones de los productores o con las tarifas de los usuarios obtiene un puntaje alto, y uno que depende del presupuesto o de renunciar a impuestos obtiene uno bajo. La calificación toma en cuenta el espacio fiscal del país, que es estrecho, pues los ingresos tributarios del Gobierno Central equivalen a cerca de 7 % del producto interno bruto [@inec2026IngresosGobierno] y la regla fiscal reduce el déficit permitido hasta 1,5 % del producto en 2030 [@laestrella2026ReformaFiscal].
+
+Los resultados invierten una intuición frecuente, la de que la economía circular requiere grandes recursos públicos. La tarifa de aseo a costo real obtiene 5 puntos porque cierra una brecha documentada, ya que la AAUD recaudó B/.35,2 millones en 2025 y gastó B/.60,6 millones [@estrella2026AAUDMorosidad], y la taxonomía también obtiene 5 por su bajo costo. La REP, el depósito, la ecomodulación y el contenido reciclado obtienen 4 puntos porque los pagan los productores. Obtienen también 4 puntos las compras públicas, porque no tienen costo adicional si se compra según el costo del ciclo de vida, así como el registro y la formación, cuyo costo es bajo. En el caso de la REP, la OCDE estima que administrar los sistemas colectivos cuesta entre 5 % y 10 % del total, mientras que la recolección y la clasificación concentran entre 60 % y 80 % [@ocde2016EPRPolicyHighlights], lo que significa que casi todo lo que pagan los productores llega a la cadena de recuperación. En el otro extremo, los incentivos fiscales obtienen 2 puntos, porque son gasto tributario en un país con ingresos tributarios bajos. Los recicladores, los bonos, el crédito y las alianzas público-privadas obtienen 3 puntos porque su sostenibilidad depende de otra fuente, sea la REP o la tasa de aseo, la regla fiscal o los recursos de la banca multilateral.
+
+Los instrumentos con más impacto son, por tanto, los que se pagan solos, porque trasladan el costo a quien pone el producto en el mercado o a quien usa el servicio. La pregunta financiera de fondo es quién paga, y la respuesta de los instrumentos del segundo paso, que son los productores y los usuarios, es la misma que explica la resistencia política descrita en el criterio anterior.
+
+## Tiempo de implementación
+
+El criterio de tiempo mide el plazo hasta que el instrumento entra en operación. Ese plazo incluye el tiempo de dictar la norma, el de preparar los sistemas y, sobre todo, el de esperar a que existan los instrumentos de los que depende. Un instrumento que puede iniciar de inmediato obtiene 5 puntos, uno que necesita uno o dos años de preparación obtiene 3, y uno que solo puede operar después de otros obtiene 1.
+
+El tiempo es el criterio con la media más baja, y la razón está en las dependencias entre instrumentos. Como muestra el @tbl-dependencias, la REP necesita el registro, la ecomodulación necesita la REP, el pago a los recicladores necesita la REP o la tarifa, y las alianzas público-privadas necesitan una tarifa que pague el servicio. Por eso la ecomodulación obtiene 1 punto y la REP, el depósito, el contenido reciclado y las alianzas público-privadas obtienen 2, mientras que la formación obtiene 5 y el registro, los incentivos vigentes, las compras públicas y el crédito con garantía obtienen 4, porque pueden empezar en un año sobre normas, sistemas o fondos que ya existen.
+
+```{r}
+#| label: tbl-dependencias
+#| tbl-cap: "Dependencias entre instrumentos"
+
+tribble(
+  ~Instrumento, ~`Requiere antes`, ~`Por qué`,
+  "REP con metas por flujo", "Registro de productores e importadores", "Las contribuciones y las metas se calculan sobre lo que cada productor pone en el mercado",
+  "Ecomodulación", "REP con sistemas colectivos en operación", "Es un ajuste de las contribuciones que cobra el sistema colectivo",
+  "Depósito y retorno", "Registro y control en frontera", "Sin control, entran envases que no pagaron el depósito y se cobran al devolverlos, como ocurrió en Ecuador",
+  "Pago a recicladores de base", "Censo y registro de recicladores; REP o tarifa de aseo", "Alguien debe pagar por cada tonelada recuperada y saber a quién",
+  "Contenido reciclado", "Oferta nacional de material recuperado", "Sin oferta, la obligación encarece la producción o se incumple",
+  "Alianzas público-privadas", "Tarifa de aseo a costo real", "El operador privado necesita un flujo de pagos confiable durante el contrato",
+  "Bonos temáticos y crédito verde", "Criterios circulares en la taxonomía y cartera de proyectos", "Sin criterios no se puede etiquetar ni verificar una inversión como circular"
+) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(4, 5.4, 8), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia con base en las fichas de los instrumentos y en la experiencia de Ecuador [@sri2014IRBPNR].*
+
+Las dependencias explican por qué los instrumentos de mayor impacto son lentos, pues cada uno espera a otro. También muestran dónde conviene empezar. El registro de productores, la tarifa de aseo a costo real y los criterios de la taxonomía son la raíz de tres cadenas distintas, la de la REP, la de la infraestructura de residuos y la del financiamiento, y cada mes que se adelanten acorta el plazo de los instrumentos que dependen de ellos.
+
+## Equidad y competitividad
+
+El último criterio pregunta quién gana y quién pierde con el instrumento. Considera el efecto sobre los hogares de menores ingresos, sobre las pequeñas empresas, sobre el empleo y sobre la competencia entre productores nacionales e importados. Para los instrumentos que imponen un cargo, la calificación usa las estimaciones de precios de la @sec-efectos; para los demás, el perfil de los sectores del estudio sectorial, que muestra, por ejemplo, que el turismo emplea a una mayoría de mujeres y está formado sobre todo por microempresas [@vargas2026SectoresPriorizados].
+
+Dos instrumentos obtienen el puntaje máximo. La formalización de los recicladores mejora los ingresos y la protección de una población pobre e informal, y el crédito con garantías favorece a microempresas, a mujeres empleadas en el turismo y a recicladores organizados. La tarifa de aseo obtiene el puntaje más bajo (2), porque una tarifa igual para todos pesa más en el presupuesto de los hogares pobres. La Ley 276 ya ofrece la respuesta, pues ordena que la tasa considere el nivel socioeconómico de cada comunidad, lo que permite cobrar menos a los hogares de menores ingresos [@panama2021Ley276, arts. 66 y 75]. La REP obtiene 3 puntos, porque un cargo de 1 % sobre los fabricantes de bienes envasados elevaría el costo de la canasta de los hogares en `r formato_es(hog("rep_envases"), 1)` % y porque los importadores pagan lo mismo que los productores nacionales, de modo que no se altera la competencia entre ambos. El depósito y las alianzas público-privadas también obtienen 3 puntos por un riesgo que conviene anticipar en el diseño, el de desplazar a los recicladores que hoy recuperan los envases, que se evita incorporándolos como operadores de los puntos de retorno y de las plantas.
+
+## Del puntaje por criterio al orden de prioridad
+
+Para pasar de siete puntajes a un orden de prioridad se calculó el promedio de cada instrumento, lo que equivale a dar el mismo peso a todos los criterios. El perfil completo de cada instrumento confirma lo que los criterios mostraron por separado. Como muestra la @fig-factibilidad, los instrumentos del primer paso tienen perfiles parejos, con puntajes de 3 y 4 en casi todos los criterios, mientras que los del segundo paso combinan puntajes altos en impacto y en lo financiero con puntajes bajos en tiempo, en lo técnico o en lo político.
 
 ```{r}
 #| label: fig-factibilidad
@@ -291,53 +419,168 @@ factibilidad |>
   theme(legend.position = "none", axis.text.y = element_text(size = 7))
 ```
 
-*Fuente: elaboración propia.*
+*Fuente: elaboración propia. Los instrumentos están ordenados de mayor a menor puntaje medio.*
 
-## Ruta legal de los instrumentos
-
-La revisión legal arroja una buena noticia, pues el marco vigente permite iniciar doce de los catorce instrumentos sin aprobar una ley nueva. Como muestra el @tbl-ruta, el registro, la formalización de recicladores, la tarifa a costo real, las compras públicas, los criterios de la taxonomía, los bonos, el crédito con garantía y las alianzas público-privadas se apoyan en decretos, resoluciones o acuerdos de instituciones que ya tienen la facultad. La REP y el depósito pueden empezar con resoluciones de la AAUD, porque la Ley 276 la faculta para proponer normas de REP y autorizar los sistemas de gestión y de depósito [@panama2021Ley276, art. 74]. Sin embargo, las metas cuantitativas con sanciones propias y un depósito obligatorio cobrado al consumidor tendrían una base más sólida en una ley específica, que reduce el riesgo de que un tribunal las anule por exceder la ley que reglamentan. Los incentivos fiscales nuevos requieren una ley, como todo beneficio tributario, pero los que ya otorgan las leyes 223 y 276 solo necesitan su reglamento [@panama2021Ley223; @panama2021Ley276, art. 52].
+Al promediar, los instrumentos del primer paso quedan arriba porque se apoyan en mandatos legales vigentes, cuestan poco y pueden iniciar pronto. Como muestra el @tbl-ranking, el registro de productores e importadores encabeza la lista con `r formato_es(pm(1), 2)` puntos de 5, seguido de la información, formación y certificación, las compras públicas circulares y el crédito verde con garantías. La REP, la tarifa de aseo a costo real y el depósito de envases, que tienen el mayor impacto, quedan en la mitad inferior, y la ecomodulación queda al final porque solo puede operar cuando la REP ya existe.
 
 ```{r}
-#| label: tbl-ruta
-#| tbl-cap: "Ruta legal de los instrumentos"
+#| label: tbl-ranking
+#| tbl-cap: "Factibilidad de los instrumentos con pesos iguales y sensibilidad a los pesos"
 
-fichas |>
+ranking |>
+  left_join(select(fichas, id, paso), by = "id") |>
   transmute(
+    Posición = posicion,
     Instrumento = instrumento,
-    `Vehículo legal mínimo` = vehiculo_legal,
-    `Base legal vigente` = gancho_legal,
-    Responsable = responsable
+    Paso = paso,
+    `Puntaje medio` = puntaje_medio,
+    `Rango de posiciones al omitir un criterio` = paste(posicion_min, "a", posicion_max),
+    `Entre los cinco primeros con pesos al azar (%)` = pct_top5
   ) |>
-  tabla_ft_es(digitos = 0, anchos_cm = c(3.6, 4.6, 4.6, 4.6), lineas_tenues = TRUE, tamano = 7)
+  tabla_ft_es(digitos = 1, enteros = "Posición", anchos_cm = c(1.6, 6.4, 1.8, 2, 2.8, 2.8), lineas_tenues = TRUE)
 ```
 
-*Fuente: elaboración propia con base en la Constitución, las leyes 502 de 2025, 276 de 2021, 223 de 2021, 518 de 2026, 51 de 2010, 33 de 2018, 187 de 2020, 22 de 2006 y 93 de 2019, y la taxonomía y el marco de financiamiento sostenible.*
+*Fuente: elaboración propia. El puntaje medio da el mismo peso a los siete criterios. La última columna resulta de repartir el peso entre los criterios al azar 10.000 veces.*
 
-La experiencia legislativa reciente indica que la vía reglamentaria es la más rápida, aunque tampoco es automática. Los reglamentos de las leyes 33 de 2018 y 276 de 2021 todavía no se han publicado, y el de la Ley 502 se empezó a redactar en 2026 [@miambiente2026ReglamentoLey502]. La Asamblea, en cambio, aprueba con rapidez prohibiciones y plazos cuando hay consenso, como lo muestran las leyes de bolsas y de plásticos de un solo uso [@panama2018Ley1; @panama2020Ley187]. Las ideas del depósito y de la REP ya tienen promotores en el órgano legislativo, pues a febrero de 2026 estaba en segundo debate un proyecto de ley de máquinas de reembolso de envases de PET, aluminio y vidrio, y se había presentado un anteproyecto sobre envases de poliestireno que incluye REP y aportes diferenciados según el tipo de envase [@asamblea2026ActaPleno].
+Dar el mismo peso a todos los criterios es un punto de partida razonable, pero distintos lectores pueden considerar que algunos importan más que otros; un ministerio de finanzas puede dar más peso al criterio financiero, y una autoridad ambiental, al impacto. Para saber si el orden depende de esa elección se hicieron dos pruebas de sensibilidad. La primera elimina un criterio a la vez y vuelve a calcular el orden, lo que muestra si algún criterio por sí solo determina el resultado. La segunda reparte al azar el peso total entre los siete criterios, 10.000 veces y sin favorecer a ninguno, y cuenta en qué proporción de esos repartos cada instrumento queda entre los cinco primeros. Un instrumento que aparece entre los cinco primeros en casi todos los repartos es una prioridad que no depende de cómo se ponderen los criterios.
 
-## Lectura por familia de instrumentos
+Las pruebas confirman el orden en sus extremos y revelan cuáles instrumentos dependen de los pesos. Como muestra la @fig-sensibilidad, el registro nunca baja del segundo lugar al eliminar un criterio y queda entre los cinco primeros en `r formato_es(top5(1), 0)` % de los repartos al azar, y las compras públicas y la formación lo hacen en más de 85 %. En el extremo opuesto, la ecomodulación ocupa el último lugar en todas las pruebas. El instrumento más sensible a los pesos es la tarifa de aseo, que sube del noveno al quinto lugar cuando se elimina el criterio de equidad o el político. Sus puntajes institucional y financiero son altos (4 y 5); lo que la frena son la equidad y la aceptación política, dos criterios que dependen del diseño de la tarifa y de cómo se comunica. Una tarifa escalonada por nivel socioeconómico, con una consulta ciudadana bien preparada, actúa justo sobre esos dos frenos.
 
-Los puntajes de cada familia de instrumentos tienen razones distintas, que se resumen a continuación.
+```{r}
+#| label: fig-sensibilidad
+#| fig-cap: "Posición de cada instrumento con pesos iguales y rango de posiciones al omitir un criterio"
+#| fig-width: 7
+#| fig-height: 4.2
 
-**Habilitantes.** El registro de productores e importadores tiene la factibilidad más alta porque puede montarse sobre sistemas que ya funcionan. Las importaciones se declaran en aduana por partida arancelaria, que es el código que identifica cada tipo de producto; el reglamento de la ley de plásticos ya exige una certificación previa del MICI para ciertas importaciones, y la Ley 276 encarga a la AAUD un sistema de información sobre la gestión de residuos [@panama2022DE9, arts. 7-13; @panama2021Ley276, arts. 22-23]. La formalización de los recicladores de base obtiene el puntaje más alto en equidad, porque mejora los ingresos de una población pobre e informal, pero depende de dos condiciones. La primera es un censo actualizado, ya que el único conteo disponible es de 2010, y la segunda es una fuente de recursos, como la REP o la tasa de aseo, que pague por cada tonelada recuperada.
+ranking |>
+  left_join(corto, by = "id") |>
+  mutate(nombre = fct_reorder(nombre, -posicion)) |>
+  ggplot(aes(y = nombre)) +
+  geom_segment(aes(x = posicion_min, xend = posicion_max, yend = nombre),
+               linewidth = 3.5, color = "#C9E3D1", lineend = "round") +
+  geom_point(aes(x = posicion), color = "#2E8B57", size = 2.6) +
+  geom_text(aes(x = 15.3, label = paste0(formato_es(pct_top5, 0), " %")), hjust = 0, size = 2.9) +
+  annotate("text", x = 15.3, y = 14.9, label = "Entre los cinco\nprimeros al azar", hjust = 0, vjust = 0, size = 2.6, lineheight = 0.9) +
+  scale_x_continuous(breaks = 1:14, limits = c(1, 17.5)) +
+  coord_cartesian(clip = "off") +
+  labs(x = "Posición (1 es la más factible)", y = NULL) +
+  tema_grafico() +
+  theme(panel.grid.minor = element_blank(), plot.margin = margin(18, 5, 5, 5))
+```
 
-**Normativos y regulatorios.** La REP es el instrumento de mayor impacto, porque traslada al precio de los productos el costo de gestionar sus residuos, y los materiales de envase representan hasta 38 % del peso de los residuos municipales [@vargas2026SectoresPriorizados]. Los sistemas de REP suelen organizarse como sistemas colectivos, en los que los productores se agrupan para contratar la recolección y el reciclaje de los productos de todos sus miembros. La Organización para la Cooperación y el Desarrollo Económicos (OCDE) estima que administrar esos sistemas cuesta entre 5 % y 10 % del total, mientras que la recolección y la clasificación concentran entre 60 % y 80 % [@ocde2016EPRPolicyHighlights]. En Chile, el estudio de impacto del decreto de envases estimó que los beneficios del sistema superan sus costos en 19 % [@mmaChile2020AGIESEnvases]. El contenido reciclado y la ecomodulación complementan la REP, pero dependen de que exista oferta nacional de material recuperado y de que los sistemas colectivos ya operen.
+*Fuente: elaboración propia. El punto indica la posición con pesos iguales y la barra, el rango de posiciones al eliminar un criterio a la vez. La cifra de la derecha es la proporción de 10.000 repartos de pesos al azar en que el instrumento queda entre los cinco primeros.*
 
-**Tributarios y tarifarios.** La tarifa de aseo a costo real tiene el puntaje financiero más alto, porque cierra una brecha documentada entre lo que la AAUD recauda y lo que gasta, y el puntaje político más bajo, porque cualquier alza de tarifas es sensible y debe pasar por consulta ciudadana. La Ley 276 ofrece una manera de reducir esa tensión, pues ordena que la tasa considere el nivel socioeconómico de cada comunidad, lo que permite cobrar menos a los hogares de menores ingresos [@panama2021Ley276, arts. 66 y 75]. El depósito y retorno tiene la evidencia internacional más sólida, con tasas de recolección superiores a 85 % en los sistemas europeos que operan plenamente [@sidorczuk2025DepositReturn]. Su riesgo principal es el fraude por envases que entran desde otros países sin haber pagado el depósito, como ocurrió en Ecuador [@sri2014IRBPNR]. Los incentivos fiscales son factibles en lo legal, porque ya existen, pero su costo pesa en un país cuyos ingresos tributarios del Gobierno Central equivalen a cerca de 7 % del producto interno bruto [@inec2026IngresosGobierno] y cuya regla fiscal reduce el déficit permitido hasta 1,5 % del producto en 2030 [@laestrella2026ReformaFiscal].
+## La disyuntiva entre impacto y facilidad
 
-**Financieros.** La taxonomía, los bonos y el crédito con garantías tienen una factibilidad institucional alta, porque los marcos y las instituciones ya existen. Su límite está en la falta de proyectos preparados y de criterios para reconocerlos, más que en la disponibilidad de recursos, como se explica en la sección sobre el sistema financiero.
+El puntaje medio mezcla dos preguntas que conviene separar, cuánto cambia el instrumento los flujos de material y qué tan fácil es ponerlo en marcha. Para separarlas se tomó el criterio de impacto como una medida y el promedio de los criterios técnico, institucional, político y regulatorio, financiero y de tiempo como otra, que aquí se llama facilidad de aplicación. El criterio de equidad queda fuera de ambas, porque describe a quién beneficia o perjudica el instrumento.
 
-**Promoción de inversiones.** Las compras públicas circulares tienen el mandato legal más directo, porque la Ley 502 modificó la ley de contrataciones para que la Dirección General de Contrataciones Públicas (DGCP) establezca criterios de economía circular en las compras de todas las entidades [@panama2025Ley502, art. 12], y la Ley 276 ordena fomentar la compra de productos con material reciclado en el país [@panama2021Ley276, art. 53]. Las alianzas público-privadas tienen una ley vigente [@panama2019Ley93] y un proyecto ancla en preparación para los distritos de Panamá y San Miguelito [@bid2024TdRResiduosAPP], pero estructurar un contrato de este tipo toma varios años.
+Al cruzar las dos medidas aparece la disyuntiva central de la política. Como muestra la @fig-impacto-facilidad, la correlación entre impacto y facilidad es negativa (`r formato_es(cor_if, 2)`). Los instrumentos con más impacto, como la REP, el depósito y las alianzas público-privadas, están entre los más difíciles de aplicar, y los más fáciles, como la formación, las compras públicas y la taxonomía, tienen un efecto más indirecto. Tres instrumentos combinan un impacto alto con una facilidad igual o superior al promedio, que son el registro de productores, el crédito con garantías y la tarifa de aseo. Los dos primeros encabezan la secuencia, y la tarifa depende sobre todo de resolver su aceptación política y su efecto en los hogares pobres, dos aspectos que este cruce no mide y que la prueba de sensibilidad ya había señalado. Esa disyuntiva es la razón de fondo para avanzar en dos pasos, empezando por lo que es fácil y habilita lo demás, de modo que cuando lleguen los instrumentos de mayor impacto ya existan el registro, los criterios y la tarifa que necesitan.
 
-**Capacidades.** La información, la formación y la certificación tienen el impacto más indirecto, pero son las más rápidas y baratas de aplicar, y sostienen a todos los demás instrumentos. En turismo, la certificación de prácticas sostenibles tiene referentes cercanos, como el Certificado de Sostenibilidad Turística de Costa Rica [@ict2026CST].
+```{r}
+#| label: fig-impacto-facilidad
+#| fig-cap: "Impacto y facilidad de aplicación de los instrumentos"
+#| fig-width: 7
+#| fig-height: 4.6
 
-# Efectos por sector de política
+ggplot(ejes, aes(x = facilidad, y = impacto, color = paso)) +
+  geom_hline(yintercept = mean(ejes$impacto), linetype = "dashed", color = "gray70") +
+  geom_vline(xintercept = mean(ejes$facilidad), linetype = "dashed", color = "gray70") +
+  annotate("text", x = 2.35, y = 5.35, label = "Más impacto, más difícil", hjust = 0, size = 2.8, color = "gray40") +
+  annotate("text", x = 4.55, y = 5.35, label = "Más impacto, más fácil", hjust = 1, size = 2.8, color = "gray40") +
+  annotate("text", x = 2.35, y = 1.75, label = "Menos impacto, más difícil", hjust = 0, size = 2.8, color = "gray40") +
+  annotate("text", x = 4.55, y = 1.75, label = "Menos impacto, más fácil", hjust = 1, size = 2.8, color = "gray40") +
+  geom_point(size = 2.8) +
+  ggrepel::geom_text_repel(aes(label = nombre), size = 2.8, seed = 7, show.legend = FALSE,
+                           box.padding = 0.4, max.overlaps = Inf) +
+  scale_color_manual(values = c(Primero = "#2E8B57", Segundo = "#C0392B"),
+                     labels = c(Primero = "Primer paso", Segundo = "Segundo paso")) +
+  scale_x_continuous(limits = c(2.3, 4.6)) +
+  scale_y_continuous(limits = c(1.7, 5.4), breaks = 2:5) +
+  labs(x = "Facilidad de aplicación (promedio de cinco criterios, 1 a 5)", y = "Impacto (1 a 5)") +
+  tema_grafico()
+```
+
+*Fuente: elaboración propia. La facilidad de aplicación es el promedio de los criterios técnico, institucional, político y regulatorio, financiero y de tiempo. Las líneas punteadas marcan los promedios de los catorce instrumentos.*
+
+# Efectos por sector de política {#sec-efectos}
+
+Los catorce instrumentos no llegan a los sectores de la economía por el mismo camino, y cada camino requiere un método distinto para medir su efecto. Algunos imponen un cargo, que sube los costos de quien lo paga y viaja por la cadena de compras hasta los demás sectores. Otros cambian el costo o el acceso al capital, o crean una demanda estable para ciertos productos, y benefician a los sectores que tienen proyectos que califican. Los restantes crean la información, los actores y las reglas que usan los demás, y su efecto por sector pasa por esos otros instrumentos. Como muestra el @tbl-canales, el primer grupo se analiza con un modelo cuantitativo de precios y los otros dos con un análisis cualitativo estructurado.
+
+```{r}
+#| label: tbl-canales
+#| tbl-cap: "Canales por los que los instrumentos llegan a los sectores de política"
+
+tribble(
+  ~Canal, ~Instrumentos, ~`Cómo llega el efecto a los sectores`, ~Método,
+  "Cargo sobre un producto o un servicio", "REP, depósito y retorno, tarifa de aseo a costo real y tasa de disposición final", "Sube el costo de quien paga, que lo traslada a sus clientes a lo largo de la cadena de compras", "Modelo de precios de insumo-producto",
+  "Costo y acceso al capital o a la demanda", "Incentivos fiscales, compras públicas, taxonomía, bonos temáticos, crédito con garantías y alianzas público-privadas", "Baja el costo del capital, reduce el riesgo que percibe la banca o crea demanda estable para los proyectos que califican", "Análisis cualitativo con cuatro preguntas",
+  "Condiciones habilitantes", "Registro de productores, formalización de recicladores, ecomodulación, contenido reciclado y formación", "Crean la información, los actores y las reglas que usan los demás instrumentos", "Análisis cualitativo"
+) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(3.2, 5.4, 5.6, 3.2), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia.*
 
 ## Instrumentos que operan como cargo
 
-Para estimar los efectos sobre los precios se construyeron cuatro escenarios, uno por cada instrumento que impone un cargo. En el escenario de la REP, los fabricantes de alimentos, bebidas, productos químicos de consumo y farmacéuticos pagan una contribución igual a 1 % del valor de su producción. En el del depósito, la industria de bebidas paga un costo de operación del sistema de la misma magnitud. En el de la tarifa de aseo, el precio del servicio de recolección sube 72 %, que es lo necesario para cerrar la brecha entre lo que la AAUD recaudó y gastó en 2025 [@estrella2026AAUDMorosidad]. En el de la tasa de residuos de obra, las actividades de construcción pagan B/.10 por cada tonelada de residuos de construcción y demolición que generan, una cifra similar al costo de operación del relleno sanitario de Cerro Patacón [@tvn2023Ecolimpia]. Como el modelo es proporcional, el efecto de un cargo de REP de 2 % es exactamente el doble del de 1 %.
+Tres de los catorce instrumentos imponen un cargo. La REP obliga a los fabricantes e importadores de bienes envasados a pagar por la gestión de sus envases, el depósito y retorno tiene un costo de operación que pagan los productores de bebidas y la tarifa de aseo a costo real, junto con la tasa de disposición final de los residuos de obra, encarece el servicio de aseo y el vertido. Ese cargo no se queda en quien lo paga, porque sus clientes también ven subir sus costos. Si una fábrica de bebidas paga una contribución por sus envases y la traslada a su precio, los restaurantes que compran esas bebidas también enfrentan un costo mayor, y lo trasladan a sus propios clientes.
 
-Los resultados muestran que los efectos son pequeños en el agregado y se concentran en las actividades que pagan el cargo y en sus clientes directos. Como muestra el @tbl-precios-sector, el cargo de REP sube los precios de agricultura y alimentos en `r formato_es(sec("rep_envases", "Agricultura y alimentos"), 2)` %, de industrias en `r formato_es(sec("rep_envases", "Industrias"), 2)` % y del turismo en `r formato_es(sec("rep_envases", "Turismo"), 2)` %; en el caso del turismo, el efecto llega por las compras de alimentos y bebidas de hoteles y restaurantes. La tarifa de aseo a costo real sube 72 % el precio del servicio de recolección, pero su efecto sobre los demás sectores no llega a medio punto porcentual, porque el servicio pesa poco en sus costos. La tasa de residuos de obra sube los precios de la construcción en apenas `r formato_es(sec("tasa_rcd", "Ciudades y construcción"), 3)` %.
+Para medir esa cadena de traslados se usó la matriz insumo-producto de 2018, que registra cuánto compra cada una de las 76 actividades económicas de la matriz a cada una de las demás [@inec2024mip]. La matriz tiene 76 actividades, y no las 80 de las cuentas nacionales, porque reúne en una sola actividad la pesca y la acuicultura (AE14), los tres tipos de comercio (AE44) y dos actividades de apoyo al transporte por agua (AE52). Con ella se puede seguir un aumento de costo de proveedor en proveedor hasta sumar todos los efectos indirectos, un procedimiento que la literatura llama modelo de precios de Leontief [@millerblair2022]. En notación matricial, el aumento de los precios es $\Delta \mathbf{p}' = \Delta \mathbf{c}' \mathbf{L}$, donde $\Delta \mathbf{c}$ es el aumento de costo por unidad producida en las actividades que pagan el cargo y $\mathbf{L}$ es la inversa de Leontief, que resume todas las rondas de compras entre actividades.
+
+El modelo supone que cada actividad traslada por completo el aumento de sus costos a su precio y que nadie cambia lo que compra ni cómo produce. En la realidad, parte del cargo la absorben los márgenes y, con el tiempo, productores y consumidores cambian de envase o de material, que es precisamente lo que el instrumento busca. Por eso los resultados deben leerse como el efecto máximo de corto plazo.
+
+Cada instrumento se tradujo en un escenario que define quién paga y cuánto. Cuando el monto depende de un diseño que todavía no existe, como la contribución de la REP, se usó un cargo de referencia de 1 % del valor de la producción, y cuando hay un dato documentado, como la brecha financiera de la AAUD, se usó ese dato. Como muestra el @tbl-escenarios, los cuatro escenarios cubren desde un cargo concentrado en una sola actividad, como el depósito sobre las bebidas, hasta uno repartido entre diez actividades, como la REP.
+
+```{r}
+#| label: tbl-escenarios
+#| tbl-cap: "Escenarios del modelo de precios"
+
+tribble(
+  ~Escenario, ~`Quién paga`, ~`Actividades de la matriz`, ~`Tamaño del cargo`, ~`Origen del parámetro`,
+  "REP de envases", "Fabricantes de alimentos, bebidas, químicos de consumo y farmacéuticos, e importadores de esos bienes", "AE16 a AE23, AE29 y AE30", "1 % del valor de la producción", "Cargo de referencia; el monto real depende del diseño",
+  "Depósito y retorno", "Industria de bebidas", "AE23", "1 % del valor de la producción", "Cargo de referencia por el costo de operación; el depósito se devuelve y no es un costo",
+  "Tarifa de aseo a costo real", "Usuarios del servicio de recolección", "AE40", "72 % sobre el precio del servicio", "Brecha entre lo que la AAUD recaudó (B/.35,2 millones) y gastó (B/.60,6 millones) en 2025",
+  "Tasa de residuos de obra", "Empresas de construcción", "AE41 a AE43", paste0("B/.10 por tonelada, unos B/.", formato_es(monto_rcd, 1), " millones al año"), "Costo de operación del relleno de Cerro Patacón, sobre 1,07 millones de toneladas al año"
+) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(2.8, 4, 2.6, 3.2, 4.8), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia con datos de la AAUD [@estrella2026AAUDMorosidad], del Banco Mundial [@worldbank2026wwaste] y del contrato del relleno de Cerro Patacón [@tvn2023Ecolimpia]. La tasa de B/.10 equivale a la cuarta parte del promedio de las tasas de vertido europeas [@eea2023EconomicInstruments]. En la REP, los bienes importados de las mismas actividades pagan el mismo cargo.*
+
+Antes de sumar los efectos por sector conviene ver por dónde viaja cada cargo, porque ese recorrido contiene lecciones de diseño. Como muestra la @fig-traslado, fuera de las actividades que lo pagan, el cargo de REP llega con más fuerza a la avicultura (`r formato_es(act_ind("rep_envases", "AE10"), 2)` %) y a la porcicultura (`r formato_es(act_ind("rep_envases", "AE09"), 2)` %), que compran alimento balanceado a la industria de alimentos. Le siguen los restaurantes (`r formato_es(act_ind("rep_envases", "AE55"), 2)` %), que compran alimentos y bebidas. El primer resultado señala un riesgo. Si la contribución se cobrara sobre el valor total de la producción de los fabricantes, gravaría también productos que no llegan al consumidor en un envase, como el alimento para animales a granel; cobrarla por tonelada de envase puesto en el mercado, como hacen los sistemas de REP, evita ese efecto y concentra el cargo donde se genera el residuo. El alza de la tarifa de aseo se reparte de otra forma. Toca a más actividades, pues `r n_aseo` de las 76 ven subir su precio más de 0,01 %, pero con montos pequeños, y las más afectadas son la captación y distribución de agua (`r formato_es(act_ind("aseo", "AE39"), 2)` %), la administración pública, la seguridad social, la enseñanza y la salud. Una parte importante del costo de una tarifa a costo real la pagaría, por tanto, el propio Estado a través de sus entidades, lo que conviene prever en sus presupuestos.
+
+```{r}
+#| label: fig-traslado
+#| fig-cap: "Actividades con mayor aumento indirecto de precio en dos escenarios, con traslado completo (%)"
+#| fig-width: 7
+#| fig-height: 5.4
+
+precios_act |>
+  filter(escenario %in% c("rep_envases", "aseo"), !directo) |>
+  slice_max(variacion_pct, n = 8, by = escenario) |>
+  mutate(
+    panel = factor(recode(escenario, rep_envases = "REP de envases (cargo de 1 %)", aseo = "Tarifa de aseo a costo real (+72 %)"),
+                   levels = c("REP de envases (cargo de 1 %)", "Tarifa de aseo a costo real (+72 %)")),
+    sector_principal = factor(sector_principal, levels = sectores_politica)
+  ) |>
+  arrange(panel, variacion_pct) |>
+  mutate(etiqueta = factor(paste0(panel, "|", actividad_mip), levels = unique(paste0(panel, "|", actividad_mip)))) |>
+  ggplot(aes(x = variacion_pct, y = etiqueta, fill = sector_principal)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = formato_es(variacion_pct, 2)), hjust = -0.15, size = 2.8) +
+  facet_wrap(~panel, ncol = 1, scales = "free") +
+  scale_y_discrete(labels = \(x) str_wrap(str_remove(x, "^.*\\|"), 45)) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_manual(values = colores_sector) +
+  labs(x = "Aumento de precio (%)", y = NULL) +
+  tema_grafico() +
+  theme(axis.text.y = element_text(size = 7)) +
+  guides(fill = guide_legend(nrow = 2))
+```
+
+*Fuente: elaboración propia con la matriz insumo-producto de 2018 del INEC [@inec2024mip]. Se excluyen las actividades que pagan el cargo, cuyo precio sube en torno al tamaño del cargo.*
+
+Al agregar las actividades por sector de política, los efectos resultan pequeños y concentrados en los sectores que pagan el cargo y en sus clientes directos. Como muestra el @tbl-precios-sector, el cargo de REP sube los precios de agricultura y alimentos en `r formato_es(sec("rep_envases", "Agricultura y alimentos"), 2)` %, de industrias en `r formato_es(sec("rep_envases", "Industrias"), 2)` % y del turismo en `r formato_es(sec("rep_envases", "Turismo"), 2)` %; en el caso del turismo, el efecto llega por las compras de alimentos y bebidas de hoteles y restaurantes. La tarifa de aseo a costo real sube 72 % el precio del servicio de recolección, pero su efecto sobre los demás sectores no llega a medio punto porcentual, porque el servicio pesa poco en sus costos. La tasa de residuos de obra sube los precios de la construcción en apenas `r formato_es(sec("tasa_rcd", "Ciudades y construcción"), 3)` %.
 
 ```{r}
 #| label: tbl-precios-sector
@@ -353,9 +596,9 @@ precios_sector |>
   tabla_ft_es(digitos = 3, anchos_cm = c(4.6, 3.2, 3.2, 3.2, 3.2))
 ```
 
-*Fuente: elaboración propia con la matriz insumo-producto de 2018 del INEC [@inec2024mip]. El cargo de REP recae sobre la fabricación de alimentos, bebidas, químicos y farmacéuticos (actividades AE16 a AE23, AE29 y AE30 de la matriz); el del depósito, sobre las bebidas (AE23); el alza de la tarifa, sobre la recolección y el tratamiento de desechos (AE40), y la tasa de obra, sobre las tres actividades de construcción (AE41 a AE43).*
+*Fuente: elaboración propia con la matriz insumo-producto de 2018 del INEC [@inec2024mip]. El aumento de cada sector es el promedio de sus actividades ponderado por su producción. El cargo de REP recae sobre la fabricación de alimentos, bebidas, químicos y farmacéuticos (actividades AE16 a AE23, AE29 y AE30 de la matriz); el del depósito, sobre las bebidas (AE23); el alza de la tarifa, sobre la recolección y el tratamiento de desechos (AE40) y la tasa de obra, sobre las tres actividades de construcción (AE41 a AE43).*
 
-Para los hogares, ningún instrumento eleva el costo de su canasta de consumo en más de un cuarto de punto porcentual. Como muestra el @tbl-precios-hogares, el mayor efecto corresponde a la REP de envases, porque los bienes importados de los mismos tipos también pagan la contribución, y el menor a la tasa de residuos de obra. El aumento por la tarifa de aseo es pequeño en promedio, pero el servicio pesa más en el presupuesto de los hogares de menores ingresos, lo que justifica la tarifa escalonada por nivel socioeconómico que la Ley 276 ya ordena.
+Para los hogares se calculó cuánto sube el costo de su canasta de consumo, ponderando el aumento de cada producto por lo que los hogares gastan en él según la matriz de 2018. Ningún instrumento eleva ese costo en más de un cuarto de punto porcentual. Como muestra el @tbl-precios-hogares, el mayor efecto corresponde a la REP de envases, porque los bienes importados de los mismos tipos también pagan la contribución, y el menor a la tasa de residuos de obra. El aumento por la tarifa de aseo es pequeño en promedio, pero el servicio pesa más en el presupuesto de los hogares de menores ingresos, lo que justifica la tarifa escalonada por nivel socioeconómico que la Ley 276 ya ordena.
 
 ```{r}
 #| label: tbl-precios-hogares
@@ -368,11 +611,13 @@ precios_hogares |>
 
 *Fuente: elaboración propia con el consumo de los hogares de la matriz insumo-producto de 2018 [@inec2024mip]. En la REP de envases, los bienes importados de las mismas actividades pagan el mismo cargo.*
 
-Conviene recordar que estas cifras son un techo. El modelo supone que todo el cargo se traslada al precio y que nadie cambia de envase, de material ni de práctica, cuando el propósito de los instrumentos es justamente inducir esos cambios. Además, una parte de los cargos sustituye costos que hoy pagan los municipios y la AAUD con recursos del presupuesto público, de modo que el costo para la sociedad en su conjunto es menor que la suma de los cargos.
+Como el modelo es proporcional, quien diseñe un instrumento puede escalar estas cifras al cargo que considere. Una contribución de REP de 0,5 % del valor de la producción elevaría la canasta de los hogares en `r formato_es(hog("rep_envases") / 2, 2)` %, y una de 2 % en `r formato_es(hog("rep_envases") * 2, 2)` %. Conviene recordar, además, que estas cifras son un techo. El modelo supone que todo el cargo se traslada al precio y que nadie cambia de envase, de material ni de práctica, cuando el propósito de los instrumentos es justamente inducir esos cambios. Una parte de los cargos sustituye, asimismo, costos que hoy pagan los municipios y la AAUD con recursos del presupuesto público, de modo que el costo para la sociedad en su conjunto es menor que la suma de los cargos.
 
 ## Instrumentos financieros y de promoción
 
-En lugar de imponer cargos, los instrumentos financieros actúan sobre el costo del capital y el acceso a él. Su efecto por sector depende de qué sectores tienen proyectos que califican y de cómo los atiende hoy la banca. El @tbl-financieros resume, para cada instrumento, quién se beneficia, quién paga, por qué canal llega el efecto y en qué sectores de política se concentra. Los beneficiarios directos están en residuos, industrias, agricultura y alimentos y turismo, y el costo recae en el presupuesto, en el gasto tributario o en recursos de la banca multilateral.
+Seis instrumentos actúan sobre el costo del capital, sobre el riesgo que percibe quien presta o sobre la demanda, en lugar de imponer un cargo. Son los incentivos fiscales a la inversión circular, las compras públicas circulares, los criterios de economía circular en la taxonomía de finanzas sostenibles, los bonos temáticos, el crédito con garantías y las alianzas público-privadas. Su efecto por sector depende de qué sectores tienen proyectos que califican y de cómo los atiende hoy la banca, y no puede medirse con un modelo de precios. Para cada uno se respondieron cuatro preguntas, quién se beneficia, quién paga, por qué canal llega el efecto y en qué sectores de política se concentra, con base en las fichas de los instrumentos, en el perfil empresarial de los sectores y en la distribución del crédito bancario que se analiza en la @sec-financiero.
+
+Las respuestas muestran que los beneficios se concentran en pocos sectores y que el costo recae casi siempre fuera de ellos. Como muestra el @tbl-financieros, los beneficiarios directos están en residuos, industrias, agricultura y alimentos y turismo, y el costo recae en el presupuesto, en el gasto tributario o en recursos de la banca multilateral, salvo en las compras públicas (que pagan las entidades compradoras) y en las alianzas público-privadas (que terminan pagando los usuarios por medio de la tasa).
 
 ```{r}
 #| label: tbl-financieros
@@ -392,13 +637,23 @@ tribble(
 
 *Fuente: elaboración propia.*
 
-En el turismo, el instrumento con mayor potencial es el crédito con garantía. El grupo de hoteles y restaurantes reúne `r formato_es(val("Empresas en la sección CIIU principal", "Turismo"), 0)` empresas, en su gran mayoría microempresas, que suelen tener acceso limitado al crédito bancario [@vargas2026SectoresPriorizados]. A él se suman la certificación de prácticas sostenibles, la participación de hoteles y restaurantes en pilotos de tarifa por cantidad de residuos y su papel como puntos de retorno del depósito de envases.
+Cada sector encuentra en este grupo un instrumento distinto. Las compras públicas son el canal natural para la construcción, porque el Estado es el mayor comprador de obra y puede exigir áridos y materiales reciclados en sus pliegos. Los bonos temáticos y la categoría circular del marco soberano encajan con la inversión pública en residuos y agua, que requiere plazos largos. Los incentivos fiscales favorecen a las plantas de reciclaje de la industria, que son empresas formales con capacidad de invertir, mientras que el crédito con garantía es el único que llega a las empresas pequeñas.
 
-# Capacidades institucionales
+En el turismo, el instrumento con mayor potencial es el crédito con garantía. El grupo de hoteles y restaurantes reúne `r formato_es(val("Empresas en la sección CIIU principal", "Turismo"), 0)` empresas, en su gran mayoría microempresas, que suelen tener acceso limitado al crédito bancario [@vargas2026SectoresPriorizados]. A él se suman la certificación de prácticas sostenibles, con referentes cercanos como el Certificado de Sostenibilidad Turística de Costa Rica [@ict2026CST], la participación de hoteles y restaurantes en pilotos de tarifa por cantidad de residuos y su papel como puntos de retorno del depósito de envases.
+
+## Instrumentos habilitantes y complementarios
+
+Los cinco instrumentos restantes, que son el registro de productores, la formalización de los recicladores de base, la ecomodulación, el contenido reciclado y la formación, no tienen un efecto propio sobre los precios ni sobre el crédito, pero cada uno reparte costos y beneficios de una manera que conviene anticipar. El registro impone un costo de reporte a los productores e importadores, que se concentra en los grandes importadores porque son los que mueven la mayor parte del volumen. La formalización de los recicladores transfiere ingresos hacia una población pobre del sector de residuos, financiada con las contribuciones de la REP o con la tarifa de aseo. La ecomodulación mantiene el monto total que pagan los productores y lo redistribuye, de modo que pagan menos quienes usan envases reciclables y más quienes usan envases difíciles de reciclar. El contenido reciclado cuesta a los productores tanto como la diferencia de precio entre el material reciclado y el virgen, y crea demanda para las recicladoras nacionales de industrias y de residuos. La formación cuesta poco al presupuesto y beneficia a todos los sectores, con un énfasis particular en la certificación de los pequeños operadores turísticos.
+
+# Capacidades institucionales {#sec-capacidades}
+
+Un instrumento económico solo funciona si alguna institución puede aplicarlo, y aplicarlo exige cumplir seis funciones. Para que la REP de envases opere, por ejemplo, alguien tiene que dictar la resolución que fija las metas (regular) y llevar la lista de los productores obligados (registrar). Alguien más tiene que cobrar y administrar las contribuciones (recaudar), verificar que nadie evada y sancionar a quien lo haga (controlar) y medir cuánto se recuperó (monitorear). En los instrumentos financieros se agrega una sexta función, la de otorgar el crédito o la garantía (financiar).
+
+Para establecer qué instituciones tienen esas funciones se revisaron las leyes de creación de quince instituciones y las leyes de residuos, contrataciones, asociaciones público-privadas y finanzas sostenibles, en sus textos publicados en la Gaceta Oficial y en Legispan. Cada combinación de institución y función recibió una de tres valoraciones. La función está asignada de forma expresa cuando la ley la otorga para un objeto aplicable a los instrumentos; es parcial cuando existe con un objeto más general o depende de un reglamento. La función no existe cuando no se encontró una base legal. Con esas valoraciones se calculó un índice de capacidad legal por institución, igual a la proporción de los puntos posibles que alcanza cuando una función expresa vale dos puntos y una parcial vale uno. El índice mide facultades legales, de modo que el análisis lo complementa con el personal y las finanzas de las instituciones clave.
 
 ## Funciones legales por institución
 
-El análisis de las leyes de creación de las instituciones muestra que la AAUD es la que tiene la base legal más completa para los instrumentos de residuos. Como muestra el @tbl-capacidades, es la única institución con las funciones de regular, registrar, recaudar, controlar y monitorear asignadas de forma expresa, gracias a la Ley 51 de 2010 y a la Ley 276 de 2021 [@panama2010Ley51; @panama2021Ley276]. Le siguen el Ministerio de Economía y Finanzas (MEF), los municipios y la Autoridad de la Micro, Pequeña y Mediana Empresa (AMPYME), esta última porque administra un fondo de garantía creado por ley [@panama2000Ley33MIPYME, arts. 22-25]. El Ministerio de Ambiente tiene a su cargo la reglamentación de la Ley 502 y la plataforma de indicadores, pero no tiene un registro de productores ni un régimen de sanciones propio de la economía circular [@panama2015Ley8; @panama2025Ley502]. Las superintendencias regulan y supervisan el sistema financiero, pero no tienen la función de financiar.
+El análisis de las leyes muestra que la AAUD es la institución con la base legal más completa para los instrumentos de residuos. Como muestra el @tbl-capacidades, es la única con las funciones de regular, registrar, recaudar, controlar y monitorear asignadas de forma expresa, gracias a la Ley 51 de 2010 y a la Ley 276 de 2021 [@panama2010Ley51; @panama2021Ley276]. Le siguen el MEF, los municipios y la AMPYME, esta última porque administra un fondo de garantía creado por ley [@panama2000Ley33MIPYME, arts. 22-25]. El Ministerio de Ambiente tiene a su cargo la reglamentación de la Ley 502 y la plataforma de indicadores, pero no tiene un registro de productores ni un régimen de sanciones propio de la economía circular [@panama2015Ley8; @panama2025Ley502]. Las superintendencias regulan y supervisan el sistema financiero, pero no tienen la función de financiar.
 
 ```{r}
 #| label: tbl-capacidades
@@ -415,27 +670,116 @@ capacidades |>
 
 *Fuente: elaboración propia con base en las leyes de creación de cada institución y en las leyes de residuos, contrataciones, asociaciones público-privadas y finanzas sostenibles. "Sí" indica una función asignada de forma expresa; "Parcial", una función general, limitada o que depende de un reglamento; "No", que no se encontró una base legal. El índice es la proporción de los puntos posibles, con dos puntos por función expresa y uno por función parcial.*
 
+## Las funciones escasas
+
+Leer la matriz por columnas, en lugar de por filas, muestra qué funciones abundan en el Estado y cuáles escasean. Como muestra la @fig-cobertura, `r cob("Monitorear y reportar")` de las quince instituciones tienen de forma expresa la función de monitorear y reportar y `r cob("Controlar y sancionar")` la de controlar y sancionar, pero solo `r cob("Recaudar y administrar fondos")` pueden recaudar y administrar fondos y solo `r cob("Financiar")`, el MEF y la AMPYME, pueden financiar. El Estado panameño está mejor equipado para vigilar que para cobrar y pagar, y cobrar y pagar es justamente lo que exigen la REP, la tarifa de aseo y el crédito con garantía. La función de registrar tiene `r cob("Registrar")` instituciones con facultad expresa, pero ninguna registra a productores e importadores por los productos que ponen en el mercado; lo que registran son gestores de residuos, emisiones de valores, empresas pequeñas, proponentes de contratos o proyectos de alianza público-privada.
+
+```{r}
+#| label: fig-cobertura
+#| fig-cap: "Número de instituciones según cómo tienen asignada cada función"
+#| fig-width: 7
+#| fig-height: 3
+
+cobertura |>
+  mutate(No = 15L - instituciones_si - instituciones_parcial) |>
+  rename(`Sí, de forma expresa` = instituciones_si, Parcial = instituciones_parcial) |>
+  pivot_longer(-funcion, names_to = "valoracion", values_to = "n") |>
+  mutate(
+    funcion = factor(funcion, levels = rev(levels(capacidades$funcion))),
+    valoracion = factor(valoracion, levels = c("No", "Parcial", "Sí, de forma expresa"))
+  ) |>
+  ggplot(aes(x = n, y = funcion, fill = valoracion)) +
+  geom_col(width = 0.7, color = "white") +
+  geom_text(aes(label = if_else(n > 0, as.character(n), "")), position = position_stack(vjust = 0.5), size = 3) +
+  scale_fill_manual(values = c("No" = "#E5E5E5", "Parcial" = "#C9E3D1", "Sí, de forma expresa" = "#2E8B57")) +
+  labs(x = "Número de instituciones (de 15)", y = NULL) +
+  tema_grafico() +
+  guides(fill = guide_legend(reverse = TRUE))
+```
+
+*Fuente: elaboración propia con base en las leyes de creación de las quince instituciones revisadas.*
+
+## Medios y particularidades de las instituciones clave
+
+Las facultades dicen qué puede hacer una institución, y su personal da una idea de cuánto puede hacer. El tamaño de las instituciones es muy desigual. Como muestra el @tbl-personal, la AAUD, el MEF, el Ministerio de Ambiente y la aduana tienen entre 1.700 y 2.700 funcionarios, mientras que la DGCP, que debe fijar los criterios de economía circular para las compras de todas las entidades públicas, tiene `r pers("DGCP")`, y la Superintendencia del Mercado de Valores, que registra los bonos temáticos, tiene `r pers("SMV")`. Los instrumentos que dependen de las instituciones pequeñas tendrán que apoyarse en guías, formatos estándar y sistemas que ya existen, más que en equipos nuevos.
+
+```{r}
+#| label: tbl-personal
+#| tbl-cap: "Funcionarios de las instituciones con funciones en los instrumentos, julio de 2026"
+
+personal |>
+  transmute(Institución = institucion, Funcionarios = funcionarios) |>
+  tabla_ft_es(digitos = 0, enteros = "Funcionarios", anchos_cm = c(10.4, 7))
+```
+
+*Fuente: elaboración propia con datos de la Contraloría General [@cgr2026PlanillaJulio, cuadro 3]. Incluye funcionarios permanentes y eventuales. Los municipios y la Secretaría de APP no se reportan por separado.*
+
+La AAUD merece una atención particular, porque reúne casi todas las facultades que necesitan los instrumentos de residuos y, al mismo tiempo, arrastra las mayores dificultades financieras. Su ley de creación le permite fijar tarifas según el nivel socioeconómico de los usuarios, con subsidios cruzados y revisión cada dos años, administrar un Fondo de Aseo depositado en el Banco Nacional, cobrar por la vía coactiva y cobrar la tasa en la factura eléctrica [@panama2010Ley51, arts. 8-10, 19-21 y 30-31]. La Ley 276 le agregó la autorización de los sistemas de REP y de depósito y multas de hasta un millón de balboas [@panama2021Ley276, arts. 71-74]. Sus finanzas, sin embargo, muestran la distancia entre las facultades y su ejercicio. En 2025 recaudó B/.35,2 millones por la tasa de aseo y gastó B/.60,6 millones, y su morosidad acumulada llega a B/.118,8 millones, de los cuales B/.98 millones corresponden a usuarios residenciales [@estrella2026AAUDMorosidad]. Su presupuesto para 2026 se recortó de B/.93,3 millones solicitados a B/.66,0 millones recomendados por el MEF [@tvn2025AAUDPresupuesto2026]. Desde 2026 cobra la tasa en la factura eléctrica del distrito de San Miguelito por medio de un convenio de cinco años [@panama2026ResGabinete21], aunque los contratos de recolección que firmó en ese distrito fueron cuestionados por haberse adjudicado sin el refrendo de la Contraloría [@prensa2026AAUDSanMiguelito]. Un dato de gobernanza conecta a la AAUD con el turismo, pues la Autoridad de Turismo integra su Junta Directiva junto con los ministerios de Salud, que la preside, de Trabajo, de Vivienda y la autoridad ambiental [@panama2010Ley51, art. 11].
+
+El Ministerio de Ambiente tiene la rectoría legal y pocas herramientas propias. Reglamenta la Ley 502 y administra el Sistema Nacional de Información Ambiental, donde debe establecerse la plataforma de indicadores de economía circular. Tiene, además, jurisdicción coactiva y cinco fondos de destino específico dentro de la Cuenta Única del Tesoro, para el desarrollo forestal, las áreas protegidas, la evaluación y fiscalización ambiental, la adaptación al cambio climático y las cuencas hidrográficas [@panama2015Ley8; @panama2025Ley502, art. 11]. Ninguno de esos fondos tiene un objeto de economía circular, y la Ley 502 no crea un fondo, una unidad administrativa ni un registro de productores. Una subcuenta en uno de los fondos existentes sería la vía más corta para disponer de recursos propios.
+
+El MEF tiene las funciones que les faltan a las demás instituciones, pues recauda y fiscaliza los tributos, gestiona el crédito público y adoptó en 2024 el Marco de Financiamiento Sostenible [@panama1998Ley97; @mef2024MarcoFinanciamientoSostenible], pero la Ley 502 no le asigna ningún papel. La cadena de control de la ley de plásticos, por su parte, ofrece un modelo que ya funciona y que puede extenderse a la REP. En ella, la aduana restringe el ingreso de los plásticos prohibidos y entrega al Ministerio de Ambiente las estadísticas de importación, la Dirección General de Normas y Tecnología Industrial del MICI certifica las alternativas y ACODECO sanciona su comercio [@panama2020Ley187, art. 15; @panama2022DE9, arts. 6-13]. Esa cadena ha mostrado capacidad de control, pues ACODECO impuso 397 sanciones por la ley de bolsas entre 2019 y junio de 2026 [@estrella2026AcodecoBolsas].
+
+Los municipios son competentes para la gestión de los residuos domiciliarios y comerciales, pueden concesionar el servicio, incorporar a los recicladores y sancionar, y la AAUD actúa en ellos de forma coordinada y supletoria [@panama2018Ley33, arts. 8, 15 y 35-38]. En los distritos de Panamá y San Miguelito, que son los más poblados, el servicio está en manos de la AAUD, de modo que la capacidad municipal importa sobre todo en el resto del país, donde los municipios pueden además celebrar alianzas público-privadas de menor tamaño [@panama2019Ley93, art. 6].
+
+## Quién hace qué en cada instrumento
+
+Para quien diseña un instrumento, la pregunta útil es quién cumple cada función en ese instrumento y qué falta para que la cadena funcione. Como muestra el @tbl-cadena, en los diez instrumentos con funciones claramente asignables existe al menos una institución con facultad para cada función, y la pieza que falta es casi siempre un reglamento, un convenio o un estudio; solo la REP con sanciones propias apunta a una ley. La AAUD aparece en cinco de las diez cadenas, la del registro, la REP, el depósito, la tarifa y las alianzas público-privadas, lo que confirma que su situación financiera es el cuello de botella de todo el bloque de instrumentos de residuos.
+
+```{r}
+#| label: tbl-cadena
+#| tbl-cap: "Institución que cumple cada función en cada instrumento y pieza que falta"
+
+cadena |>
+  rename(Instrumento = instrumento, `Recaudar` = `Recaudar y administrar fondos`,
+         Controlar = `Controlar y sancionar`, Monitorear = `Monitorear y reportar`,
+         `Pieza que falta` = pieza_faltante) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(2.2, 2.2, 2, 2, 2, 2, 2, 3), lineas_tenues = TRUE, tamano = 6.5)
+```
+
+*Fuente: elaboración propia con base en la matriz de funciones y en la ruta legal de los instrumentos.*
+
 ## Fortalezas
 
-El país cuenta con cuatro fortalezas institucionales sobre las cuales construir. La primera es la propia AAUD, que reúne la fijación de tasas, un fondo propio, el cobro coactivo, el cobro en la factura eléctrica, las sanciones y el sistema de información, y que desde 2026 cobra la tasa de aseo en la factura eléctrica del distrito de San Miguelito por medio de un convenio de cinco años [@panama2026ResGabinete21]. La segunda es la cadena de control de la ley de plásticos, en la que la aduana revisa las importaciones, el MICI certifica los productos y ACODECO fiscaliza el comercio; esta última impuso 397 multas por la ley de bolsas, lo que muestra que la cadena funciona [@estrella2026AcodecoBolsas]. La tercera es el mandato expreso de la DGCP de incorporar criterios de economía circular en las compras de todas las entidades públicas [@panama2006Ley22TU, art. 40]. La cuarta es la arquitectura de finanzas sostenibles, que incluye la taxonomía, el marco soberano de financiamiento y la guía de bonos temáticos [@sbp2024TaxonomiaPanama; @mef2024MarcoFinanciamientoSostenible; @smv2025GuiaBonosTematicos].
+El país cuenta con cuatro fortalezas institucionales sobre las cuales construir. La primera es la propia AAUD, que reúne la fijación de tasas, un fondo propio, el cobro coactivo, el cobro en la factura eléctrica, las sanciones y el sistema de información. La segunda es la cadena de control de la ley de plásticos, con la aduana en la frontera, el MICI en la certificación y ACODECO en el comercio. La tercera es el mandato expreso de la DGCP de incorporar criterios de economía circular en las compras de todas las entidades públicas [@panama2006Ley22TU, art. 40]. La cuarta es la arquitectura de finanzas sostenibles, que incluye la taxonomía, el marco soberano de financiamiento y la guía de bonos temáticos [@sbp2024TaxonomiaPanama; @mef2024MarcoFinanciamientoSostenible; @smv2025GuiaBonosTematicos].
 
 ## Brechas
 
-Las brechas se concentran en la operación y en las finanzas de las instituciones, más que en sus facultades. Ninguna institución opera hoy un registro de productores para la REP. El Consejo Nacional de Economía Circular, que la Ley 502 crea para coordinar la política, no incluye al MEF, a la aduana, a ACODECO ni a la DGCP, que son piezas clave de la cadena de recaudación y control [@panama2025Ley502, art. 9]. La AAUD recauda poco más de la mitad de lo que gasta, y su presupuesto para 2026 se recortó de B/.93,3 millones solicitados a B/.66,0 millones recomendados por el MEF [@tvn2025AAUDPresupuesto2026]; además, sus contratos recientes de recolección en San Miguelito fueron cuestionados por haberse adjudicado sin el refrendo de la Contraloría [@prensa2026AAUDSanMiguelito]. Por último, la responsabilidad sobre los residuos está repartida entre el Ministerio de Salud, que tiene la rectoría técnica, la AAUD, los municipios y el Ministerio de Ambiente [@panama2021Ley276, arts. 8-16], lo que exige una coordinación explícita para evitar vacíos y duplicaciones.
+Las brechas se concentran en la operación y en las finanzas de las instituciones, más que en sus facultades. Ninguna institución opera hoy un registro de productores para la REP. El Consejo Nacional de Economía Circular, que la Ley 502 crea para coordinar la política, da voz y voto al Ministerio de Ambiente, al de Salud, al MICI y a representantes del sector privado y de organizaciones no gubernamentales, mientras que la AAUD, la AMPYME y los municipios solo tienen voz, y el MEF, la aduana, ACODECO y la DGCP no forman parte de él [@panama2025Ley502, arts. 8-9]. Así, la institución con más facultades para aplicar los instrumentos no vota en el órgano que coordina la política, y las que recaudan y controlan no participan. A ello se suman la brecha financiera de la AAUD y la dispersión de la responsabilidad sobre los residuos entre el Ministerio de Salud, que tiene la rectoría técnica, la AAUD, los municipios y el Ministerio de Ambiente [@panama2021Ley276, arts. 8-16], que exige una coordinación explícita para evitar vacíos y duplicaciones.
 
 ## Necesidades de fortalecimiento
 
-Cada una de las brechas anteriores se traduce en una acción concreta. El reglamento de la Ley 502 debería crear el registro de productores, definir qué institución recauda y cuál fiscaliza, y ampliar el Consejo para incluir al MEF y a la aduana. La AAUD necesita un plan de saneamiento financiero que separe en su contabilidad los recursos de la REP y los de la tasa de aseo, para que unos no cubran los déficits de los otros. La aduana, el MICI y el Ministerio de Ambiente necesitan convenios para intercambiar los datos de importaciones que alimentarían el registro. La DGCP puede incorporar criterios circulares por categoría de compra en el sistema PanamaCompra. Las superintendencias pueden pedir a los bancos que reporten la cartera alineada con la taxonomía, y el fondo de garantías puede abrir una ventana para proyectos circulares.
+Cada brecha se traduce en una acción concreta con un responsable y un vehículo legal. Como muestra el @tbl-necesidades, casi todas las acciones caben en resoluciones, convenios o en el reglamento de la Ley 502, que se vuelve así la pieza institucional más importante de los próximos meses. Como la composición del Consejo está fijada en la ley, el reglamento no puede cambiarla, pero sí puede crear una comisión técnica en la que participen de forma permanente el MEF, la aduana, ACODECO y la DGCP.
 
-# Sistema financiero nacional
+```{r}
+#| label: tbl-necesidades
+#| tbl-cap: "Brechas institucionales y acciones de fortalecimiento"
+
+tribble(
+  ~Brecha, ~Acción, ~Responsable, ~Vehículo,
+  "No existe un registro de productores e importadores", "Crear el registro en el reglamento de la Ley 502, alimentado con los datos de importación de la aduana", "Ministerio de Ambiente y AAUD", "Decreto ejecutivo y convenio de datos",
+  "El Consejo no incluye a quienes recaudan y controlan", "Crear una comisión técnica de financiamiento y control con el MEF, la aduana, ACODECO y la DGCP", "Ministerio de Ambiente", "Reglamento de la Ley 502",
+  "La AAUD gasta más de lo que recauda", "Plan de saneamiento financiero, tarifa escalonada y separación contable de los recursos de la REP y de la tasa", "AAUD y MEF", "Resolución de la Junta Directiva",
+  "El Ministerio de Ambiente no tiene recursos propios de economía circular", "Subcuenta de economía circular en un fondo existente y una unidad técnica a cargo", "Ministerio de Ambiente", "Resolución ministerial; ley para un fondo nuevo",
+  "Las compras públicas no tienen criterios circulares", "Criterios por categoría en los convenios marco y una etiqueta en PanamaCompra para medirlos", "DGCP", "Resolución",
+  "La cartera circular de la banca no se mide", "Reporte progresivo de la cartera alineada con la taxonomía", "Superintendencia de Bancos", "Acuerdo de la Superintendencia"
+) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(4, 6, 3.4, 4), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia.*
+
+# Sistema financiero nacional {#sec-financiero}
+
+El análisis del sistema financiero busca responder tres preguntas, que son hacia dónde se dirige hoy el crédito, qué reglas existen para reconocer una inversión como circular y qué financia el mercado de valores con etiquetas verdes o sostenibles. Para la primera se usó el informe de actividad bancaria de septiembre de 2026 de la Superintendencia de Bancos, que publica la cartera de crédito local por sector económico. Esos sectores no coinciden con las actividades de las cuentas nacionales, pero varios pueden asociarse a un sector de política, de modo que la agricultura, la ganadería y la pesca con agricultura y alimentos, la industria con industrias y la construcción con ciudades y construcción. Después se comparó la participación de cada sector en el crédito con su participación en el valor agregado de 2024. Para la segunda pregunta se revisaron la taxonomía de finanzas sostenibles, la guía de la Superintendencia para su uso por los bancos, el marco soberano del MEF y la evaluación del sector financiero del Banco Mundial. Para la tercera se clasificaron las series temáticas vigentes en la Bolsa Latinoamericana de Valores (Latinex) según su relación con la economía circular, que es directa cuando el negocio del emisor es el reciclaje, parcial cuando el uso de los fondos incluye una categoría de prevención de la contaminación o de economía circular, y nula en los demás casos.
 
 ## Tamaño y orientación del crédito
 
-El sistema bancario panameño es grande para el tamaño de su economía, pero su crédito local se dirige sobre todo a los hogares y al comercio. A septiembre de 2026 operaban 64 bancos, y la cartera de crédito local del sistema bancario nacional sumaba `r formato_es(total_cartera, 0)` millones de dólares [@sbp2026IAB092026]. Como muestra el @tbl-cartera, el crédito hipotecario representa `r formato_es(part_cartera("Hipotecario"), 0)` % de esa cartera, el consumo personal `r formato_es(part_cartera("Consumo personal"), 0)` % y el comercio `r formato_es(part_cartera("Comercio"), 0)` %. La industria y la construcción, que son los sectores más ligados a los flujos de materiales, perdieron saldo en el último año.
+El sistema bancario panameño tiene recursos de sobra, y la pregunta relevante es hacia dónde los dirige. A septiembre de 2026 operaban 64 bancos, con activos por más de 171.800 millones de dólares, una liquidez legal de 54 %, frente a un mínimo de 30 %, y, a junio, un índice de adecuación de capital de 15,7 %, casi el doble del mínimo de 8 % [@sbp2026IAB092026]. La cartera de crédito local al sector privado sumaba `r formato_es(total_cartera, 0)` millones de dólares. Como muestra el @tbl-cartera, el crédito hipotecario representa `r formato_es(part_cartera("Hipotecario"), 0)` % de esa cartera, el consumo personal `r formato_es(part_cartera("Consumo personal"), 0)` % y el comercio `r formato_es(part_cartera("Comercio"), 0)` %. La industria y la construcción, que son los sectores más ligados a los flujos de materiales, perdieron saldo en el último año, `r formato_es(-var_sbp("Industria"), 0)` % y `r formato_es(-var_sbp("Construcción"), 0)` % respectivamente.
 
 ```{r}
 #| label: tbl-cartera
-#| tbl-cap: "Cartera de crédito local del sistema bancario nacional por sector económico (millones de dólares)"
+#| tbl-cap: "Cartera de crédito local al sector privado por sector económico (millones de dólares)"
 
 cartera |>
   select(fecha, sector_sbp, saldo_musd) |>
@@ -450,36 +794,42 @@ cartera |>
   tabla_ft_es(digitos = 1, enteros = c("Septiembre 2025", "Septiembre 2026"), anchos_cm = c(5.4, 3, 3, 3, 3))
 ```
 
-*Fuente: elaboración propia con datos de la Superintendencia de Bancos [@sbp2026IAB092026, cuadro 3].*
+*Fuente: elaboración propia con datos de la Superintendencia de Bancos [@sbp2026IAB092026, cuadro 3]. No incluye el crédito al sector público.*
 
-Una manera de ver si un sector recibe poco o mucho crédito es comparar su participación en la cartera con su participación en la producción del país. Si un sector produce 10 % del valor agregado pero recibe solo 5 % del crédito, el cociente entre ambas participaciones es 0,5, y el sector recibe la mitad del crédito que le correspondería por su tamaño. Como muestra el @tbl-credito-vab, agricultura y alimentos recibe `r formato_es(cvab("Agricultura y alimentos"), 1)` veces y ciudades y construcción `r formato_es(cvab("Ciudades y construcción"), 1)` veces lo que les correspondería por su peso en el valor agregado, mientras que industrias recibe `r formato_es(cvab("Industrias"), 1)` veces. La Superintendencia no publica una línea de crédito específica para hoteles y restaurantes, de modo que el crédito al turismo no puede medirse con las estadísticas bancarias.
+Una manera de ver si un sector recibe poco o mucho crédito es comparar su participación en la cartera con su participación en la producción del país. Si un sector produce 10 % del valor agregado pero recibe solo 5 % del crédito, el cociente entre ambas participaciones es 0,5, y el sector recibe la mitad del crédito que le correspondería por su tamaño. Como muestra la @fig-credito-vab, industrias recibe `r formato_es(cvab("Industrias"), 1)` veces lo que le correspondería por su peso en el valor agregado, mientras que agricultura y alimentos recibe `r formato_es(cvab("Agricultura y alimentos"), 1)` veces y ciudades y construcción apenas `r formato_es(cvab("Ciudades y construcción"), 1)` veces. El contraste es útil para diseñar instrumentos. La industria ya es cliente habitual de la banca, de modo que sus proyectos de reciclaje y de ecodiseño pueden financiarse por las relaciones de crédito que ya tiene si existen criterios para reconocerlos. La construcción, que genera más de un millón de toneladas de residuos de obra al año, es en cambio el sector con menos crédito en relación con su tamaño, y es donde las compras públicas y las garantías pueden hacer más diferencia. La Superintendencia no publica una línea de crédito específica para hoteles y restaurantes, de modo que el crédito al turismo no puede medirse con las estadísticas bancarias.
 
 ```{r}
-#| label: tbl-credito-vab
-#| tbl-cap: "Participación en el crédito local (2026) y en el valor agregado (2024) por sector de política"
+#| label: fig-credito-vab
+#| fig-cap: "Participación en el crédito local (2026) dividida entre la participación en el valor agregado (2024), por sector de política"
+#| fig-width: 7
+#| fig-height: 2.8
 
 cartera_pol |>
-  transmute(
-    `Sector de política` = sector_principal,
-    `Crédito (millones de US$)` = saldo_musd,
-    `Participación en el crédito (%)` = participacion_credito,
-    `Participación en el valor agregado (%)` = participacion_vab,
-    `Crédito sobre valor agregado` = credito_sobre_vab
-  ) |>
-  tabla_ft_es(digitos = 1, enteros = "Crédito (millones de US$)", anchos_cm = c(4.6, 3.2, 3.2, 3.2, 3.2))
+  mutate(sector_principal = factor(sector_principal, levels = rev(sectores_politica))) |>
+  ggplot(aes(x = credito_sobre_vab, y = sector_principal, fill = sector_principal)) +
+  geom_col(width = 0.6) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "gray40") +
+  geom_text(aes(label = formato_es(credito_sobre_vab, 2)), hjust = -0.2, size = 3) +
+  annotate("text", x = 1.03, y = 4.45, label = "Crédito proporcional a su tamaño", hjust = 0, size = 2.7, color = "gray40") +
+  scale_fill_manual(values = colores_sector, guide = "none") +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(x = "Cociente entre participaciones", y = NULL) +
+  tema_grafico()
 ```
 
-*Fuente: elaboración propia con datos de la Superintendencia de Bancos [@sbp2026IAB092026] y del INEC [@inec2026cou]. Agricultura y alimentos incluye el crédito a la agricultura, la ganadería y la pesca; industrias, el crédito a la industria; ciudades y construcción, el crédito a la construcción. El resto de la economía incluye hipotecas, consumo, comercio, finanzas y minas.*
+*Fuente: elaboración propia con datos de la Superintendencia de Bancos [@sbp2026IAB092026] y del INEC [@inec2026cou]. Agricultura y alimentos incluye el crédito a la agricultura, la ganadería y la pesca; industrias, el crédito a la industria; ciudades y construcción, el crédito a la construcción. El resto de la economía incluye hipotecas, consumo, comercio, finanzas y minas. Los demás sectores de política no tienen una línea propia en las estadísticas bancarias.*
 
 ## Finanzas sostenibles
 
-Las finanzas sostenibles son el conjunto de reglas y productos que permiten a bancos e inversionistas identificar y financiar actividades con beneficios ambientales o sociales. La pieza central es la taxonomía, que es una lista de actividades económicas con criterios técnicos que indican cuándo una actividad contribuye de forma sustancial a un objetivo ambiental, de modo que un banco pueda llamar verde a un crédito con fundamento. Panamá adoptó su Taxonomía de Finanzas Sostenibles en 2024 e incluyó la transición hacia una economía circular entre sus objetivos [@sbp2024TaxonomiaPanama], pero todavía no tiene criterios técnicos para ese objetivo. Por eso, la guía para bancos indica que las operaciones circulares deben marcarse como contingentes hasta que una edición posterior fije los criterios [@sbp2025GuiaTFSBancos]. En el ejercicio piloto de la taxonomía con siete bancos, 99 % de la cartera que calificaba contribuía a la mitigación del cambio climático, en energía, transporte y construcción [@sbp2025GuiaTFSBancos]. La Superintendencia de Bancos regula además el riesgo climático y ambiental de los bancos desde el Acuerdo 11-2022 [@sbp2022Acuerdo11], y el Banco Mundial recomendó introducir por etapas el reporte de la cartera según la taxonomía [@bm2023FSAPClimaPanama].
+Las finanzas sostenibles son el conjunto de reglas y productos que permiten a bancos e inversionistas identificar y financiar actividades con beneficios ambientales o sociales. La pieza central es la taxonomía, que es una lista de actividades económicas con criterios técnicos que indican cuándo una actividad contribuye de forma sustancial a un objetivo ambiental, de modo que un banco pueda llamar verde a un crédito con fundamento. Panamá adoptó su Taxonomía de Finanzas Sostenibles en 2024, con siete objetivos ambientales y once sectores, e incluyó la transición hacia una economía circular entre sus objetivos [@sbp2024TaxonomiaPanama]. En esta primera edición, sin embargo, los criterios de contribución sustancial solo se definieron para la mitigación del cambio climático y la adaptación a él, y para la economía circular solo hay requisitos de no causar daño significativo [@sbp2024TaxonomiaPanama, pp. 43-44]. Por eso, la guía para bancos indica que las operaciones circulares deben marcarse como contingentes hasta que una edición posterior fije los criterios [@sbp2025GuiaTFSBancos]. En la práctica, hoy ningún crédito o bono puede presentarse como alineado con la taxonomía por su contribución a la economía circular.
 
-El Estado también tiene su propio marco. El Marco de Financiamiento Sostenible de la República establece en qué tipos de proyectos puede usar el dinero de un bono soberano verde o sostenible, e incluye una categoría de prevención y control de la contaminación con procesos de economía circular; una evaluación independiente lo calificó de forma favorable [@mef2024MarcoFinanciamientoSostenible; @sustainablefitch2024SPOPanama]. Hasta ahora no se ha emitido un bono soberano temático bajo ese marco.
+El ejercicio piloto de la taxonomía con siete bancos confirma ese sesgo. La cartera que esos bancos marcaban como verde equivalía a 13 % de su cartera total, y 99 % de la que resultó elegible contribuía a la mitigación del cambio climático, en energía, transporte y construcción [@sbp2025GuiaTFSBancos]. La taxonomía vigente ya contiene, no obstante, el punto de partida para los criterios circulares, pues sus requisitos para la gestión de residuos incluyen la recolección segregada, el compostaje y el aprovechamiento de residuos como materia prima, y los de la construcción exigen reutilizar o reciclar al menos 20 % de los desechos de obra [@sbp2024TaxonomiaPanama, pp. 90, 93 y 100]. La Superintendencia de Bancos regula además el riesgo climático y ambiental de los bancos desde el Acuerdo 11-2022 [@sbp2022Acuerdo11], y el Banco Mundial recomendó introducir por etapas el reporte de la cartera según la taxonomía [@bm2023FSAPClimaPanama].
+
+El Estado también tiene su propio marco. El Marco de Financiamiento Sostenible de la República establece en qué tipos de proyectos puede usar el dinero de un bono soberano verde o sostenible, e incluye una categoría de prevención y control de la contaminación con procesos de economía circular, que abarca el reciclaje, la reutilización, la reparación y el reacondicionamiento de residuos; una evaluación independiente lo calificó de forma favorable [@mef2024MarcoFinanciamientoSostenible; @sustainablefitch2024SPOPanama]. El marco solo puede financiar inversión pública incluida en el presupuesto. Hasta ahora no se ha emitido un bono soberano temático bajo ese marco, y la estrategia de deuda de mediano plazo 2025-2029 no menciona los bonos temáticos [@mef2025EstrategiaDeuda].
 
 ## Mercado de valores
 
-Los bonos temáticos son títulos de deuda cuyos fondos se destinan a proyectos con beneficios ambientales o sociales, y llevan etiquetas como verde, social o sostenible. El mercado local de estos bonos es pequeño y se concentra en la energía. Como muestra el @tbl-tematicos, las series temáticas vigentes en la Bolsa Latinoamericana de Valores suman `r formato_es(monto_tem, 1)` millones de dólares, la mayoría con etiqueta verde, de emisores que financian energía renovable, edificios y eficiencia energética [@latinex2026EmisionesSostenibles]. La única emisora cuyo negocio es directamente circular es una empresa de reciclaje de metales y residuos electrónicos, que registró en 2026 un programa de bonos verdes [@bgmetal2026SuplementoSerieI]. Ese caso muestra que el mercado puede financiar a empresas de reciclaje de tamaño mediano cuando estas se preparan para emitir.
+Los bonos temáticos son títulos de deuda cuyos fondos se destinan a proyectos con beneficios ambientales o sociales, y llevan etiquetas como verde, social o sostenible. El mercado local de estos bonos es pequeño y se concentra en la energía. Como muestra el @tbl-tematicos, las series temáticas vigentes en Latinex suman `r formato_es(monto_tem, 1)` millones de dólares de `r n_emisores` emisores, la mayoría con etiqueta verde, que financian energía renovable, edificios y eficiencia energética [@latinex2026EmisionesSostenibles].
 
 ```{r}
 #| label: tbl-tematicos
@@ -492,9 +842,38 @@ tematicos_res |>
 
 *Fuente: elaboración propia con datos de Latinex [@latinex2026EmisionesSostenibles]. Series vigentes a noviembre de 2026; algunas financian proyectos fuera de Panamá.*
 
+Al clasificar las series por su relación con la economía circular aparece un caso que muestra el camino. Como muestra la @fig-tematicos, la única emisora cuyo negocio es directamente circular es una empresa de reciclaje de metales y residuos electrónicos, que registró en 2026 un programa de bonos verdes de hasta 30 millones de dólares [@bgmetal2026SuplementoSerieI] y tiene `r n_circ` series vigentes por `r formato_es(monto_circ, 1)` millones. Sus series son pequeñas, de medio millón a 3,5 millones de dólares, frente a los 125 millones de un parque eólico. Ese caso muestra que el mercado puede financiar a empresas de reciclaje de tamaño mediano por medio de emisiones pequeñas y repetidas, siempre que estas se preparen para emitir y cubran el costo de la revisión externa que exige la etiqueta verde.
+
+```{r}
+#| label: fig-tematicos
+#| fig-cap: "Monto de las series temáticas vigentes en Latinex por emisor y relación con la economía circular, 2026 (millones de dólares)"
+#| fig-width: 7
+#| fig-height: 3.6
+
+tematicos |>
+  mutate(relacion = case_when(
+    str_starts(relacion_economia_circular, "Directa") ~ "Directa",
+    str_starts(relacion_economia_circular, "Parcial") ~ "Parcial",
+    TRUE ~ "Ninguna explícita"
+  )) |>
+  summarize(monto = sum(monto_serie_usd, na.rm = TRUE) / 1e6, series = n(), .by = c(emisor, relacion)) |>
+  mutate(emisor = emisor_corto(emisor), emisor = fct_reorder(emisor, monto),
+         relacion = factor(relacion, levels = c("Directa", "Parcial", "Ninguna explícita"))) |>
+  ggplot(aes(x = monto, y = emisor, fill = relacion)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = paste0(formato_es(monto, 1), " (", series, if_else(series == 1, " serie)", " series)"))),
+            hjust = -0.08, size = 2.7) +
+  scale_fill_manual(values = c("Directa" = "#8C564B", "Parcial" = "#D2B48C", "Ninguna explícita" = "#C8C8C8")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.3))) +
+  labs(x = "Millones de dólares", y = NULL) +
+  tema_grafico()
+```
+
+*Fuente: elaboración propia con datos de Latinex [@latinex2026EmisionesSostenibles]. La relación es directa cuando el negocio del emisor es el reciclaje y parcial cuando el uso de los fondos incluye una categoría de prevención de la contaminación o de economía circular.*
+
 ## Actores y mecanismos
 
-El sistema financiero tiene los actores necesarios para canalizar recursos a la economía circular, pero ninguno de ellos tiene un mandato de desarrollo. Como muestra el @tbl-actores, la regulación está a cargo de tres superintendencias, el financiamiento público pasa por el MEF y la banca pública, y los recursos en condiciones favorables llegan por medio de la banca multilateral. Panamá usa el dólar como moneda y no tiene un banco central ni una banca de desarrollo que otorgue crédito dirigido, de modo que los programas públicos de financiamiento operan por medio de fideicomisos con recursos multilaterales. El ejemplo principal es el Fondo de Garantías de Panamá, que administra el Banco Nacional con recursos del Banco Interamericano de Desarrollo (BID) y que la Superintendencia reconoce como mitigante del riesgo de crédito [@sbp2025Acuerdo8]. Los inversionistas institucionales son pequeños y conservadores, pues el Fondo de Ahorro de Panamá no tiene mandato de inversión en el país [@fap2026InformeAnual2025] y el sistema de ahorro de los servidores públicos invierte sobre todo en deuda pública y depósitos bancarios [@siacap2025ResumenSep].
+El sistema financiero tiene los actores necesarios para canalizar recursos a la economía circular, pero ninguno de ellos tiene un mandato de desarrollo. Como muestra el @tbl-actores, la regulación está a cargo de tres superintendencias, el financiamiento público pasa por el MEF y la banca pública, y los recursos en condiciones favorables llegan por medio de la banca multilateral.
 
 ```{r}
 #| label: tbl-actores
@@ -507,21 +886,45 @@ actores |>
 
 *Fuente: elaboración propia con base en la Superintendencia de Bancos, la Superintendencia del Mercado de Valores, el MEF, el Banco Mundial y los informes de los actores.*
 
+La ausencia de un banco de desarrollo tiene una causa estructural. Panamá usa el dólar como moneda y no tiene un banco central ni una banca de desarrollo que otorgue crédito dirigido, de modo que los programas públicos de financiamiento operan por medio de fideicomisos con recursos multilaterales. El ejemplo principal es el Fondo de Garantías de Panamá, creado con un préstamo de 150 millones de dólares del Banco Interamericano de Desarrollo (BID), que administra el Banco Nacional como fiduciario para las micro, pequeñas y medianas empresas del agro, el comercio y los servicios y que la Superintendencia reconoce como mitigante del riesgo de crédito al calcular las provisiones de los bancos [@sbp2025Acuerdo8]. Ese reconocimiento es importante para la economía circular, porque un crédito garantizado por el fondo le cuesta menos capital al banco, y el fondo todavía no tiene una ventana para proyectos circulares. La banca privada también recibe líneas multilaterales, como la de hasta 100 millones de dólares que BID Invest otorgó a un banco local para su cartera verde, aunque sin mención a la economía circular [@idbinvest2023GlobalBank]. La Ley 502 enuncia el acceso al financiamiento como una de sus finalidades, pero no crea un fondo, una garantía ni un incentivo financiero propio [@panama2025Ley502, art. 2].
+
+Los inversionistas institucionales son pequeños y conservadores. El Fondo de Ahorro de Panamá no tiene mandato de inversión en el país [@fap2026InformeAnual2025], y el sistema de ahorro de los servidores públicos invierte sobre todo en deuda pública y depósitos bancarios [@siacap2025ResumenSep]. En el corto plazo, por tanto, el financiamiento de la economía circular dependerá de la banca comercial, del mercado de bonos y de los recursos multilaterales, más que del ahorro institucional.
+
 ## Oportunidades
 
-El análisis identifica cinco oportunidades para llevar recursos hacia la economía circular con los mecanismos que ya existen. La primera es una segunda edición de la taxonomía con criterios de contribución sustancial para la gestión de residuos, el reciclaje, la construcción y la manufactura, que puede partir de los requisitos que la edición vigente ya contiene para esas actividades. La segunda es abrir una ventana de economía circular en el Fondo de Garantías de Panamá para recicladores, gestores de residuos y pequeñas empresas, incluidas las turísticas, aprovechando que la Superintendencia ya lo reconoce como mitigante de riesgo. La tercera es usar la categoría circular del marco soberano para financiar inversión pública en valorización de residuos y tratamiento de agua. La cuarta es la asociación público-privada de residuos de Panamá y San Miguelito, que puede servir como proyecto ancla para combinar recursos del BID, de bancos locales y de bonos en la bolsa [@bid2024TdRResiduosAPP]. La quinta es replicar el caso de la empresa de reciclaje que emite bonos verdes, con apoyo para cubrir los costos de la revisión externa, y orientar hacia carteras circulares líneas de la banca multilateral como la que BID Invest otorgó a un banco local para su cartera verde [@idbinvest2023GlobalBank].
+El análisis identifica cinco oportunidades para llevar recursos hacia la economía circular con los mecanismos que ya existen, y todas pueden activarse sin una ley nueva. Como muestra el @tbl-oportunidades, cada una tiene un responsable claro y un primer paso concreto. La segunda edición de la taxonomía es la más importante de las cinco, porque sin criterios circulares las otras cuatro no pueden etiquetarse ni medirse.
+
+```{r}
+#| label: tbl-oportunidades
+#| tbl-cap: "Oportunidades para movilizar recursos hacia la economía circular"
+
+tribble(
+  ~Oportunidad, ~`Quién la activa`, ~Vehículo, ~`Primer paso`, ~`Sectores de política`,
+  "Criterios circulares en la taxonomía", "Superintendencias con el Ministerio de Ambiente y el MEF", "Segunda edición técnica", "Partir de los requisitos de residuos, construcción y manufactura de la edición vigente", "Todos",
+  "Ventana circular en el Fondo de Garantías", "MEF, Banco Nacional y BID", "Reglamento del fideicomiso", "Cobertura o prima preferente para recicladores, gestores y pymes con un plan circular", "Residuos, industrias, agricultura y alimentos, turismo",
+  "Categoría circular del marco soberano", "MEF (Crédito Público)", "Resolución MEF-RES-2024-1529, vigente", "Identificar la inversión pública presupuestada en valorización de residuos y en agua", "Residuos, recursos hídricos",
+  "Proyecto ancla de residuos", "AAUD, MEF, Secretaría de APP y municipios", "Ley 93 de 2019", "Completar la prefactibilidad con el BID y fijar la tasa que pagará el servicio", "Residuos",
+  "Bonos verdes de empresas de reciclaje", "Superintendencia del Mercado de Valores, Latinex y emisores", "Guía de bonos temáticos", "Apoyo para el costo de la revisión externa e indicadores circulares", "Residuos, industrias"
+) |>
+  tabla_ft_es(digitos = 0, anchos_cm = c(3.2, 3.4, 3, 4.8, 3), lineas_tenues = TRUE, tamano = 7)
+```
+
+*Fuente: elaboración propia.*
+
+La primera oportunidad es una segunda edición de la taxonomía con criterios de contribución sustancial para la gestión de residuos, el reciclaje, la construcción y la manufactura, que puede partir de los requisitos que la edición vigente ya contiene para esas actividades. La segunda es abrir una ventana de economía circular en el Fondo de Garantías de Panamá para recicladores, gestores de residuos y pequeñas empresas, incluidas las turísticas, aprovechando que la Superintendencia ya lo reconoce como mitigante de riesgo. La tercera es usar la categoría circular del marco soberano para financiar inversión pública en valorización de residuos y tratamiento de agua. La cuarta es la asociación público-privada de residuos de Panamá y San Miguelito, que puede servir como proyecto ancla para combinar recursos del BID, de bancos locales y de bonos en la bolsa [@bid2024TdRResiduosAPP]. La quinta es replicar el caso de la empresa de reciclaje que emite bonos verdes, con apoyo para cubrir los costos de la revisión externa, y orientar hacia carteras circulares líneas de la banca multilateral como la que BID Invest otorgó a un banco local.
 
 # Conclusiones
 
-La evaluación permite extraer siete conclusiones.
+La evaluación permite extraer ocho conclusiones.
 
-1. Panamá tiene en leyes vigentes casi todas las facultades que requieren los instrumentos propuestos, en particular en la Ley 276 de 2021, que hace de la AAUD la autoridad de la REP y del depósito y retorno. Lo que falta son los reglamentos que las pongan en operación.
-2. Los instrumentos del primer paso son los más factibles, y su orden se mantiene con cualquier ponderación razonable de los criterios. El registro de productores e importadores es la pieza que habilita a los demás y puede construirse sobre los datos de la aduana y la plataforma de indicadores de la Ley 502.
-3. La REP y el depósito pueden empezar con resoluciones de la AAUD, pero una ley de REP con metas y sanciones les daría una base más sólida, como recomienda la Hoja de Ruta de plásticos.
-4. Los efectos de los cargos sobre los precios son pequeños, pues ningún escenario eleva la canasta de los hogares en más de un cuarto de punto porcentual, y se concentran en agricultura y alimentos, industrias y turismo.
-5. La AAUD necesita sanear sus finanzas antes de asumir nuevas funciones, y la tarifa a costo real escalonada por nivel socioeconómico es la herramienta que la ley ya le da para hacerlo.
-6. El sistema financiero tiene la arquitectura de finanzas sostenibles, pero todavía no reconoce ni financia la economía circular. La taxonomía, el fondo de garantías y el marco soberano son las palancas inmediatas.
-7. El turismo se beneficiaría sobre todo del crédito con garantía, de la certificación y de su participación en las tarifas por cantidad de residuos y en el depósito de envases, y tiene en la recaudación del hospedaje y en las tasas municipales por visitante dos fuentes posibles para financiar la gestión de residuos en los destinos.
+1. Panamá tiene en leyes vigentes casi todas las facultades que requieren los instrumentos propuestos, en particular en la Ley 276 de 2021, que hace de la AAUD la autoridad de la REP y del depósito y retorno. Lo que falta son los reglamentos que las pongan en operación, y doce de los catorce instrumentos pueden iniciar sin una ley nueva.
+2. Las restricciones del país están en los datos, en los plazos y en la operación de las instituciones. Ningún instrumento encuentra hoy toda la información técnica que necesita, y la carencia más repetida es saber cuánto ponen en el mercado los productores e importadores.
+3. Los instrumentos del primer paso son los más factibles, y su orden se mantiene con cualquier ponderación razonable de los criterios. El registro de productores e importadores es la pieza que habilita a los demás y puede construirse sobre los datos de la aduana y la plataforma de indicadores de la Ley 502.
+4. Existe una disyuntiva entre impacto y facilidad. Los instrumentos con más impacto, como la REP y el depósito, se financian solos, pero son los más lentos y los que más resistencia enfrentan; esa disyuntiva justifica la secuencia en dos pasos. La REP y el depósito pueden empezar con resoluciones de la AAUD, y una ley de REP con metas y sanciones les daría una base más sólida, como recomienda la Hoja de Ruta de plásticos.
+5. Los efectos de los cargos sobre los precios son pequeños, pues ningún escenario eleva la canasta de los hogares en más de un cuarto de punto porcentual, y se concentran en agricultura y alimentos, industrias y turismo. Cobrar la REP por tonelada de envase, en lugar de sobre el valor de la producción, evita gravar insumos que no llevan envase.
+6. El Estado está mejor equipado para vigilar que para cobrar y pagar. La AAUD necesita sanear sus finanzas antes de asumir nuevas funciones, y la tarifa a costo real escalonada por nivel socioeconómico es la herramienta que la ley ya le da para hacerlo. El reglamento de la Ley 502 es la ocasión para crear el registro y sumar al MEF, la aduana, ACODECO y la DGCP a la coordinación.
+7. El sistema financiero tiene recursos y la arquitectura de finanzas sostenibles, pero todavía no reconoce ni financia la economía circular. La taxonomía, el fondo de garantías y el marco soberano son las palancas inmediatas.
+8. El turismo se beneficiaría sobre todo del crédito con garantía, de la certificación y de su participación en las tarifas por cantidad de residuos y en el depósito de envases, y tiene en la recaudación del hospedaje y en las tasas municipales por visitante dos fuentes posibles para financiar la gestión de residuos en los destinos.
 
 Estas conclusiones son la base para diseñar en detalle los instrumentos, con sus responsables, plazos, fuentes de financiamiento, reformas normativas e indicadores de seguimiento, en una Hoja de Ruta Nacional para el Financiamiento de la Economía Circular.
 
