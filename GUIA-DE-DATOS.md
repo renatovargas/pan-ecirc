@@ -91,6 +91,55 @@ En los `.rds`, `sector_principal` es un factor con este orden; en los `.xlsx` es
 
 - `mapeo_sectores_scn` (c01): las 80 actividades con su sector principal, sectores secundarios, tipo de vínculo, código de la matriz insumo-producto y la evidencia de la asignación. Es la llave para unir cualquier dato por actividad con los sectores.
 
+## Hallazgos y conclusiones de los documentos
+
+Los datos cuentan la mitad de la historia; la interpretación está en tres documentos que se leen en este orden. Cada uno se publica en el sitio y se descarga en Word desde la misma carpeta (`<nombre>.docx`). Para un resumen rápido, lo mejor es leer el **Resumen ejecutivo** (al inicio) y las **Conclusiones** (al final) de cada documento.
+
+| Documento | Pregunta que responde | Dirección |
+|---|---|---|
+| Sectores económicos priorizados | Cómo son los siete sectores de política y qué instrumentos proponer | <https://renatovargas.github.io/pan-ecirc/materiales/documentos/a1c-sectores-economicos-priorizados/> |
+| Factibilidad de los instrumentos y capacidades | Si los catorce instrumentos son aplicables, cuánto suben los precios, qué instituciones pueden aplicarlos y qué financia hoy el sistema financiero | <https://renatovargas.github.io/pan-ecirc/materiales/documentos/a2-factibilidad-capacidades/> |
+| Hoja de Ruta Nacional para el Financiamiento de la Economía Circular | Cómo, cuándo, con quién y con qué dinero aplicar los instrumentos entre 2027 y 2030 | <https://renatovargas.github.io/pan-ecirc/materiales/documentos/a3-hoja-de-ruta/> |
+
+El método general está en el documento de metodología (`materiales/documentos/a1a-metodologia/`). Cada documento tiene una presentación con los mismos mensajes en versión corta, en `slides/` (web y PowerPoint), enlazada desde <https://renatovargas.github.io/pan-ecirc/materiales/>.
+
+### Sectores económicos priorizados
+
+Secciones clave: "Síntesis por sector de política", "Instrumentos de política pública que pueden promover la circularidad en Panamá" y "Conclusiones y pasos siguientes".
+
+- Los sectores con más empleo (agricultura y alimentos, construcción, industrias) tienen alta informalidad, así que la formalización es una condición previa para recaudar o incentivar.
+- Residuos es pequeño en las cuentas nacionales, pero tiene la mayor intensidad de emisiones entre los sectores de política con categoría propia y gestiona los flujos de material de toda la economía; su cadena de recuperación está atomizada y se mide mal.
+- Industrias y agricultura y alimentos tienen saldos comerciales negativos, de modo que quienes deberán cumplir una REP serán en buena parte importadores, lo que hace indispensable un registro de importadores y productores.
+- Los encadenamientos hacia atrás más altos están en agricultura y alimentos, turismo e industrias, por lo que los instrumentos en esos sectores arrastran a los proveedores nacionales.
+- El turismo es el mayor exportador entre los sectores, emplea mayoritariamente a mujeres y opera con microempresas, así que sus instrumentos deben ser simples y combinarse con crédito y certificación.
+- La información faltante (residuos, recicladores, inversión) es un hallazgo en sí misma.
+- Los catorce instrumentos se ordenan en dos pasos: primero los que crean condiciones (registro, formalización de recicladores, información, financiamiento y compras públicas) y después los que imponen metas o cargos (REP con ecomodulación, depósito y retorno, tarifas y contenido reciclado).
+
+### Factibilidad de los instrumentos y capacidades
+
+Secciones clave: "Del puntaje por criterio al orden de prioridad", "La disyuntiva entre impacto y facilidad", "Instrumentos que operan como cargo", "Quién hace qué en cada instrumento", "Oportunidades" y "Conclusiones".
+
+- Panamá ya tiene en leyes vigentes casi todas las facultades necesarias, en especial la Ley 276 de 2021, que hace de la Autoridad de Aseo Urbano y Domiciliario (AAUD) la autoridad de la REP y del depósito y retorno. Faltan los reglamentos, y doce de los catorce instrumentos pueden iniciar sin una ley nueva.
+- Las restricciones están en los datos, los plazos y la operación de las instituciones; la carencia más repetida es no saber cuánto ponen en el mercado los productores e importadores.
+- Los instrumentos del primer paso son los más factibles, y ese orden resiste cualquier ponderación razonable de los criterios. El registro de productores e importadores encabeza la lista.
+- Hay una disyuntiva entre impacto y facilidad: la REP y el depósito tienen más impacto y se financian solos, pero son los más lentos y los que más resistencia enfrentan. Esa disyuntiva justifica la secuencia en dos pasos.
+- Los cargos tienen efectos pequeños en los precios: ningún escenario eleva la canasta de los hogares en más de un cuarto de punto porcentual. Cobrar la REP por tonelada de envase evita gravar insumos que no llevan envase.
+- El Estado está mejor equipado para vigilar que para cobrar y pagar. La AAUD tiene todas las funciones legales, pero gasta más de lo que recauda.
+- El sistema financiero tiene recursos y reglas de finanzas sostenibles, pero todavía no reconoce ni financia la economía circular: de los bonos temáticos vigentes en la bolsa local, una sola emisora financia reciclaje. La taxonomía, el Fondo de Garantías y el marco soberano son las palancas inmediatas.
+
+### Hoja de Ruta
+
+Secciones clave: "Resumen ejecutivo", "Dos pasos y tres cadenas", "Cronograma y calendario de hitos", "Fuentes de financiamiento", "Reformas normativas e institucionales", "Indicadores de seguimiento" y "Conclusiones".
+
+- Tres decisiones de diseño: usar las instituciones y leyes que ya existen, empezar por el registro de productores e importadores alimentado por las declaraciones de aduana, y financiar los instrumentos sobre todo con aportes de quienes ponen productos en el mercado y de quienes usan el servicio de aseo.
+- Primer paso (2027): siete instrumentos que solo requieren reglamentos y resoluciones (registro de productores, registro de recicladores, tarifa de aseo a costo real escalonada, reglamento de los incentivos fiscales vigentes, compras públicas circulares, una ventana circular en el Fondo de Garantías y formación y certificación).
+- Segundo paso (2028-2030): REP de envases con metas de valorización de 10 % a 45 % en diez años, depósito y retorno de envases de bebidas, contenido reciclado, segunda edición de la taxonomía, una emisión soberana temática, la asociación público-privada de residuos de Panamá y San Miguelito y, al final, la ecomodulación.
+- La REP de envases movilizaría decenas de millones de dólares al año desde su primer año, a un costo de fracciones de centavo por envase, y la tarifa a costo real cerraría la brecha entre lo que la AAUD recauda y lo que gasta. Las cifras exactas están en `hoja_ruta_montos`, `hoja_ruta_rep_anual` y `hoja_ruta_aseo_finanzas`.
+- Las reformas necesarias son una ley de REP, cuatro decretos reglamentarios (leyes 502, 276 y 223), resoluciones institucionales, acuerdos de las superintendencias y acuerdos municipales (`hoja_ruta_reformas`).
+- El avance se mide con catorce indicadores alineados con la plataforma de indicadores de la Ley 502 (`hoja_ruta_indicadores`), y los pasos de implementación tienen responsable, vehículo legal y semestre (`hoja_ruta_pasos`).
+
+Al citar una cifra en un tablero, conviene tomarla de la base de `data/outputs/` y no del texto de esta guía, porque las bases se actualizan cuando se corrige una memoria. Los textos de los documentos sí sirven para redactar los mensajes y las notas explicativas.
+
 ## Supuestos que un tablero no debería ocultar
 
 - Las cifras de las cuentas nacionales están a precios corrientes; las tasas de crecimiento no descuentan la inflación. El año 2024 es provisional.
