@@ -98,7 +98,7 @@ tabla_pasos <- function(i) {
 
 # Resumen ejecutivo {.unnumbered}
 
-La transición hacia una economía circular, en la que los materiales se mantienen en uso en lugar de terminar en un relleno sanitario, necesita dinero. Hace falta pagar la recolección separada de los residuos, su clasificación y su reciclaje, invertir en plantas y equipos y dar acceso al crédito a los recicladores y a las pequeñas empresas que quieren participar. Hoy ese dinero no alcanza. El servicio de aseo de la región metropolitana recauda poco más de la mitad de lo que cuesta, y el sistema de residuos no recibe ningún aporte de quienes ponen en el mercado los productos que se convierten en residuo. Esta Hoja de Ruta propone cómo movilizar esos recursos en Panamá entre 2027 y 2030 por medio de catorce instrumentos económicos y financieros, y funciona como un manual para las instituciones que deben aplicarlos. Para cada instrumento explica qué es y cómo funciona, quién hace qué, los pasos de su implementación con su responsable y su plazo, cuánto cuesta y quién paga, qué riesgos tiene y cómo se medirá.
+La transición hacia una economía circular, en la que los materiales se mantienen en uso en lugar de terminar en un relleno sanitario, necesita dinero. Hace falta pagar la recolección separada de los residuos, su clasificación y su reciclaje, invertir en plantas y equipos y dar acceso al crédito a los recicladores y a las pequeñas empresas que quieren participar. Hoy ese dinero no es suficiente. El servicio de aseo de la región metropolitana recauda poco más de la mitad de lo que cuesta, y el sistema de residuos no recibe ningún aporte de quienes ponen en el mercado los productos que se convierten en residuo. Esta Hoja de Ruta propone cómo movilizar esos recursos en Panamá entre 2027 y 2030 por medio de catorce instrumentos económicos y financieros, y funciona como un manual para las instituciones que deben aplicarlos. Para cada instrumento explica qué es y cómo funciona, quién es responsable de qué, los pasos de su implementación y su plazo, cuánto cuesta y quién paga, qué riesgos tiene y cómo se medirá.
 
 La propuesta parte de dos estudios previos. El primero caracterizó con estadísticas oficiales los siete sectores de política donde la circularidad es más relevante, que son los seis que prioriza la Hoja de Ruta de Economía Circular del Ministerio de Ambiente y el turismo, y propuso los catorce instrumentos [@vargas2026SectoresPriorizados]. El segundo evaluó su factibilidad y concluyó que casi todas las facultades legales que requieren ya existen en leyes vigentes, aunque faltan los reglamentos que las pongan en operación [@vargas2026Factibilidad].
 
@@ -195,15 +195,13 @@ tribble(
 
 Panamá decidió el rumbo de su transición hacia la economía circular con la Ley 502 de 2025, que declara la REP como uno de sus mecanismos y ordena un Plan Estratégico Nacional de Economía Circular [@panama2025Ley502, arts. 2 y 10]. Una ley marco como esa fija objetivos, pero no dice cuánto costará alcanzarlos, quién pagará ni por medio de qué instituciones. Esta Hoja de Ruta responde esas preguntas. Propone un conjunto de instrumentos económicos y financieros, los diseña para la realidad institucional, legal y financiera del país, los ordena en el tiempo y descompone cada uno en pasos concretos.
 
-La Hoja de Ruta es el tercer documento de una secuencia. El primero relacionó las 80 actividades económicas de las cuentas nacionales con siete sectores de política, caracterizó cada uno con indicadores de producción, empleo, comercio, emisiones y residuos, y propuso catorce instrumentos [@vargas2026SectoresPriorizados]. El segundo evaluó la factibilidad política y técnica de esos instrumentos, estimó su efecto sobre los precios, revisó las capacidades de las instituciones públicas y analizó el sistema financiero [@vargas2026Factibilidad]. Este documento toma los resultados de ambos y los convierte en un plan de acción. Para que pueda leerse sin consultar los anteriores, la sección de antecedentes resume lo que hace falta saber de ellos.
+La Hoja de Ruta es el tercero de tres documentos que conforman esta secuencia. El primero relacionó las 80 actividades económicas de las cuentas nacionales con siete sectores de política, caracterizó cada uno con indicadores de producción, empleo, comercio, emisiones y residuos, y propuso catorce instrumentos económicos y financieros para mejorar la circularidad [@vargas2026SectoresPriorizados]. El segundo evaluó la factibilidad política y técnica de esos instrumentos, estimó su efecto sobre los precios, revisó las capacidades de las instituciones públicas y analizó el sistema financiero [@vargas2026Factibilidad]. Este documento toma los resultados de ambos y los convierte en un plan de acción.
 
-El documento forma parte de la cooperación técnica que la CEPAL presta al Ministerio de Ambiente, financiada por el programa CEPAL-BMZ/GIZ "Promoviendo la Economía Circular". Sus cálculos se documentan en memorias de cálculo públicas.[^memorias]
+El documento forma parte de la cooperación técnica que la CEPAL presta al Ministerio de Ambiente, financiada por el programa CEPAL-BMZ/GIZ "Promoviendo la Economía Circular". Sus cálculos se documentan en memorias de cálculo públicas[^memorias] y está pensado para que cada institución se oriente rápidamente en cuanto a lo que le corresponde. Las secciones de antecedentes y de arquitectura explican por qué se proponen estos instrumentos y en qué orden. Después, cada instrumento tiene su propia ficha dentro del paso al que pertenece. Como muestra el @tbl-lectura, todas las fichas siguen la misma estructura, de modo que el lector que busca, por ejemplo, qué debe hacer la aduana o cuánto pagará un productor encuentre la respuesta en el mismo lugar de cada ficha. Las secciones finales reúnen lo transversal, que son los actores y sus roles, las fuentes de financiamiento, las reformas normativas, los riesgos, la articulación con otras políticas y los indicadores.
 
 [^memorias]: Las memorias de cálculo están disponibles en <https://renatovargas.github.io/pan-ecirc/materiales/calculos/>. Las de este documento son la 10 a la 14.
 
-## Cómo usar esta Hoja de Ruta
 
-El documento está pensado para que cada institución encuentre rápido lo que le toca. Las secciones de antecedentes y de arquitectura explican por qué se proponen estos instrumentos y en qué orden. Después, cada instrumento tiene su propia ficha dentro del paso al que pertenece. Como muestra el @tbl-lectura, todas las fichas siguen la misma estructura, de modo que quien busca, por ejemplo, qué debe hacer la aduana o cuánto pagará un productor encuentra la respuesta en el mismo lugar de cada ficha. Las secciones finales reúnen lo transversal, que son los actores y sus roles, las fuentes de financiamiento, las reformas normativas, los riesgos, la articulación con otras políticas y los indicadores.
 
 ```{r}
 #| label: tbl-lectura
@@ -264,7 +262,7 @@ composicion |>
 
 *Fuente: elaboración propia con datos del Banco Mundial [@worldbank2026wwaste].*
 
-Recuperar esos materiales cuesta dinero, y hoy nadie paga lo suficiente. El Plan Nacional de Gestión Integral de Residuos estimó en 2017 que un modelo moderno de gestión costaría en promedio B/.84,31 por tonelada, de los cuales la venta de materiales y energía cubriría unos B/.15, y constató que el sistema de residuos no recibía ningún financiamiento de la REP [@aaud2017PNGIR, pp. 123 y 266]. En la región metropolitana, la AAUD recaudó en 2025 B/.35,2 millones por la tasa de aseo y gastó B/.60,6 millones [@estrella2026AAUDMorosidad]. Los instrumentos de esta Hoja de Ruta existen para cerrar esa brecha haciendo que quienes ponen productos en el mercado paguen la gestión de sus residuos y que el servicio de aseo cobre lo que cuesta, y, además, abriendo el acceso al crédito a quienes invierten en recuperar materiales.
+Recuperar esos materiales cuesta dinero, y hoy no se paga lo suficiente. El Plan Nacional de Gestión Integral de Residuos estimó en 2017 que un modelo moderno de gestión costaría en promedio B/.84,31 por tonelada, de los cuales la venta de materiales y energía cubriría unos B/.15, y constató que el sistema de residuos no recibía ningún financiamiento de la REP [@aaud2017PNGIR, pp. 123 y 266]. En la región metropolitana, la AAUD recaudó en 2025 B/.35,2 millones por la tasa de aseo y gastó B/.60,6 millones [@estrella2026AAUDMorosidad]. Los instrumentos de esta Hoja de Ruta existen para cerrar esa brecha haciendo que quienes ponen productos en el mercado paguen la gestión de sus residuos y que el servicio de aseo cobre lo que cuesta, y, además, abriendo el acceso al crédito a quienes invierten en recuperar materiales.
 
 ## Los sectores de política
 
@@ -465,7 +463,7 @@ pasos |>
 
 ## Resumen del diseño
 
-El @tbl-diseno reúne en un solo lugar el diseño de los catorce instrumentos, ordenados por el año en que entrarían en operación, con sus parámetros principales, su meta y su monto de referencia. Es el cuadro de consulta de la Hoja de Ruta; las secciones siguientes desarrollan cada fila.
+El @tbl-diseno muestra el diseño de los catorce instrumentos, ordenados por el año en que entrarían en operación, con sus parámetros principales, su meta y su monto de referencia. Es el cuadro de consulta de la Hoja de Ruta; las secciones siguientes desarrollan cada fila.
 
 ```{r}
 #| label: tbl-diseno
@@ -926,7 +924,7 @@ roles |>
 
 *Fuente: elaboración propia con base en los pasos de implementación y en las funciones legales de cada institución. Los instrumentos están ordenados por su año de entrada en operación.*
 
-## Qué le toca a cada actor
+## Qué le corresponde a cada actor
 
 **Autoridad de Aseo Urbano y Domiciliario.** Lidera la tarifa a costo real, la REP, el depósito, la ecomodulación y la formalización de los recicladores. Dicta las normas de REP por flujo, autoriza y fiscaliza los sistemas colectivos y el administrador del depósito, aprueba el pliego tarifario con consulta ciudadana y opera el sistema de información de residuos. Su primera tarea es sanear sus finanzas con la tarifa escalonada, separar en su contabilidad los recursos de la tasa de los que provengan de la REP y reducir la morosidad con el cobro en la factura eléctrica.
 

@@ -95,6 +95,12 @@ tema_grafico <- function() {
 # tamano: tamaño de letra.
 tabla_ft_es <- function(x, digitos = 1, enteros = NULL, anchos_cm = NULL,
                         lineas_tenues = FALSE, tamano = 8) {
+  # En la página web la letra sube dos puntos para leerse en pantalla; Word
+  # y las presentaciones (revealjs) conservan el tamaño indicado
+  if (isTRUE(knitr::pandoc_to() %in% c("html", "html4", "html5"))) {
+    tamano <- tamano + 2
+  }
+
   tabla <- x |>
     # Los enteros pasan a numéricos para usar el mismo formato que los decimales
     mutate(across(where(is.integer), as.numeric)) |>
