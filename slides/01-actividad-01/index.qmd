@@ -13,6 +13,13 @@ format:
     theme: [simple, ../pstyles.scss]
     slide-number: c/t
     footer: "Economía circular en Panamá: sectores priorizados, metodología y plan de trabajo"
+  pptx:
+    reference-doc: ../../assets/reference.pptx
+    output-file: 01-actividad-01.pptx
+    slide-level: 2
+    fig-dpi: 150
+    filters:
+      - ../pptx.lua
 execute:
   echo: false
   warning: false

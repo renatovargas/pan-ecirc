@@ -104,6 +104,11 @@ tabla_ft_es <- function(x, digitos = 1, enteros = NULL, anchos_cm = NULL,
   if (isTRUE(knitr::pandoc_to() %in% c("html", "html4", "html5"))) {
     tamano <- tamano + 2
   }
+  # En PowerPoint la diapositiva mide 720 x 405 puntos y revealjs escala su
+  # lienzo de 1050 x 700 píxeles; 0,7 conserva la proporción de los cuadros
+  if (isTRUE(knitr::pandoc_to() == "pptx")) {
+    tamano <- round(tamano * 0.7, 1)
+  }
 
   tabla <- x |>
     # Los enteros pasan a numéricos para usar el mismo formato que los decimales

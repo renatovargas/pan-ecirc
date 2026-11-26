@@ -8,7 +8,7 @@ subtitle: "Instrumentos económicos para la economía circular en Panamá"
 ::::
 
 ::::{.slide-links}
-[⛶ Pantalla completa](../../../slides/02-factibilidad/index.html){target="_blank"}
+[⛶ Pantalla completa](../../../slides/02-factibilidad/index.html){target="_blank"} · [⬇ Descargar PowerPoint](../../../slides/02-factibilidad/02-factibilidad.pptx){download="02-factibilidad.pptx"}
 ::::
 
 ## Objetivos

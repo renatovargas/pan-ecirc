@@ -8,7 +8,7 @@ subtitle: "Instrumentos económicos para la economía circular en Panamá"
 ::::
 
 ::::{.slide-links}
-[⛶ Pantalla completa](../../../slides/03-hoja-de-ruta/index.html){target="_blank"}
+[⛶ Pantalla completa](../../../slides/03-hoja-de-ruta/index.html){target="_blank"} · [⬇ Descargar PowerPoint](../../../slides/03-hoja-de-ruta/03-hoja-de-ruta.pptx){download="03-hoja-de-ruta.pptx"}
 ::::
 
 ## Objetivos
