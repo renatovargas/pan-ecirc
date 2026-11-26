@@ -7,6 +7,7 @@ project:
     - "*.qmd"
     - "materiales/**/*.qmd"
     - "slides/**/*.qmd"
+    - "!GUIA-DE-DATOS.md"
     - "!refs/"
   resources:
     - data/

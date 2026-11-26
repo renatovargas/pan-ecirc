@@ -228,7 +228,7 @@ fbkf_origen |>
     `FBKF estimada que realiza` = sum(d[[3]], na.rm = TRUE),
     `Tasa de inversión (%)` = fbkf_tasa_total
   )))() |>
-  tabla_slide(tamano = 13, digitos = 1, enteros = c("Bienes de capital que produce", "FBKF estimada que realiza")) |>
+  tabla_slide(tamano = 13, ancho_pptx = 4.4, digitos = 1, enteros = c("Bienes de capital que produce", "FBKF estimada que realiza")) |>
   colformat_double(j = "FBKF estimada que realiza", digits = 0, big.mark = ".", decimal.mark = ",", na_str = "n. a.") |>
   colformat_double(j = "Tasa de inversión (%)", digits = 1, big.mark = ".", decimal.mark = ",", na_str = "n. a.") |>
   bold(i = 9, part = "body") |>
@@ -294,7 +294,7 @@ estructura_emp |>
     Grande = grande,
     `Grandes (%)` = pct_grande
   ) |>
-  tabla_slide(tamano = 13, digitos = 1, enteros = c("Empresas", "Micro", "Pequeña", "Mediana", "Grande"))
+  tabla_slide(tamano = 13, ancho_pptx = 4.4, digitos = 1, enteros = c("Empresas", "Micro", "Pequeña", "Mediana", "Grande"))
 ```
 :::
 ::: {.column width="45%" .smaller}

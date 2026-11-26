@@ -45,10 +45,10 @@ armar_reference_pptx <- function(salida = "assets/reference.pptx") {
     c('<p:titleStyle><a:lvl1pPr algn="ctr"', '<p:titleStyle><a:lvl1pPr algn="l"'),
     c('<a:defRPr sz="3300" kern="1200"><a:solidFill><a:schemeClr val="tx1"/>',
       '<a:defRPr sz="2600" b="1" kern="1200"><a:solidFill><a:srgbClr val="009EDB"/>'),
-    c('<a:defRPr sz="2400" kern="1200">', '<a:defRPr sz="1800" kern="1200">'),
-    c('<a:defRPr sz="2100" kern="1200">', '<a:defRPr sz="1600" kern="1200">'),
+    c('<a:defRPr sz="2400" kern="1200">', '<a:defRPr sz="1600" kern="1200">'),
+    c('<a:defRPr sz="2100" kern="1200">', '<a:defRPr sz="1400" kern="1200">'),
     c('<a:defRPr sz="1800" kern="1200"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="+mn-lt"/><a:ea typeface="+mn-ea"/><a:cs typeface="+mn-cs"/></a:defRPr></a:lvl3pPr>',
-      '<a:defRPr sz="1400" kern="1200"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="+mn-lt"/><a:ea typeface="+mn-ea"/><a:cs typeface="+mn-cs"/></a:defRPr></a:lvl3pPr>')
+      '<a:defRPr sz="1200" kern="1200"><a:solidFill><a:schemeClr val="tx1"/></a:solidFill><a:latin typeface="+mn-lt"/><a:ea typeface="+mn-ea"/><a:cs typeface="+mn-cs"/></a:defRPr></a:lvl3pPr>')
   ))
 
   # Encabezado de sección con fondo azul y texto blanco
@@ -58,6 +58,18 @@ armar_reference_pptx <- function(salida = "assets/reference.pptx") {
     c('<a:defRPr sz="3000" b="1" cap="all"/>',
       '<a:defRPr sz="3000" b="1" cap="none"><a:solidFill><a:srgbClr val="FFFFFF"/></a:solidFill></a:defRPr>'),
     c('<a:schemeClr val="tx1"><a:tint val="75000"/></a:schemeClr>', '<a:srgbClr val="FFFFFF"/>')
+  ))
+
+  # Columnas ("Two Content" y "Comparison") con el mismo cuerpo pequeño
+  editar("ppt/slideLayouts/slideLayout4.xml", list(
+    c('<a:lvl1pPr><a:defRPr sz="2100"/>', '<a:lvl1pPr><a:defRPr sz="1400"/>'),
+    c('<a:lvl2pPr><a:defRPr sz="1800"/>', '<a:lvl2pPr><a:defRPr sz="1200"/>'),
+    c('<a:lvl3pPr><a:defRPr sz="1500"/>', '<a:lvl3pPr><a:defRPr sz="1100"/>')
+  ))
+  editar("ppt/slideLayouts/slideLayout5.xml", list(
+    c('<a:lvl1pPr><a:defRPr sz="1800"/>', '<a:lvl1pPr><a:defRPr sz="1400"/>'),
+    c('<a:lvl2pPr><a:defRPr sz="1500"/>', '<a:lvl2pPr><a:defRPr sz="1200"/>'),
+    c('<a:lvl3pPr><a:defRPr sz="1350"/>', '<a:lvl3pPr><a:defRPr sz="1100"/>')
   ))
 
   archivos <- list.files(dir_x, recursive = TRUE, all.files = TRUE, no.. = TRUE)

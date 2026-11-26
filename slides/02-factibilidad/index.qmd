@@ -352,7 +352,7 @@ Seis funciones por institución, con su base legal en quince instituciones.
 indice_inst |>
   head(10) |>
   rename(Institución = institucion, `Índice de capacidad legal (%)` = indice) |>
-  tabla_slide(tamano = 14, digitos = 0)
+  tabla_slide(tamano = 14, ancho_pptx = 4.4, digitos = 0)
 ```
 :::
 ::: {.column width="45%" .smaller}

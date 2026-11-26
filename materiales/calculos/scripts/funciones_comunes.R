@@ -92,13 +92,32 @@ tema_grafico <- function() {
     theme(legend.position = "bottom", legend.title = element_blank())
 }
 
+# Anchos de columna (pulgadas) que suman `ancho`: las columnas angostas, como
+# las de números, conservan su ancho natural y las de texto se reparten el
+# resto en partes iguales; si todo cabe, se amplían en proporción
+anchos_pptx <- function(tabla, ancho) {
+  w <- pmax(dim_pretty(tabla)$widths, 0.5)
+  if (sum(w) <= ancho) return(w * ancho / sum(w))
+  libre <- rep(TRUE, length(w))
+  repeat {
+    parte <- (ancho - sum(w[!libre])) / sum(libre)
+    cabe <- libre & w <= parte
+    if (!any(cabe)) break
+    libre[cabe] <- FALSE
+  }
+  w[libre] <- parte
+  w
+}
+
 # Tabla de flextable con formato español, ajustada al ancho de la página
 #
 # anchos_cm: anchos de columna en cm (layout fijo; Word los respeta).
 # lineas_tenues: separa los renglones con líneas finas gris claro.
 # tamano: tamaño de letra.
+# ancho_pptx: ancho en pulgadas del cuadro en PowerPoint (9 = diapositiva
+#   completa; 4,4 = una de dos columnas).
 tabla_ft_es <- function(x, digitos = 1, enteros = NULL, anchos_cm = NULL,
-                        lineas_tenues = FALSE, tamano = 8) {
+                        lineas_tenues = FALSE, tamano = 8, ancho_pptx = 9) {
   # En la página web la letra sube dos puntos para leerse en pantalla; Word
   # y las presentaciones (revealjs) conservan el tamaño indicado
   if (isTRUE(knitr::pandoc_to() %in% c("html", "html4", "html5"))) {
@@ -135,7 +154,13 @@ tabla_ft_es <- function(x, digitos = 1, enteros = NULL, anchos_cm = NULL,
     )
   }
 
-  if (is.null(anchos_cm)) {
+  if (isTRUE(knitr::pandoc_to() == "pptx")) {
+    # PowerPoint no aplica el ajuste automático y deja las columnas en su
+    # ancho mínimo; se fijan anchos que llenen el espacio disponible
+    tabla |>
+      set_table_properties(layout = "fixed") |>
+      width(width = anchos_pptx(tabla, ancho_pptx))
+  } else if (is.null(anchos_cm)) {
     set_table_properties(tabla, layout = "autofit", width = 1)
   } else {
     stopifnot(length(anchos_cm) == ncol(x))
