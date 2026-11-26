@@ -51,10 +51,14 @@ set_flextable_defaults(
 # Convierte un data frame en flextable con formato uniforme.
 # digitos: decimales de las columnas numéricas (no enteras).
 tabla_ft <- function(x, digitos = 1) {
+  # Mismo tamaño de letra que los cuadros de los documentos en la página web
+  # (8 puntos más los dos que suma tabla_ft_es en HTML)
+  tamano <- if (isTRUE(knitr::pandoc_to() %in% c("html", "html4", "html5"))) 10 else 9
   x |>
     flextable() |>
     colformat_double(digits = digitos) |>
     theme_booktabs() |>
+    fontsize(size = tamano, part = "all") |>
     autofit()
 }
 
